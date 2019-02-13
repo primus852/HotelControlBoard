@@ -1,12 +1,96 @@
 <!DOCTYPE html>
-<html>
-    <head>
-        <meta charset="UTF-8">
-        <title>{% block title %}Welcome!{% endblock %}</title>
-        {% block stylesheets %}{% endblock %}
-    </head>
-    <body>
-        {% block body %}{% endblock %}
-        {% block javascripts %}{% endblock %}
-    </body>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>HotelControlBoard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <!-- LOAD CSS FILES -->
+    <link type="text/css" rel="stylesheet" href="//fonts.googleapis.com/css?family=Roboto:400,100,300,500"/>
+    <link type="text/css" rel="stylesheet" href="{{ asset('node_modules/bootstrap/dist/css/bootstrap.min.css') }}">
+    <link type="text/css" rel="stylesheet" href="{{ asset('node_modules/font-awesome/css/font-awesome.min.css') }}">
+    <link type="text/css" rel="stylesheet" href="{{ asset('node_modules/animate.css/animate.min.css') }}">
+    <link type="text/css" rel="stylesheet" href="{{ asset('node_modules/perfect-scrollbar/css/perfect-scrollbar.css') }}"/>
+    <link type="text/css" rel="stylesheet" href="{{ asset('node_modules/noty/lib/noty.css') }}">
+    <link type="text/css" rel="stylesheet" href="{{ asset('node_modules/x0popup/dist/x0popup.min.css') }}">
+    <link type="text/css" rel="stylesheet" href="{{ asset('node_modules/tooltipster/dist/css/tooltipster.bundle.min.css') }}">
+    <link type="text/css" rel="stylesheet" href="{{ asset('assets/vendor/wiki/css/buttons.css') }}"/>
+    <link type="text/css" rel="stylesheet" href="{{ asset('assets/vendor/wiki/css/modal.css') }}"/>
+    <link type="text/css" rel="stylesheet" href="{{ asset('assets/css/style.min.css') }}"/>
+    <link type="text/css" rel="stylesheet" href="{{ asset('assets/css/reset.css') }}"/>
+    {% block stylesheets %}{% endblock %}
+    <link type="text/css" rel="stylesheet" href="{{ asset('assets/css/overrides.min.css') }}"/>
+</head>
+<body>
+
+<aside id="sidebar" class="nano">
+    <div class="nano-content" id="pScrollerMenu">
+        <div class="logo-container"><img src="{{ asset('assets/img/logo.png') }}" style="height:30px;" alt="Logo"/>HotelControlBoard
+            <div class="mw-version">User: {{ app.user ? app.user.username : 'NONE' }} <a href="{{ path('fos_user_security_logout') }}"><i class="fa fa-power-off tt" title="Logout"></i> </a> - v{{ render(controller('App\\Controller\\RenderController::renderVersionAction')) }}<a href="{{ path('changelog') }}">&nbsp;<i class="fa fa-file tt"
+                                                                                                                                                                                                                          title="Changelog"></i></a></div>
+        </div>
+        <div class="menu-segment">
+            <div class="row">
+                <div class="col-12">
+
+                </div>
+            </div>
+            <br/>
+            <ul>
+                <li>
+                    <div class="title" style="float:left;"><p id="startClock"></p> (KW {{ "now"|date("W") }})</div>
+                </li>
+            </ul>
+        </div>
+        <br/>
+        <div class="separator"></div>
+        <menu class="menu-segment">
+            <ul>
+                <li id="contentMain">
+                    <a href="#" class="mLink">
+                        <i class="fa fa-list"></i> Stundenzettel
+                    </a>
+                </li>
+            </ul>
+        </menu>
+        <div class="separator"></div>
+        <menu class="menu-segment">
+            <ul>
+                <li>
+                    <a href="#" class="mLink toggleTree">
+                        <i class="fa fa-chevron-right"></i> Verwaltung
+                    </a>
+                    <ul class="treeMenu">
+                        {% if is_granted('ROLE_ADMIN') %}
+                            <li id="contentSettings" class="treeItem">
+                                <a href="" class="mLink">
+                                    <i class="fa fa-users"></i> Alle Benutzer
+                                </a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </li>
+            </ul>
+        </menu>
+        <div class="bottom-padding"></div>
+    </div>
+</aside>
+<!-- Slide in Window -->
+
+{% block body %}{% endblock %}
+<!-- LOAD JS FILES -->
+
+<script type="text/javascript" src="{{ asset('node_modules/jquery/dist/jquery.min.js') }}"></script>
+<script type="text/javascript" src="{{ asset('node_modules/popper.js/dist/umd/popper.min.js') }}"></script>
+<script type="text/javascript" src="{{ asset('node_modules/bootstrap/dist/js/bootstrap.min.js') }}"></script>
+<script type="text/javascript" src="{{ asset('node_modules/x0popup/dist/x0popup.min.js') }}"></script>
+<script type="text/javascript" src="{{ asset('node_modules/perfect-scrollbar/dist/perfect-scrollbar.min.js') }}"></script>
+<script type="text/javascript" src="{{ asset('node_modules/noty/lib/noty.min.js') }}"></script>
+<script type="text/javascript" src="{{ asset('node_modules/tooltipster/dist/js/tooltipster.bundle.min.js') }}"></script>
+<script type="text/javascript" src="{{ asset('assets/js/hashchange.min.js') }}"></script>
+{% block javascripts %}{% endblock %}
+<script type="text/javascript" src="{{ asset('assets/js/script.js') }}"></script>
+</body>
 </html>

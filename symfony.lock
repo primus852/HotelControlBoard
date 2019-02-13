@@ -68,6 +68,9 @@
     "egulias/email-validator": {
         "version": "2.1.7"
     },
+    "erusev/parsedown": {
+        "version": "1.7.1"
+    },
     "friendsofsymfony/user-bundle": {
         "version": "v2.1.2"
     },

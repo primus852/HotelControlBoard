@@ -1,0 +1,56 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <main id="main">
+        <div class="overlay"></div>
+        <header class="header">
+            <h1 class="page-title">
+                <a class="sidebar-toggle-btn trigger-toggle-sidebar">
+                    <span class="line"></span>
+                    <span class="line"></span>
+                    <span class="line"></span>
+                    <span class="line line-angle1"></span>
+                    <span class="line line-angle2"></span>
+                </a>Ratetypes
+                <a class="btn btn-info btn-sm rounded-0" data-url="{{ path('ajaxAddRatetype') }}" id="js-add-rate" href="#"><i class="fa fa-plus"></i> Add Ratetype</a>
+            </h1>
+        </header>
+        <div id="main-nano-wrapper" class="nano">
+            <div class="nano-content" id="perfectScroll">
+                <div class="container-fluid">
+                    <div class="row" style="padding-left:15px;">
+                        <div class="col-12">
+                            {% for rate in rates %}
+                                <div class="row table-font" style="border-bottom:1px solid #ccc;">
+                                    <div class="col-2">{{ rate.nameShort }}</div>
+                                    <div class="col-8">{{ rate.name }}</div>
+                                    <div class="col-1">{% if rate.isBase == true %}<i class="fa fa-check"></i>{% else %}<i class="fa fa-remove"></i>{% endif %}</div>
+                                    <div class="col-1">
+                                        <a href="#"
+                                           class="btn btn-success btn-sm rounded-0 tt clickable"
+                                           data-url="EDITPATH"
+                                           data-hash="details-ratetype-{{ rate.id }}" data-trigger="{{ rate.id }}">
+                                            <i class="fa fa-info-circle"></i> Details
+                                        </a>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <br/>
+        </div>
+    </main>
+{% endblock %}
+
+{% block stylesheets %}
+
+{% endblock stylesheets %}
+
+{% block javascripts %}
+    <script>
+        var GetNav = "contentSettingsRates";
+    </script>
+{% endblock javascripts %}
+

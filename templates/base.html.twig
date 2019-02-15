@@ -16,8 +16,7 @@
     <link type="text/css" rel="stylesheet" href="{{ asset('node_modules/noty/lib/noty.css') }}">
     <link type="text/css" rel="stylesheet" href="{{ asset('node_modules/x0popup/dist/x0popup.min.css') }}">
     <link type="text/css" rel="stylesheet" href="{{ asset('node_modules/tooltipster/dist/css/tooltipster.bundle.min.css') }}">
-    <link type="text/css" rel="stylesheet" href="{{ asset('assets/vendor/wiki/css/buttons.css') }}"/>
-    <link type="text/css" rel="stylesheet" href="{{ asset('assets/vendor/wiki/css/modal.css') }}"/>
+    <link type="text/css" rel="stylesheet" href="{{ asset('assets/css/tinymce.min.css') }}"/>
     <link type="text/css" rel="stylesheet" href="{{ asset('assets/css/style.min.css') }}"/>
     <link type="text/css" rel="stylesheet" href="{{ asset('assets/css/reset.css') }}"/>
     {% block stylesheets %}{% endblock %}
@@ -28,8 +27,9 @@
 <aside id="sidebar" class="nano">
     <div class="nano-content" id="pScrollerMenu">
         <div class="logo-container"><img src="{{ asset('assets/img/logo.png') }}" style="height:30px;" alt="Logo"/>HotelControlBoard
-            <div class="mw-version">User: {{ app.user ? app.user.username : 'NONE' }} <a href="{{ path('fos_user_security_logout') }}"><i class="fa fa-power-off tt" title="Logout"></i> </a> - v{{ render(controller('App\\Controller\\RenderController::renderVersionAction')) }}<a href="{{ path('changelog') }}">&nbsp;<i class="fa fa-file tt"
-                                                                                                                                                                                                                          title="Changelog"></i></a></div>
+            <div class="mw-version">User: {{ app.user ? app.user.username : 'NONE' }} <a href="{{ path('fos_user_security_logout') }}"><i class="fa fa-power-off tt" title="Logout"></i> </a> -
+                v{{ render(controller('App\\Controller\\RenderController::renderVersionAction')) }}<a href="{{ path('changelog') }}">&nbsp;<i class="fa fa-file tt"
+                                                                                                                                              title="Changelog"></i></a></div>
         </div>
         <div class="menu-segment">
             <div class="row">
@@ -56,24 +56,29 @@
             </ul>
         </menu>
         <div class="separator"></div>
-        <menu class="menu-segment">
-            <ul>
-                <li>
-                    <a href="#" class="mLink toggleTree">
-                        <i class="fa fa-chevron-right"></i> Verwaltung
-                    </a>
-                    <ul class="treeMenu">
-                        {% if is_granted('ROLE_ADMIN') %}
-                            <li id="contentSettings" class="treeItem">
-                                <a href="" class="mLink">
-                                    <i class="fa fa-users"></i> Alle Benutzer
+        {% if is_granted('ROLE_ADMIN') %}
+            <menu class="menu-segment">
+                <ul>
+                    <li>
+                        <a href="#" class="mLink toggleTree">
+                            <i class="fa fa-chevron-right"></i> Settings
+                        </a>
+                        <ul class="treeMenu">
+                            <li id="contentSettingsRoomtypes" class="treeItem">
+                                <a href="{{ path('settingsRoomtypes') }}" class="mLink">
+                                    <i class="fa fa-bed"></i> Roomtypes
                                 </a>
                             </li>
-                        {% endif %}
-                    </ul>
-                </li>
-            </ul>
-        </menu>
+                            <li id="contentSettingsRates" class="treeItem">
+                                <a href="{{ path('settingsRatetypes') }}" class="mLink">
+                                    <i class="fa fa-money"></i> Ratetypes
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </menu>
+        {% endif %}
         <div class="bottom-padding"></div>
     </div>
 </aside>

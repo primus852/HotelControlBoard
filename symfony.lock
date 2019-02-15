@@ -1,4 +1,7 @@
 {
+    "defuse/php-encryption": {
+        "version": "v2.2.1"
+    },
     "doctrine/annotations": {
         "version": "1.0",
         "recipe": {
@@ -85,6 +88,12 @@
     },
     "ocramius/proxy-manager": {
         "version": "2.2.2"
+    },
+    "primus852/simple-crypt": {
+        "version": "1.2.0"
+    },
+    "primus852/symfony-short-response": {
+        "version": "dev-master"
     },
     "psr/cache": {
         "version": "1.0.1"

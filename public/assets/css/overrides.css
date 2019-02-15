@@ -1,0 +1,364 @@
+
+* {
+    -webkit-border-radius: 0 !important;
+    -moz-border-radius: 0 !important;
+    border-radius: 0 !important;
+}
+
+input, select, textarea {
+    display: inline-block;
+    width: 100%;
+    border-bottom: 1px solid #ddd;
+    padding: 12px 20px 10px 10px;
+    font-size: 16px;
+}
+
+select {
+    height: 40px;
+    padding: 0;
+}
+
+label {
+    font-style: italic;
+    font-weight: 300;
+    font-size: 0.85rem;
+}
+
+.tableMT {
+    color: #333;
+    font-family: Helvetica, Arial, sans-serif;
+    width: 100%;
+    border-collapse: collapse;
+    border-spacing: 0;
+}
+
+.tableMT td, .tableMT th {
+    border: 0 none;
+    height: 15px;
+    vertical-align: middle;
+    padding: 2px;
+}
+
+.tableMT th {
+    /* Gradient Background */
+    background: linear-gradient(#333 0%, #444 100%) !important;
+    color: #FFF;
+    font-weight: bold !important;
+    text-align: center !important;
+    padding: 5px !important;
+}
+
+.tableMT td {
+    background: #FAFAFA;
+}
+
+/* Zebra Stripe Rows */
+
+.tableMT tr:nth-child(even) td {
+    background: #EEE;
+}
+
+.tableMT tr:nth-child(odd) td {
+    background: #FDFDFD;
+}
+
+/* First-child blank cells! */
+.tableMT tr td:first-child, tr th {
+    font-weight: bold !important;
+    margin-left: 10px;
+}
+
+.tableMT tr:first-child th:last-child {
+
+}
+
+.cardTransparent {
+    background: transparent !important;
+}
+
+.noty_layout_mixin, #noty_layout__top, #noty_layout__topLeft, #noty_layout__topCenter, #noty_layout__topRight, #noty_layout__bottom, #noty_layout__bottomLeft, #noty_layout__bottomCenter, #noty_layout__bottomRight, #noty_layout__center, #noty_layout__centerLeft, #noty_layout__centerRight {
+    filter: none;
+}
+
+.row-margin-bottom {
+    margin-bottom: 5px !important;
+}
+
+.row-margin-top {
+    margin-top: 5px !important;
+}
+
+.pika-single {
+    z-index: 99999999 !important;
+}
+
+.easy-autocomplete-container {
+    top: 0 !important;
+}
+
+.easy-autocomplete input {
+    display: inline-block;
+    width: 100%;
+    float: left;
+    border-bottom: 1px solid #ddd;
+    padding: 12px 20px 10px 10px;
+    font-size: 16px;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+    border-radius: 0;
+    box-shadow: none;
+    color: inherit;
+
+}
+
+.easy-autocomplete-container ul li {
+    color: #000;
+}
+
+.easy-autocomplete-container {
+    top: 39px !important;
+}
+
+#userSelect {
+    height: 37px;
+    font-size: 13px;
+}
+
+#ssvPerYear {
+    height: 30px;
+    font-size: 15px;
+}
+
+table.dataTable tbody th, table.dataTable tbody td {
+    padding: 0 !important;
+}
+
+.checkLabel {
+    position: relative;
+    top: 10px;
+}
+
+.easy-autocomplete-container > ul > li {
+    padding: 5px !important;
+}
+
+#remember_me {
+    float: left;
+}
+
+#startClock {
+    display: inline-block;
+}
+
+.dataTables_processing {
+    z-index: 1000;
+    background: linear-gradient(to right, rgba(255, 255, 255, 0) 0%, rgba(92, 184, 92, 0.9) 25%, rgba(111, 203, 111, 0.9) 75%, rgba(255, 255, 255, 0) 100%) !important;
+    top: 110px !important;
+    height: 100% !important;
+}
+
+.offsetProcess {
+    top: 150px;
+}
+
+.form-check {
+    margin-left: 1.5rem !important;
+}
+
+.main-mobile {
+    left: 0 !important;
+}
+
+.main-nano-mobile {
+    top: 15px !important;
+}
+
+.long-input {
+    width: 350px !important;
+}
+
+.short-input {
+    width: 75px !important;
+}
+
+.noty_buttons {
+    margin: 5px;
+}
+
+#noty_layout__center {
+    width: 1000px;
+    -webkit-transform: none;
+    transform: none;
+    position: fixed;
+    top: 10px;
+    left: calc(50% - 500px);
+}
+
+.device-alert-missing-right {
+    position: absolute;
+    top: 50%;
+    right: 5px;
+}
+
+.device-alert-missing-left {
+    position: absolute;
+    top: 50%;
+    left: 5px;
+}
+
+.switch-light {
+    display: inline-block;
+}
+
+.editToggle, .editToggleSelect {
+    color: #888 !important;
+    cursor: text !important;
+}
+
+.editable-click, a.editable-click {
+    line-height: 0.8em !important;
+}
+
+.hideEdit, .hideEditSecond {
+    display: none;
+}
+
+.subItem {
+    padding-left: 30px;
+}
+
+.editableform .form-control {
+    width: 100%;
+}
+
+.badge-purple {
+    background-color: #703bd4;
+    color: #fff;
+}
+
+.btn-purple {
+    color: #ffffff;
+    background-color: #703BD4;
+    border-color: #703BD4;
+}
+
+.btn-purple:hover,
+.btn-purple:focus,
+.btn-purple:active,
+.btn-purple.active,
+.open .dropdown-toggle.btn-purple {
+    color: #ffffff;
+    background-color: #49247A;
+    border-color: #703BD4;
+}
+
+.btn-purple:active,
+.btn-purple.active,
+.open .dropdown-toggle.btn-purple {
+    background-image: none;
+}
+
+.btn-purple.disabled,
+.btn-purple[disabled],
+fieldset[disabled] .btn-purple,
+.btn-purple.disabled:hover,
+.btn-purple[disabled]:hover,
+fieldset[disabled] .btn-purple:hover,
+.btn-purple.disabled:focus,
+.btn-purple[disabled]:focus,
+fieldset[disabled] .btn-purple:focus,
+.btn-purple.disabled:active,
+.btn-purple[disabled]:active,
+fieldset[disabled] .btn-purple:active,
+.btn-purple.disabled.active,
+.btn-purple[disabled].active,
+fieldset[disabled] .btn-purple.active {
+    background-color: #703BD4;
+    border-color: #703BD4;
+}
+
+.btn-purple .badge {
+    color: #703BD4;
+    background-color: #ffffff;
+}
+
+.bootbox-close-button {
+    position: absolute !important;
+    right: 10px !important;
+}
+
+.editableBootboxClient {
+    line-height: .8em !important;
+    color: #373a3c !important;
+    border-bottom: dashed 1px #c6c6c6 !important;
+}
+
+.bg-outlier {
+    background-color: #80a73d !important;
+}
+
+.chart-row {
+    padding-bottom: 15px;
+}
+
+.editBtn {
+    position: absolute;
+    top: -40px;
+    left: 70px;
+}
+
+.x0p.default .text {
+    font-size: 16px !important;
+}
+
+.fa {
+    font-family: "Helvetica Neue", Helvetica, FontAwesome, Arial, sans-serif !important;
+}
+
+.nm-circle {
+    margin-left: 15px !important;
+}
+
+.jqstooltip {
+    width: 50px !important;
+    height: 25px !important;
+}
+
+.col-toc {
+    -webkit-box-flex: 0 !important;
+    -webkit-flex: 0 0 13% !important;
+    -ms-flex: 0 0 13% !important;
+    flex: 0 0 13% !important;
+    max-width: 13% !important;
+}
+
+.col-doc {
+    -webkit-box-flex: 0 !important;
+    -webkit-flex: 0 0 87% !important;
+    -ms-flex: 0 0 87% !important;
+    flex: 0 0 87% !important;
+    max-width: 87% !important;
+}
+
+.js-load-holiday {
+    top: 0 !important;
+    position: absolute !important;
+    font-size: 15px !important;
+    color: #FFAA10 !important;
+}
+
+.unlockFieldChild::selection {
+    background-color: transparent;
+}
+
+.table-font {
+    font-size: 1.2em;
+    line-height: 1.5em;
+    font-weight: 100;
+}
+.table-font-thicker {
+    font-size: 1.2em;
+    line-height: 1.5em;
+    font-weight: 700;
+}

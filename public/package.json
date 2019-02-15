@@ -1,0 +1,35 @@
+{
+  "name": "hcb",
+  "version": "1.0.0",
+  "description": "Hotel Control Board",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/primus852/HotelControlBoard.git"
+  },
+  "keywords": [
+    "HCB",
+    "Hotel",
+    "Rates"
+  ],
+  "author": "Torsten Wolter <tow.berlin@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/primus852/HotelControlBoard/issues"
+  },
+  "homepage": "https://github.com/primus852/HotelControlBoard#readme",
+  "dependencies": {
+    "animate.css": "^3.7.0",
+    "bootstrap": "^4.2.1",
+    "font-awesome": "^4.7.0",
+    "jquery": "^3.3.1",
+    "noty": "^3.2.0-beta",
+    "perfect-scrollbar": "^1.4.0",
+    "popper.js": "^1.14.7",
+    "tooltipster": "^4.2.6",
+    "x0popup": "^0.3.3"
+  }
+}

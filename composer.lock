@@ -4,8 +4,71 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "1a3ab5f9c2faea6c403eb66dfc423bb6",
+    "content-hash": "47fb4b4f7160018a2699fa53ba7aef34",
     "packages": [
+        {
+            "name": "defuse/php-encryption",
+            "version": "v2.2.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/defuse/php-encryption.git",
+                "reference": "0f407c43b953d571421e0020ba92082ed5fb7620"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/defuse/php-encryption/zipball/0f407c43b953d571421e0020ba92082ed5fb7620",
+                "reference": "0f407c43b953d571421e0020ba92082ed5fb7620",
+                "shasum": ""
+            },
+            "require": {
+                "ext-openssl": "*",
+                "paragonie/random_compat": ">= 2",
+                "php": ">=5.4.0"
+            },
+            "require-dev": {
+                "nikic/php-parser": "^2.0|^3.0|^4.0",
+                "phpunit/phpunit": "^4|^5"
+            },
+            "bin": [
+                "bin/generate-defuse-key"
+            ],
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Defuse\\Crypto\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Taylor Hornby",
+                    "email": "taylor@defuse.ca",
+                    "homepage": "https://defuse.ca/"
+                },
+                {
+                    "name": "Scott Arciszewski",
+                    "email": "info@paragonie.com",
+                    "homepage": "https://paragonie.com"
+                }
+            ],
+            "description": "Secure PHP Encryption Library",
+            "keywords": [
+                "aes",
+                "authenticated encryption",
+                "cipher",
+                "crypto",
+                "cryptography",
+                "encrypt",
+                "encryption",
+                "openssl",
+                "security",
+                "symmetric key cryptography"
+            ],
+            "time": "2018-07-24T23:27:56+00:00"
+        },
         {
             "name": "doctrine/annotations",
             "version": "v1.6.0",
@@ -1537,6 +1600,83 @@
                 "service proxies"
             ],
             "time": "2018-09-27T13:45:01+00:00"
+        },
+        {
+            "name": "primus852/simple-crypt",
+            "version": "1.2.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/primus852/simple-crypt.git",
+                "reference": "478f0bc0837344e9f6c09f8e52de5c14a4b3af64"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/primus852/simple-crypt/zipball/478f0bc0837344e9f6c09f8e52de5c14a4b3af64",
+                "reference": "478f0bc0837344e9f6c09f8e52de5c14a4b3af64",
+                "shasum": ""
+            },
+            "require": {
+                "defuse/php-encryption": "^2.1",
+                "ext-openssl": "*",
+                "php": "^7.0"
+            },
+            "type": "package",
+            "autoload": {
+                "psr-4": {
+                    "primus852\\SimpleCrypt\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "GPL-3.0-or-later"
+            ],
+            "authors": [
+                {
+                    "name": "Torsten Wolter",
+                    "email": "findnibbler@gmail.com",
+                    "homepage": "https://leaguestreams.net"
+                }
+            ],
+            "description": "Simple String Crypt",
+            "time": "2018-09-21T11:58:15+00:00"
+        },
+        {
+            "name": "primus852/symfony-short-response",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/primus852/symfony-short-response.git",
+                "reference": "cda8ed53893c78fb39a4a876f1e2a6fa0ce9f5a1"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/primus852/symfony-short-response/zipball/cda8ed53893c78fb39a4a876f1e2a6fa0ce9f5a1",
+                "reference": "cda8ed53893c78fb39a4a876f1e2a6fa0ce9f5a1",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^7.0",
+                "symfony/http-foundation": "~3.4|~4.0"
+            },
+            "type": "package",
+            "autoload": {
+                "psr-4": {
+                    "primus852\\ShortResponse\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "mit"
+            ],
+            "authors": [
+                {
+                    "name": "Torsten Wolter",
+                    "email": "findnibbler@gmail.com",
+                    "homepage": "https://leaguestreams.net"
+                }
+            ],
+            "description": "Simple JSON Responses for a Symfony Project",
+            "time": "2018-09-05T07:53:34+00:00"
         },
         {
             "name": "psr/cache",
@@ -4743,7 +4883,9 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": [],
+    "stability-flags": {
+        "primus852/symfony-short-response": 20
+    },
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {

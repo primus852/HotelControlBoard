@@ -1,0 +1,72 @@
+<div class="header">
+    <div class="row">
+        <div class="col-10">
+            <h1 class="page-title"><a class="icon circle-icon fa fa-remove trigger-message-close"></a>
+                Roomtype Details
+            </h1>
+        </div>
+        <div class="col-2 text-right">
+            &nbsp;
+        </div>
+    </div>
+</div>
+<div class="messageFly-nano-wrapper nano">
+    <div class="nano-content subScroll">
+        <div class="message-container">
+            <div class="row">
+                <div class="col-12">
+                    <div class="message-box">
+                        <div class="message">
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="card">
+                                        <div class="card-header text-white bg-dark rounded-0">
+                                            <div class="row">
+                                                <div class="col-6">
+                                                    <div class="h2-wiki">Details</div>
+                                                </div>
+                                                <div class="col-6 text-right">
+                                                    <a href="#" class="btn btn-success btn-sm" id="js-update-room" data-room="{{ room.id }}"><i class="fa fa-save"></i> Save</a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="row">
+                                                <div class="col-6">
+                                                    <label for="room-name">Name</label>
+                                                    <input type="text" id="room-name" value="{{ room.name }}">
+                                                </div>
+                                                <div class="col-4">
+                                                    <label for="room-name">Short Name</label>
+                                                    <input type="text" id="room-name-short" value="{{ room.nameShort }}">
+                                                </div>
+                                                <div class="col-2">
+                                                    <label for="room-occ">Max. Occupancy</label>
+                                                    <input type="text" id="room-occ" value="{{ room.maxOccupancy }}">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tool-box">
+                            <a href="#" class="btn btn-sm btn-danger" id="js-remove-entity" data-name="Roomtype {{ room.nameShort }}" data-url="{{ path('ajaxRemoveEntity') }}" data-type="{{ 'Roomtype'|encrypt }}" data-id="{{ room.id }}">
+                                <i class="fa fa-remove"></i> Remove
+                            </a>
+                            {% if room.isActive %}
+                                <a href="#" class="btn btn-sm btn-warning js-toggle-active" data-url="{{ path('ajaxToggleActive') }}" data-set="deactivate" data-type="{{ 'Roomtype'|encrypt }}" data-id="{{ room.id }}">
+                                    <i class="fa fa-ban"></i> Deactivate
+                                </a>
+                            {% else %}
+                                <a href="#" class="btn btn-sm btn-warning js-toggle-active" data-url="{{ path('ajaxToggleActive') }}" data-set="activate" data-type="{{ 'Roomtype'|encrypt }}" data-id="{{ room.id }}">
+                                    <i class="fa fa-check"></i> Activate
+                                </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

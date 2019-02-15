@@ -1,0 +1,63 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <main id="main">
+        <div class="overlay"></div>
+        <header class="header">
+            <h1 class="page-title">
+                <a class="sidebar-toggle-btn trigger-toggle-sidebar">
+                    <span class="line"></span>
+                    <span class="line"></span>
+                    <span class="line"></span>
+                    <span class="line line-angle1"></span>
+                    <span class="line line-angle2"></span>
+                </a>Roomtypes
+                <a class="btn btn-info btn-sm rounded-0" data-url="{{ path('ajaxAddRoomtype') }}" id="js-add-room" href="#"><i class="fa fa-plus"></i> Add Roomtype</a>
+            </h1>
+        </header>
+        <div id="main-nano-wrapper" class="nano">
+            <div class="nano-content" id="perfectScroll">
+                <div class="container-fluid" id="js-result-table">
+
+                    <div class="row table-font-thicker" style="border-bottom:2px solid #ccc;">
+                        <div class="col-2">Short</div>
+                        <div class="col-7">Name</div>
+                        <div class="col-1">max. Occ.</div>
+                        <div class="col-1">Status</div>
+                        <div class="col-1">Action</div>
+                    </div>
+                    {% for room in rooms %}
+                        <div class="row table-font" style="border-bottom:1px solid #ccc;" id="row_{{ 'Roomtype'|encrypt }}_{{ room.id }}">
+                            <div class="col-2">{{ room.nameShort }}</div>
+                            <div class="col-7">{{ room.name }}</div>
+                            <div class="col-1">{{ room.maxOcc }}</div>
+                            <div class="col-1">{% if room.isActive %}<span class="badge badge-success" id="status_{{ 'Roomtype'|encrypt }}_{{ room.id }}">active</span>{% else %}<span class="badge badge-danger" id="status_{{ 'Roomtype'|encrypt }}_{{ room.id }}">inactive</span>{% endif %}</div>
+                            <div class="col-1">
+                                <a href="#"
+                                   class="btn btn-success btn-sm rounded-0 tt clickable"
+                                   title="View Details"
+                                   data-url="{{ path('renderRoomtype',{'id':room.id}) }}"
+                                   data-hash="details-roomtype-{{ room.id }}" data-trigger="{{ room.id }}">
+                                    <i class="fa fa-info-circle"></i> Details
+                                </a>
+                            </div>
+                        </div>
+                    {% endfor %}
+
+                </div>
+            </div>
+            <br/>
+        </div>
+    </main>
+{% endblock %}
+
+{% block stylesheets %}
+
+{% endblock stylesheets %}
+
+{% block javascripts %}
+    <script>
+        var GetNav = "contentSettingsRoomtypes";
+    </script>
+{% endblock javascripts %}
+

@@ -2,7 +2,10 @@
 
 namespace App\Controller;
 
+use App\Util\Rate\RateHandler;
+use App\Util\Room\RoomHandler;
 use App\Util\SecurityChecker;
+use Doctrine\Common\Persistence\ObjectManager;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\Routing\Annotation\Route;
@@ -33,6 +36,46 @@ class DefaultController extends AbstractController
         return $this->render('default/index.html.twig', [
             'controller_name' => 'DefaultController',
         ]);
+    }
+
+    /**
+     * @Route("/panel/settings/room-types", name="settingsRoomtypes")
+     * @param ObjectManager $em
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     */
+    public function settingsRoomtypes(ObjectManager $em)
+    {
+
+        /* @var $security SecurityChecker */
+        $security = new SecurityChecker($this->getUser(), $this->container);
+
+        if (!$security->hasRole($this->getUser())) {
+            return $this->redirectToRoute('login');
+        }
+
+        return $this->render('default/settingsRoomtypes.html.twig', array(
+            'rooms' => RoomHandler::gather_all($em)
+        ));
+    }
+
+    /**
+     * @Route("/panel/settings/rate-types", name="settingsRatetypes")
+     * @param ObjectManager $em
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     */
+    public function settingsRatetypes(ObjectManager $em)
+    {
+
+        /* @var $security SecurityChecker */
+        $security = new SecurityChecker($this->getUser(), $this->container);
+
+        if (!$security->hasRole($this->getUser())) {
+            return $this->redirectToRoute('login');
+        }
+
+        return $this->render('default/settingsRatetypes.html.twig', array(
+            'rates' => RateHandler::gather_all($em)
+        ));
     }
 
     /**

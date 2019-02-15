@@ -1,0 +1,54 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <main id="main">
+        <div class="overlay"></div>
+        <header class="header">
+            <h1 class="page-title">
+                <a class="sidebar-toggle-btn trigger-toggle-sidebar">
+                    <span class="line"></span>
+                    <span class="line"></span>
+                    <span class="line"></span>
+                    <span class="line line-angle1"></span>
+                    <span class="line line-angle2"></span>
+                </a>HCB Changelog
+            </h1>
+        </header>
+        <div id="main-nano-wrapper" class="nano">
+            <div class="nano-content" id="perfectScroll">
+                <div class="container-fluid">
+                    <div class="row" style="padding-left:15px;">
+                        <div class="col-12 changelog">
+                            {{ log|raw }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <br/>
+        </div>
+    </main>
+{% endblock %}
+
+{% block stylesheets %}
+    <style>
+        .changelog > h2 {
+            font-size: 25px;
+            line-height: 18px;
+            font-weight: 100;
+            padding-bottom:10px;
+            padding-top:15px;
+        }
+        .changelog > ul {
+            list-style-type: circle;
+            padding-left: 30px;
+            font-weight: 400;
+        }
+    </style>
+{% endblock stylesheets %}
+
+{% block javascripts %}
+    <script>
+        var GetNav = "contentMain";
+    </script>
+{% endblock javascripts %}
+

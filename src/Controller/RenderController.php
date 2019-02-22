@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Ratetype;
 use App\Entity\Roomtype;
 use Doctrine\Common\Persistence\ObjectManager;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -38,6 +39,28 @@ class RenderController extends AbstractController
 
         return $this->render('render/detailsRoomtype.html.twig', array(
             'room' => $room
+        ));
+    }
+
+    /**
+     * @Route("/panel/_render/_ratetype/{id}", name="renderRatetype", defaults={"id"="0"})
+     * @param int $id
+     * @param ObjectManager $em
+     * @return Response
+     */
+    public function renderDetailsRatetype(int $id, ObjectManager $em)
+    {
+        /**
+         * Find Ratetype
+         */
+        $rate = $em->getRepository(Ratetype::class)->find($id);
+
+        if($rate === null){
+            return $this->render('render/detailsNotFound.html.twig', array('id' => $id));
+        }
+
+        return $this->render('render/detailsRatetype.html.twig', array(
+            'rate' => $rate
         ));
     }
 }

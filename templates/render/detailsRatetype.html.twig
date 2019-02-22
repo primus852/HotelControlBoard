@@ -2,7 +2,7 @@
     <div class="row">
         <div class="col-10">
             <h1 class="page-title"><a class="icon circle-icon fa fa-remove trigger-message-close"></a>
-                Roomtype Details
+                Ratetype Details
             </h1>
         </div>
         <div class="col-2 text-right">
@@ -26,23 +26,26 @@
                                                     <div class="h2-wiki">Details</div>
                                                 </div>
                                                 <div class="col-6 text-right">
-                                                    <a href="#" class="btn btn-success btn-sm" id="js-update-room" data-url="{{ path('ajaxUpdateRoomtype') }}" data-id="{{ room.id }}"><i class="fa fa-save"></i> Save</a>
+                                                    <a href="#" class="btn btn-success btn-sm" id="js-update-rate" data-url="{{ path('ajaxUpdateRatetype') }}" data-id="{{ rate.id }}"><i class="fa fa-save"></i> Save</a>
                                                 </div>
                                             </div>
                                         </div>
                                         <div class="card-body">
                                             <div class="row">
                                                 <div class="col-6">
-                                                    <label for="room-name">Name</label>
-                                                    <input type="text" id="room-name" value="{{ room.name }}">
+                                                    <label for="rate-name">Name</label>
+                                                    <input type="text" id="rate-name" value="{{ rate.name }}">
                                                 </div>
                                                 <div class="col-4">
-                                                    <label for="room-name">Short Name</label>
-                                                    <input type="text" id="room-name-short" value="{{ room.nameShort }}">
+                                                    <label for="rate-name">Short Name</label>
+                                                    <input type="text" id="rate-name-short" value="{{ rate.nameShort }}">
                                                 </div>
                                                 <div class="col-2">
-                                                    <label for="room-occ">Max. Occupancy</label>
-                                                    <input type="text" id="room-occ" value="{{ room.maxOccupancy }}">
+                                                    <label for="rate-base">BaseRate</label>
+                                                    <select id="rate-base">
+                                                        <option value="yes" {% if rate.isBase %}selected="selected"{% endif %}>Yes</option>
+                                                        <option value="no" {% if not rate.isBase %}selected="selected"{% endif %}>No</option>
+                                                    </select>
                                                 </div>
                                             </div>
                                         </div>
@@ -51,15 +54,15 @@
                             </div>
                         </div>
                         <div class="tool-box">
-                            <a href="#" class="btn btn-sm btn-danger" id="js-remove-entity" data-name="Roomtype {{ room.nameShort }}" data-url="{{ path('ajaxRemoveEntity') }}" data-type="{{ 'Roomtype'|encrypt }}" data-id="{{ room.id }}">
+                            <a href="#" class="btn btn-sm btn-danger" id="js-remove-entity" data-name="Ratetype {{ rate.nameShort }}" data-url="{{ path('ajaxRemoveEntity') }}" data-type="{{ 'Ratetype'|encrypt }}" data-id="{{ rate.id }}">
                                 <i class="fa fa-remove"></i> Remove
                             </a>
-                            {% if room.isActive %}
-                                <a href="#" class="btn btn-sm btn-warning js-toggle-active" data-url="{{ path('ajaxToggleActive') }}" data-set="deactivate" data-type="{{ 'Roomtype'|encrypt }}" data-id="{{ room.id }}">
+                            {% if rate.isActive %}
+                                <a href="#" class="btn btn-sm btn-warning js-toggle-active" data-url="{{ path('ajaxToggleActive') }}" data-set="deactivate" data-type="{{ 'Ratetype'|encrypt }}" data-id="{{ rate.id }}">
                                     <i class="fa fa-ban"></i> Deactivate
                                 </a>
                             {% else %}
-                                <a href="#" class="btn btn-sm btn-warning js-toggle-active" data-url="{{ path('ajaxToggleActive') }}" data-set="activate" data-type="{{ 'Roomtype'|encrypt }}" data-id="{{ room.id }}">
+                                <a href="#" class="btn btn-sm btn-warning js-toggle-active" data-url="{{ path('ajaxToggleActive') }}" data-set="activate" data-type="{{ 'Ratetype'|encrypt }}" data-id="{{ rate.id }}">
                                     <i class="fa fa-check"></i> Activate
                                 </a>
                             {% endif %}

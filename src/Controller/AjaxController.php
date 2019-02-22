@@ -18,6 +18,186 @@ class AjaxController extends AbstractController
 {
 
     /**
+     * @Route("/_ajax/_updateRoomtype", name="ajaxUpdateRoomtype")
+     * @param Request $request
+     * @param ObjectManager $em
+     * @return JsonResponse
+     */
+    public function updateRoomtype(Request $request, ObjectManager $em)
+    {
+
+        /**
+         * Gather Vars
+         */
+        $id = $request->get('id');
+        $name = $request->get('name');
+        $nameShort = $request->get('nameShort');
+        $maxOcc = $request->get('maxOcc');
+
+        if ($name === null || trim($name) === '') {
+            return ShortResponse::error('Name cannot be empty');
+        }
+
+        if ($nameShort === null || trim($nameShort) === '') {
+            return ShortResponse::error('Name (Short) cannot be empty');
+        }
+
+        if ($maxOcc === null || trim($maxOcc) === '') {
+            return ShortResponse::error('Max. Occupancy cannot be empty');
+        }
+
+        if (!is_numeric($maxOcc)) {
+            return ShortResponse::error('Max. Occupancy is not a valid number');
+        }
+
+        /**
+         * Get Roomtype
+         */
+        $room = $em->getRepository(Roomtype::class)->find($id);
+
+        if ($room === null) {
+            return ShortResponse::error('Roomtype not found');
+        }
+
+        /**
+         * Check if we have the name already
+         */
+        $nameRoom = $em->getRepository(Roomtype::class)->findOneBy(array(
+            'name' => $name,
+        ));
+
+        if ($nameRoom !== null && $nameRoom !== $room) {
+            return ShortResponse::error('Same Name already exists in Database');
+        }
+
+        /**
+         * Check if we have the nameShort already
+         */
+        $nameShortRoom = $em->getRepository(Roomtype::class)->findOneBy(array(
+            'nameShort' => $nameShort,
+        ));
+
+        if ($nameShortRoom !== null && $nameShortRoom !== $room) {
+            return ShortResponse::error('Same Name (Short) already exists in Database');
+        }
+
+        $room->setName($name);
+        $room->setNameShort($nameShort);
+        $room->setMaxOccupancy($maxOcc);
+
+        $em->persist($room);
+
+        try {
+            $em->flush();
+        } catch (\Exception $e) {
+            return ShortResponse::mysql($e->getMessage());
+        }
+
+        return ShortResponse::success('Roomtype updated', array(
+            'id' => $room->getId(),
+            'type' => SimpleCrypt::enc('Roomtype'),
+            'name' => $room->getName(),
+            'nameShort' => $room->getNameShort(),
+            'maxOcc' => $room->getMaxOccupancy(),
+        ));
+
+    }
+
+    /**
+     * @Route("/_ajax/_updateRatetype", name="ajaxUpdateRatetype")
+     * @param Request $request
+     * @param ObjectManager $em
+     * @return JsonResponse
+     */
+    public function updateRatetype(Request $request, ObjectManager $em)
+    {
+
+        /**
+         * Gather Vars
+         */
+        $id = $request->get('id');
+        $name = $request->get('name');
+        $nameShort = $request->get('nameShort');
+        $isBaseRate = $request->get('isBase') === 'yes' ? true : false;
+
+        if ($name === null || trim($name) === '') {
+            return ShortResponse::error('Name cannot be empty');
+        }
+
+        if ($nameShort === null || trim($nameShort) === '') {
+            return ShortResponse::error('Name (Short) cannot be empty');
+        }
+
+        if ($request->get('isBase') === null) {
+            return ShortResponse::error('BaseRate cannot be empty');
+        }
+
+        /**
+         * Get Ratetype
+         */
+        $rate = $em->getRepository(Ratetype::class)->find($id);
+
+        if ($rate === null) {
+            return ShortResponse::error('Ratetype not found');
+        }
+
+        /**
+         * Check if we have the name already
+         */
+        $nameRate = $em->getRepository(Ratetype::class)->findOneBy(array(
+            'name' => $name,
+        ));
+
+        if ($nameRate !== null && $nameRate !== $rate) {
+            return ShortResponse::error('Same Name already exists in Database');
+        }
+
+        /**
+         * Check if we have the nameShort already
+         */
+        $nameShortRate = $em->getRepository(Ratetype::class)->findOneBy(array(
+            'nameShort' => $nameShort,
+        ));
+
+        if ($nameShortRate !== null && $nameShortRate !== $rate) {
+            return ShortResponse::error('Same Name (Short) already exists in Database');
+        }
+
+        /**
+         * Check if we have a BaseRate already
+         */
+        $baseRate = $em->getRepository(Ratetype::class)->findOneBy(array(
+            'isBase' => true,
+        ));
+
+        if ($baseRate !== null && $baseRate !== $rate && $isBaseRate) {
+            return ShortResponse::error('BaseRate already exists in Database');
+        }
+
+        $rate->setName($name);
+        $rate->setNameShort($nameShort);
+        $rate->setIsBase($isBaseRate);
+
+        $em->persist($rate);
+
+        try {
+            $em->flush();
+        } catch (\Exception $e) {
+            return ShortResponse::mysql($e->getMessage());
+        }
+
+        return ShortResponse::success('Ratetype updated', array(
+            'id' => $rate->getId(),
+            'type' => SimpleCrypt::enc('Ratetype'),
+            'name' => $rate->getName(),
+            'nameShort' => $rate->getNameShort(),
+            'isBase' => $rate->getIsBase() ? '<i class="fa fa-check" id="base_' . SimpleCrypt::enc('Ratetype') . '_' . $rate->getId() . '"></i>' : '<i class="fa fa-remove" id="base_' . SimpleCrypt::enc('Ratetype') . '_' . $rate->getId() . '"></i>',
+        ));
+
+
+    }
+
+    /**
      * @Route("/_ajax/_toggleActive", name="ajaxToggleActive")
      * @param Request $request
      * @param ObjectManager $em
@@ -25,9 +205,9 @@ class AjaxController extends AbstractController
      */
     public function toggleActive(Request $request, ObjectManager $em)
     {
-        try{
+        try {
             $state = Helper::toggleActive($request->get('type'), $request->get('id'), $request->get('to_set'), $em);
-        }catch (HelperException $e){
+        } catch (HelperException $e) {
             return ShortResponse::exception('Error deleting Entity', $e->getMessage());
         }
 
@@ -141,7 +321,11 @@ class AjaxController extends AbstractController
             'id' => $rate->getId(),
             'name' => $rate->getName(),
             'nameShort' => $rate->getNameShort(),
-            'isBase' => $isBase,
+            'isBase' => $rate->getIsBase() ? '<i class="fa fa-check" id="base_' . SimpleCrypt::enc('Ratetype') . '_' . $rate->getId() . '"></i>' : '<i class="fa fa-remove" id="base_' . SimpleCrypt::enc('Ratetype') . '_' . $rate->getId() . '"></i>',
+            'link' => $this->generateUrl('renderRatetype', array(
+                'id' => $rate->getId(),
+            )),
+            'type' => SimpleCrypt::enc('Ratetype'),
         ));
 
 
@@ -224,7 +408,7 @@ class AjaxController extends AbstractController
             'name' => $room->getName(),
             'nameShort' => $room->getNameShort(),
             'maxOcc' => $room->getMaxOccupancy(),
-            'link' => $this->generateUrl('renderRoomtype',array(
+            'link' => $this->generateUrl('renderRoomtype', array(
                 'id' => $room->getId(),
             )),
             'type' => SimpleCrypt::enc('Roomtype'),

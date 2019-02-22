@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -35,6 +37,16 @@ class Ratetype
      * @ORM\Column(type="boolean")
      */
     private $isBase;
+
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\Ratecode", mappedBy="Ratetype", orphanRemoval=true)
+     */
+    private $ratecodes;
+
+    public function __construct()
+    {
+        $this->ratecodes = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -85,6 +97,37 @@ class Ratetype
     public function setIsBase(bool $isBase): self
     {
         $this->isBase = $isBase;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Ratecode[]
+     */
+    public function getRatecodes(): Collection
+    {
+        return $this->ratecodes;
+    }
+
+    public function addRatecode(Ratecode $ratecode): self
+    {
+        if (!$this->ratecodes->contains($ratecode)) {
+            $this->ratecodes[] = $ratecode;
+            $ratecode->setRatetype($this);
+        }
+
+        return $this;
+    }
+
+    public function removeRatecode(Ratecode $ratecode): self
+    {
+        if ($this->ratecodes->contains($ratecode)) {
+            $this->ratecodes->removeElement($ratecode);
+            // set the owning side to null (unless already changed)
+            if ($ratecode->getRatetype() === $this) {
+                $ratecode->setRatetype(null);
+            }
+        }
 
         return $this;
     }

@@ -79,6 +79,26 @@ class DefaultController extends AbstractController
     }
 
     /**
+     * @Route("/panel/settings/rate-codes", name="settingsRatecodes")
+     * @param ObjectManager $em
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     */
+    public function settingsRatecodes(ObjectManager $em)
+    {
+
+        /* @var $security SecurityChecker */
+        $security = new SecurityChecker($this->getUser(), $this->container);
+
+        if (!$security->hasRole($this->getUser())) {
+            return $this->redirectToRoute('login');
+        }
+
+        return $this->render('default/settingsRatecodes.html.twig', array(
+
+        ));
+    }
+
+    /**
      * @Route("/panel/changelog", name="changelog")
      */
     public function changelog()

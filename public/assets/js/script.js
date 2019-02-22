@@ -131,6 +131,7 @@ $(document).on('click', '#js-add-rate', function (e) {
     e.preventDefault();
     var $btn = $(this);
     var $url = $btn.attr('data-url');
+    var $table = $('#js-result-table');
 
     var html = 'Would you like to add another Ratetype?<br />\n<div class="row">\n    <div class="col-10">\n        <input placeholder="Rate Name (e.g. Best available Rate)" value="" type="text" id="rate-name"/>\n    </div>\n</div>\n<div class="row">\n    <div class="col-10">\n        <input placeholder="Rate Name Short (e.g. BAR)" value="" type="text" id="rate-name-short"/>\n    </div>\n</div>\n<div class="row">\n    <div class="col-1">\n        <input style="position:relative;top:10px;" type="checkbox" id="rate-is-base">\n    </div>\n    <div class="col-9">\n        <span style="position:relative;top:10px;">is Baserate<br />(Discounts will be applied from this rate)</span>\n    </div>\n</div>';
 
@@ -169,6 +170,23 @@ $(document).on('click', '#js-add-rate', function (e) {
             })
                 .done(function (data) {
                     if (data.result === 'success') {
+
+                        $table.append('' +
+                            '<div class="row table-font" style="border-bottom:1px solid #ccc;" id="row_'+data.extra.type+'_'+data.extra.id+'">\n    ' +
+                            '   <div class="col-2" id="nameShort_'+data.extra.type+'_'+data.extra.id+'">'+data.extra.nameShort+'</div>\n    ' +
+                            '   <div class="col-7" id="name_'+data.extra.type+'_'+data.extra.id+'">'+data.extra.name+'</div>\n    ' +
+                            '   <div class="col-1">'+data.extra.isBase+'</div>\n    ' +
+                            '   <div class="col-1"><span class="badge badge-success" id="status_'+data.extra.type+'_'+data.extra.id+'">active</span></div>\n    ' +
+                            '   <div class="col-1">\n        ' +
+                            '       <a href="#" class="btn btn-success btn-sm rounded-0 tt clickable" title="View Details"' +
+                            '           data-url="'+data.extra.link+'"' +
+                            '           data-hash="details-ratetype-'+data.extra.id+'"' +
+                            '           data-trigger="'+data.extra.id+'"' +
+                            '       >\n            ' +
+                            '           <i class="fa fa-info-circle"></i> Details\n        ' +
+                            '       </a>\n    ' +
+                            '   </div>\n' +
+                            '</div>');
 
                         x0p('Success',
                             data.extra.name + ' added',
@@ -234,10 +252,10 @@ $(document).on('click', '#js-add-room', function (e) {
 
                         $table.append('' +
                             '<div class="row table-font" style="border-bottom:1px solid #ccc;" id="row_'+data.extra.type+'_'+data.extra.id+'">\n    ' +
-                            '   <div class="col-2">'+data.extra.nameShort+'</div>\n    ' +
-                            '   <div class="col-7">'+data.extra.name+'</div>\n    ' +
-                            '   <div class="col-1">'+data.extra.maxOcc+'</div>\n    ' +
-                            '   <div class="col-1"><span class="badge badge-success">active</span></div>\n    ' +
+                            '   <div class="col-2" id="nameShort_'+data.extra.type+'_'+data.extra.id+'">'+data.extra.nameShort+'</div>\n    ' +
+                            '   <div class="col-7" id="name_'+data.extra.type+'_'+data.extra.id+'">'+data.extra.name+'</div>\n    ' +
+                            '   <div class="col-1" id="maxOcc_'+data.extra.type+'_'+data.extra.id+'">'+data.extra.maxOcc+'</div>\n    ' +
+                            '   <div class="col-1"><span class="badge badge-success" id="status_'+data.extra.type+'_'+data.extra.id+'"></div>\n    ' +
                             '   <div class="col-1">\n        ' +
                             '       <a href="#" class="btn btn-success btn-sm rounded-0 tt clickable" title="View Details"' +
                             '           data-url="'+data.extra.link+'"' +
@@ -264,6 +282,125 @@ $(document).on('click', '#js-add-room', function (e) {
             ;
         }
     });
+});
+
+$(document).on('click', '#js-update-room', function (e) {
+
+    e.preventDefault();
+    var $btn = $(this);
+    var url = $btn.attr('data-url');
+    var id = $btn.attr('data-id');
+
+    var $name = $('#room-name');
+    var $nameShort = $('#room-name-short');
+    var $maxOcc = $('#room-occ');
+
+    if($.trim($name.val()) === ''){
+        openNoty('error','Name cannot be empty');
+        return false;
+    }
+
+    if($.trim($nameShort.val()) === ''){
+        openNoty('error','Name (Short) cannot be empty');
+        return false;
+    }
+
+    if($.trim($maxOcc.val()) === ''){
+        openNoty('error','Max. Occupancy cannot be empty');
+        return false;
+    }
+
+    /* Ajax Call */
+    $.post(url, {
+        name: $name.val(),
+        nameShort: $nameShort.val(),
+        maxOcc: $maxOcc.val(),
+        id: id
+    })
+        .done(function (data) {
+            if (data.result === 'success') {
+
+                closeDetails(function () {
+                    var $nameRow = $('#name_' + data.extra.type + '_' + data.extra.id);
+                    var $nameShortRow = $('#nameShort_' + data.extra.type + '_' + data.extra.id);
+                    var $maxOcc = $('#maxOcc_' + data.extra.type + '_' + data.extra.id);
+
+                    $nameRow.html(data.extra.name);
+                    $nameShortRow.html(data.extra.nameShort);
+                    $maxOcc.html(data.extra.maxOcc);
+
+                });
+
+                x0p('Success',
+                    $nameShort.val() + ' updated',
+                    'ok', false);
+            } else {
+                x0p('Error',
+                    data.message,
+                    'error', false);
+            }
+        })
+        .fail(function () {
+            openNoty('error', 'Ajax Error');
+        })
+    ;
+});
+
+$(document).on('click', '#js-update-rate', function (e) {
+
+    e.preventDefault();
+    var $btn = $(this);
+    var url = $btn.attr('data-url');
+    var id = $btn.attr('data-id');
+
+    var $name = $('#rate-name');
+    var $nameShort = $('#rate-name-short');
+    var $isBase = $('#rate-base');
+
+    if($.trim($name.val()) === ''){
+        openNoty('error','Name cannot be empty');
+        return false;
+    }
+
+    if($.trim($nameShort.val()) === ''){
+        openNoty('error','Name (Short) cannot be empty');
+        return false;
+    }
+
+    /* Ajax Call */
+    $.post(url, {
+        name: $name.val(),
+        nameShort: $nameShort.val(),
+        isBase: $isBase.val(),
+        id: id
+    })
+        .done(function (data) {
+            if (data.result === 'success') {
+
+                closeDetails(function () {
+                    var $nameRow = $('#name_' + data.extra.type + '_' + data.extra.id);
+                    var $nameShortRow = $('#nameShort_' + data.extra.type + '_' + data.extra.id);
+                    var $isBaseRow = $('#base_' + data.extra.type + '_' + data.extra.id).parent();
+
+                    $nameRow.html(data.extra.name);
+                    $nameShortRow.html(data.extra.nameShort);
+                    $isBaseRow.html(data.extra.isBase);
+
+                });
+
+                x0p('Success',
+                    $nameShort.val() + ' updated',
+                    'ok', false);
+            } else {
+                x0p('Error',
+                    data.message,
+                    'error', false);
+            }
+        })
+        .fail(function () {
+            openNoty('error', 'Ajax Error');
+        })
+    ;
 });
 
 $(document).on('click', '#js-remove-entity', function (e) {

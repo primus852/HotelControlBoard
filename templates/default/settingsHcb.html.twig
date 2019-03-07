@@ -1,0 +1,55 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <main id="main">
+        <div class="overlay"></div>
+        <header class="header">
+            <h1 class="page-title">
+                <a class="sidebar-toggle-btn trigger-toggle-sidebar">
+                    <span class="line"></span>
+                    <span class="line"></span>
+                    <span class="line"></span>
+                    <span class="line line-angle1"></span>
+                    <span class="line line-angle2"></span>
+                </a>General Settings
+            </h1>
+        </header>
+        <div id="main-nano-wrapper" class="nano">
+            <div class="nano-content" id="perfectScroll">
+                <div class="container-fluid" id="js-result-table">
+                    <div class="row justify-content-center">
+                        <div class="col-3">
+                            <label for="add_double">Double Room Modifier</label>
+                            <input type="text" id="add_double" value="{{ add_double.val }}">
+                        </div>
+                        <div class="col-3">
+                            <label for="add_triple">Triple Room Modifier</label>
+                            <input type="text" id="add_triple" value="{{ add_triple.val }}">
+                        </div>
+                        <div class="col-3">
+                            <label for="add_extra">Extra Person</label>
+                            <input type="text" id="add_extra" value="{{ add_extra.val }}">
+                        </div>
+                        <div class="col-3 text-center">
+                            <br />
+                            <!-- TODO: ADD BUTTON FUNCTIONALITY -->
+                            <a href="#" class="btn btn-success" id="js-save-settings"><i class="fa fa-save"></i> Save</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <br/>
+        </div>
+    </main>
+{% endblock %}
+
+{% block stylesheets %}
+
+{% endblock stylesheets %}
+
+{% block javascripts %}
+    <script>
+        var GetNav = "contentSettingsHcb";
+    </script>
+{% endblock javascripts %}
+

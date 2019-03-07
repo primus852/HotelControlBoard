@@ -362,3 +362,8 @@ fieldset[disabled] .btn-purple.active {
     line-height: 1.5em;
     font-weight: 700;
 }
+
+.x0p.default input[type="text"], .x0p.default input[type="password"]{
+    background-color: transparent !important;
+    border-color: #ddd !important;
+}

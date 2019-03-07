@@ -119,6 +119,8 @@ class AjaxController extends AbstractController
         $name = $request->get('name');
         $nameShort = $request->get('nameShort');
         $isBaseRate = $request->get('isBase') === 'yes' ? true : false;
+        $dcAmount = (float) str_replace(',','.',$request->get('dcAmount'));
+        $dcType = $request->get('dcType') === 'p' ? true : false;
 
         if ($name === null || trim($name) === '') {
             return ShortResponse::error('Name cannot be empty');
@@ -174,9 +176,25 @@ class AjaxController extends AbstractController
             return ShortResponse::error('BaseRate already exists in Database');
         }
 
+        /**
+         * If this is the BaseRate
+         */
+        if ($isBaseRate && $dcAmount > 0) {
+            return ShortResponse::error('Cannot apply discount to BaseRate');
+        }
+
+        /**
+         * If there is no BaseRate yet, no discount can be applied
+         */
+        if($baseRate === null && $dcAmount > 0){
+            return ShortResponse::error('There is no BaseRate defined. Please define a BaseRate before adding a discounted Rate');
+        }
+
         $rate->setName($name);
         $rate->setNameShort($nameShort);
         $rate->setIsBase($isBaseRate);
+        $rate->setDiscountAmount($dcAmount);
+        $rate->setDiscountPercent($dcType);
 
         $em->persist($rate);
 
@@ -191,6 +209,8 @@ class AjaxController extends AbstractController
             'type' => SimpleCrypt::enc('Ratetype'),
             'name' => $rate->getName(),
             'nameShort' => $rate->getNameShort(),
+            'dcAmount' => $rate->getDiscountAmount(),
+            'dcType' => $rate->getDiscountPercent() ? '&percnt;' : '&euro;',
             'isBase' => $rate->getIsBase() ? '<i class="fa fa-check" id="base_' . SimpleCrypt::enc('Ratetype') . '_' . $rate->getId() . '"></i>' : '<i class="fa fa-remove" id="base_' . SimpleCrypt::enc('Ratetype') . '_' . $rate->getId() . '"></i>',
         ));
 
@@ -254,6 +274,8 @@ class AjaxController extends AbstractController
         $name = $request->get('name');
         $short = $request->get('nameShort');
         $isBase = $request->get('isBase') === 'yes' ? true : false;
+        $dcAmount = (float) str_replace(',','.',$request->get('dcAmount'));
+        $dcType = $request->get('dcType') === 'p' ? true : false;
 
         /**
          * Check $name
@@ -270,16 +292,34 @@ class AjaxController extends AbstractController
         }
 
         /**
+         * Search BaseRate for BaseRate / Discount Check
+         */
+        $ratesBase = $em->getRepository(Ratetype::class)->findOneBy(array(
+            'isBase' => true
+        ));
+
+        /**
          * If the BaseRate is selected, check if we have another BaseRate already
          */
         if ($isBase) {
-            $ratesBase = $em->getRepository(Ratetype::class)->findOneBy(array(
-                'isBase' => true
-            ));
 
             if ($ratesBase !== null) {
                 return ShortResponse::error('There is already a BaseRate in the Database: ' . $ratesBase->getName());
             }
+
+            /**
+             * If the BaseRate is selected, no discount can be applied
+             */
+            if($dcAmount > 0){
+                return ShortResponse::error('No Discount can be applied to the BaseRate');
+            }
+        }
+
+        /**
+         * If there is no BaseRate yet, no discount can be applied
+         */
+        if($ratesBase === null && $dcAmount > 0){
+            return ShortResponse::error('There is no BaseRate defined. Please define a BaseRate before adding a discounted Rate');
         }
 
         /**
@@ -308,6 +348,8 @@ class AjaxController extends AbstractController
         $rate->setName($name);
         $rate->setNameShort($short);
         $rate->setIsBase($isBase);
+        $rate->setDiscountAmount($dcAmount);
+        $rate->setDiscountPercent($dcType);
         $rate->setIsActive(true);
 
         try {
@@ -321,6 +363,8 @@ class AjaxController extends AbstractController
             'id' => $rate->getId(),
             'name' => $rate->getName(),
             'nameShort' => $rate->getNameShort(),
+            'dcAmount' => $rate->getDiscountAmount(),
+            'dcType' => $rate->getDiscountPercent() ? '&percnt;' : '&euro;',
             'isBase' => $rate->getIsBase() ? '<i class="fa fa-check" id="base_' . SimpleCrypt::enc('Ratetype') . '_' . $rate->getId() . '"></i>' : '<i class="fa fa-remove" id="base_' . SimpleCrypt::enc('Ratetype') . '_' . $rate->getId() . '"></i>',
             'link' => $this->generateUrl('renderRatetype', array(
                 'id' => $rate->getId(),

@@ -133,7 +133,7 @@ $(document).on('click', '#js-add-rate', function (e) {
     var $url = $btn.attr('data-url');
     var $table = $('#js-result-table');
 
-    var html = 'Would you like to add another Ratetype?<br />\n<div class="row">\n    <div class="col-10">\n        <input placeholder="Rate Name (e.g. Best available Rate)" value="" type="text" id="rate-name"/>\n    </div>\n</div>\n<div class="row">\n    <div class="col-10">\n        <input placeholder="Rate Name Short (e.g. BAR)" value="" type="text" id="rate-name-short"/>\n    </div>\n</div>\n<div class="row">\n    <div class="col-1">\n        <input style="position:relative;top:10px;" type="checkbox" id="rate-is-base">\n    </div>\n    <div class="col-9">\n        <span style="position:relative;top:10px;">is Baserate<br />(Discounts will be applied from this rate)</span>\n    </div>\n</div>';
+    var html = 'Would you like to add another Ratetype?<br />\n<div class="row">\n    <div class="col-10">\n        <input placeholder="Rate Name (e.g. Best available Rate)" value="" type="text" id="rate-name"/>\n    </div>\n</div>\n<div class="row">\n    <div class="col-10">\n        <input placeholder="Rate Name Short (e.g. BAR)" value="" type="text" id="rate-name-short"/>\n    </div>\n</div>\n<div class="row">\n    <div class="col-8">\n        <input placeholder="Discount from BaseRate" value="" type="text" id="rate-dc-amount"/>\n    </div>\n    <div class="col-2">\n        <select id="rate-dc-type" style="margin-top:30%;">\n            <option value="p">&percnt;</option>\n            <option value="e">&euro;</option>\n        </select>\n    </div>\n</div>\n<div class="row">\n    <div class="col-1">\n        <input style="position:relative;top:10px;" type="checkbox" id="rate-is-base">\n    </div>\n    <div class="col-9">\n        <span style="position:relative;top:10px;">is Baserate<br />(Discounts will be applied from this rate)</span>\n    </div>\n</div>';
 
     x0p({
         title: 'Add Ratetype',
@@ -160,13 +160,16 @@ $(document).on('click', '#js-add-rate', function (e) {
             var name = $.trim($('#rate-name').val());
             var nameShort = $.trim($('#rate-name-short').val());
             var isBase = $('#rate-is-base:checked').val() ? 'yes' : 'no';
-
+            var dcAmount = $.trim($('#rate-dc-amount').val());
+            var dcType = $.trim($('#rate-dc-type').val());
 
             /* Ajax Call */
             $.post($url, {
                 name: name,
                 nameShort: nameShort,
-                isBase: isBase
+                isBase: isBase,
+                dcAmount: dcAmount,
+                dcType: dcType
             })
                 .done(function (data) {
                     if (data.result === 'success') {
@@ -174,9 +177,12 @@ $(document).on('click', '#js-add-rate', function (e) {
                         $table.append('' +
                             '<div class="row table-font" style="border-bottom:1px solid #ccc;" id="row_'+data.extra.type+'_'+data.extra.id+'">\n    ' +
                             '   <div class="col-2" id="nameShort_'+data.extra.type+'_'+data.extra.id+'">'+data.extra.nameShort+'</div>\n    ' +
-                            '   <div class="col-7" id="name_'+data.extra.type+'_'+data.extra.id+'">'+data.extra.name+'</div>\n    ' +
+                            '   <div class="col-6" id="name_'+data.extra.type+'_'+data.extra.id+'">'+data.extra.name+'</div>\n    ' +
                             '   <div class="col-1">'+data.extra.isBase+'</div>\n    ' +
                             '   <div class="col-1"><span class="badge badge-success" id="status_'+data.extra.type+'_'+data.extra.id+'">active</span></div>\n    ' +
+                            '   <div class="col-1">\n        ' +
+                            '       <span id="dc_amount_'+data.extra.type+'_'+data.extra.id+'">'+data.extra.dcAmount+'</span><span id="dc_type_'+data.extra.type+'_'+data.extra.id+'">'+data.extra.dcType+'</span>\n    ' +
+                            '   </div>\n    ' +
                             '   <div class="col-1">\n        ' +
                             '       <a href="#" class="btn btn-success btn-sm rounded-0 tt clickable" title="View Details"' +
                             '           data-url="'+data.extra.link+'"' +
@@ -253,9 +259,9 @@ $(document).on('click', '#js-add-room', function (e) {
                         $table.append('' +
                             '<div class="row table-font" style="border-bottom:1px solid #ccc;" id="row_'+data.extra.type+'_'+data.extra.id+'">\n    ' +
                             '   <div class="col-2" id="nameShort_'+data.extra.type+'_'+data.extra.id+'">'+data.extra.nameShort+'</div>\n    ' +
-                            '   <div class="col-7" id="name_'+data.extra.type+'_'+data.extra.id+'">'+data.extra.name+'</div>\n    ' +
+                            '   <div class="col-6" id="name_'+data.extra.type+'_'+data.extra.id+'">'+data.extra.name+'</div>\n    ' +
                             '   <div class="col-1" id="maxOcc_'+data.extra.type+'_'+data.extra.id+'">'+data.extra.maxOcc+'</div>\n    ' +
-                            '   <div class="col-1"><span class="badge badge-success" id="status_'+data.extra.type+'_'+data.extra.id+'"></div>\n    ' +
+                            '   <div class="col-1"><span class="badge badge-success" id="status_'+data.extra.type+'_'+data.extra.id+'">active</span></div>\n    ' +
                             '   <div class="col-1">\n        ' +
                             '       <a href="#" class="btn btn-success btn-sm rounded-0 tt clickable" title="View Details"' +
                             '           data-url="'+data.extra.link+'"' +
@@ -356,6 +362,8 @@ $(document).on('click', '#js-update-rate', function (e) {
     var $name = $('#rate-name');
     var $nameShort = $('#rate-name-short');
     var $isBase = $('#rate-base');
+    var $dcAmount = $('#rate-dc-amount');
+    var $dcType = $('#rate-dc-type');
 
     if($.trim($name.val()) === ''){
         openNoty('error','Name cannot be empty');
@@ -372,7 +380,9 @@ $(document).on('click', '#js-update-rate', function (e) {
         name: $name.val(),
         nameShort: $nameShort.val(),
         isBase: $isBase.val(),
-        id: id
+        id: id,
+        dcAmount: $dcAmount.val(),
+        dcType: $dcType.val()
     })
         .done(function (data) {
             if (data.result === 'success') {
@@ -381,10 +391,14 @@ $(document).on('click', '#js-update-rate', function (e) {
                     var $nameRow = $('#name_' + data.extra.type + '_' + data.extra.id);
                     var $nameShortRow = $('#nameShort_' + data.extra.type + '_' + data.extra.id);
                     var $isBaseRow = $('#base_' + data.extra.type + '_' + data.extra.id).parent();
+                    var $dcAmountRow = $('#dc_amount_' + data.extra.type + '_' + data.extra.id);
+                    var $dcTypeRow = $('#dc_type_' + data.extra.type + '_' + data.extra.id);
 
                     $nameRow.html(data.extra.name);
                     $nameShortRow.html(data.extra.nameShort);
                     $isBaseRow.html(data.extra.isBase);
+                    $dcAmountRow.html(data.extra.dcAmount);
+                    $dcTypeRow.html(data.extra.dcType);
 
                 });
 

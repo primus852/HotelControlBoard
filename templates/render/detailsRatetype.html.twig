@@ -32,19 +32,30 @@
                                         </div>
                                         <div class="card-body">
                                             <div class="row">
-                                                <div class="col-6">
-                                                    <label for="rate-name">Name</label>
-                                                    <input type="text" id="rate-name" value="{{ rate.name }}">
-                                                </div>
-                                                <div class="col-4">
-                                                    <label for="rate-name">Short Name</label>
-                                                    <input type="text" id="rate-name-short" value="{{ rate.nameShort }}">
-                                                </div>
-                                                <div class="col-2">
+                                                <div class="col-1">
                                                     <label for="rate-base">BaseRate</label>
                                                     <select id="rate-base">
                                                         <option value="yes" {% if rate.isBase %}selected="selected"{% endif %}>Yes</option>
                                                         <option value="no" {% if not rate.isBase %}selected="selected"{% endif %}>No</option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-5">
+                                                    <label for="rate-name">Name</label>
+                                                    <input type="text" id="rate-name" value="{{ rate.name }}">
+                                                </div>
+                                                <div class="col-3">
+                                                    <label for="rate-name">Short Name</label>
+                                                    <input type="text" id="rate-name-short" value="{{ rate.nameShort }}">
+                                                </div>
+                                                <div class="col-2">
+                                                    <label for="rate-dc-amount">Discount</label>
+                                                    <input type="text" id="rate-dc-amount" value="{{ rate.discountAmount }}">
+                                                </div>
+                                                <div class="col-1">
+                                                    <label for="rate-dc-type">&nbsp;</label>
+                                                    <select id="rate-dc-type">
+                                                        <option value="p" {% if rate.discountPercent %}selected="selected"{% endif %}>&percnt;</option>
+                                                        <option value="e" {% if not rate.discountPercent %}selected="selected"{% endif %}>&euro;</option>
                                                     </select>
                                                 </div>
                                             </div>

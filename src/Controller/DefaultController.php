@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\HcbSettings;
 use App\Util\Rate\RateHandler;
 use App\Util\Room\RoomHandler;
 use App\Util\SecurityChecker;
@@ -79,11 +80,11 @@ class DefaultController extends AbstractController
     }
 
     /**
-     * @Route("/panel/settings/rate-codes", name="settingsRatecodes")
+     * @Route("/panel/settings/global", name="settingsGlobal")
      * @param ObjectManager $em
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function settingsRatecodes(ObjectManager $em)
+    public function settingsGlobal(ObjectManager $em)
     {
 
         /* @var $security SecurityChecker */
@@ -93,8 +94,19 @@ class DefaultController extends AbstractController
             return $this->redirectToRoute('login');
         }
 
-        return $this->render('default/settingsRatecodes.html.twig', array(
 
+
+
+        return $this->render('default/settingsHcb.html.twig', array(
+            'add_double' => $em->getRepository(HcbSettings::class)->findOneBy(array(
+                'name' => 'add_double'
+            )),
+            'add_triple' => $em->getRepository(HcbSettings::class)->findOneBy(array(
+                'name' => 'add_triple'
+            )),
+            'add_extra' => $em->getRepository(HcbSettings::class)->findOneBy(array(
+                'name' => 'add_extra'
+            )),
         ));
     }
 

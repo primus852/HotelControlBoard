@@ -39,14 +39,14 @@ class Ratetype
     private $isBase;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\Ratecode", mappedBy="Ratetype", orphanRemoval=true)
+     * @ORM\Column(type="float", nullable=true)
      */
-    private $ratecodes;
+    private $discountAmount;
 
-    public function __construct()
-    {
-        $this->ratecodes = new ArrayCollection();
-    }
+    /**
+     * @ORM\Column(type="boolean")
+     */
+    private $discountPercent;
 
     public function getId(): ?int
     {
@@ -101,34 +101,29 @@ class Ratetype
         return $this;
     }
 
-    /**
-     * @return Collection|Ratecode[]
-     */
-    public function getRatecodes(): Collection
+    public function getDiscountAmount(): ?float
     {
-        return $this->ratecodes;
+        return $this->discountAmount;
     }
 
-    public function addRatecode(Ratecode $ratecode): self
+    public function setDiscountAmount(?float $discountAmount): self
     {
-        if (!$this->ratecodes->contains($ratecode)) {
-            $this->ratecodes[] = $ratecode;
-            $ratecode->setRatetype($this);
-        }
+        $this->discountAmount = $discountAmount;
 
         return $this;
     }
 
-    public function removeRatecode(Ratecode $ratecode): self
+    public function getDiscountPercent(): ?bool
     {
-        if ($this->ratecodes->contains($ratecode)) {
-            $this->ratecodes->removeElement($ratecode);
-            // set the owning side to null (unless already changed)
-            if ($ratecode->getRatetype() === $this) {
-                $ratecode->setRatetype(null);
-            }
-        }
+        return $this->discountPercent;
+    }
+
+    public function setDiscountPercent(bool $discountPercent): self
+    {
+        $this->discountPercent = $discountPercent;
 
         return $this;
     }
+
+    
 }

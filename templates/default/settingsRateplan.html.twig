@@ -1,0 +1,61 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <main id="main">
+        <div class="overlay"></div>
+        <header class="header">
+            <div class="row">
+                <div class="col-11">
+                    <h1 class="page-title">
+                        <a class="sidebar-toggle-btn trigger-toggle-sidebar">
+                            <span class="line"></span>
+                            <span class="line"></span>
+                            <span class="line"></span>
+                            <span class="line line-angle1"></span>
+                            <span class="line line-angle2"></span>
+                        </a>Rateplan {{ date_string }}
+                    </h1>
+                </div>
+                <div class="col-1 text-right">
+                    <select id="js-select-rateplan-date">
+                        {% for m in months %}
+                            <option value="{{ m }}" {% if currMonth == m %}selected="selected"{% endif %}>{{ m }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+        </header>
+        <div id="main-nano-wrapper" class="nano">
+            <div class="nano-content" id="perfectScroll">
+                <div class="container-fluid" id="js-result-table">
+                    <div class="row">
+                        <div class="col-12" style="height:250px;" id="js-chart-month">CHART</div>
+                    </div>
+                    <br/>
+                    <div class="row" style="margin: 0 auto;">
+                        {% for hf in hfs %}
+                            <div class="col-2" style="border:1px solid #ddd;margin-bottom:5px;height:50px;line-height:50px;">B: {{ hf.bookedRooms }}</div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            <br/>
+        </div>
+    </main>
+{% endblock %}
+
+{% block stylesheets %}
+
+{% endblock stylesheets %}
+
+{% block javascripts %}
+    <script>
+        var GetNav = "contentSettingsPrice";
+    </script>
+    <script>
+        $(document).on('change','#js-select-rateplan-date',function(){
+            window.location.assign('{{ path('settingsRateplan') }}/'+$(this).val());
+        });
+    </script>
+{% endblock javascripts %}
+

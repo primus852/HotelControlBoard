@@ -551,18 +551,26 @@ $(document).on('click', '.js-toggle-active', function (e) {
 
 });
 
-$(document).on('change','.inputfile',function(){
+$(document).on('change','.inputfile',function(e){
 
     var $btn = $(this);
-    uploadReport($btn);
+    var $label = $('label[for="'+$btn.attr('id')+'"]');
+    uploadReport($btn, $label.html());
 
 });
 
-function uploadReport($btn){
+function uploadReport($btn, html){
 
     var url = $btn.attr('data-url');
     var form = $('#form_'+$btn.attr('data-report-type'))[0];
     var formData = new FormData(form);
+    var $label = $('label[for="'+$btn.attr('id')+'"]');
+
+    if($label.hasClass('disabled')){
+        return false;
+    }
+
+    $label.addClass('disabled').html('<i class="fa fa-spin fa-spinner"></i> <span>Uploading...</span>');
 
     $.ajax({
         url: url,
@@ -574,13 +582,14 @@ function uploadReport($btn){
 
         },
         success: function(data){
-
+            $label.removeClass('disabled').html(html);
             openNoty('success', 'Upload succeeded');
 
 
         },
         error: function(xhr, ajaxOptions, thrownError) {
             openNoty('error', 'Upload failed');
+            $label.removeClass('disabled').html(html);
             console.log(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
         }
     });
@@ -595,7 +604,7 @@ function uploadReport($btn){
 function openNoty(type, text) {
     new Noty({
         layout: 'topRight',
-        theme: 'sunset',
+        theme: 'mint',
         text: text,
         type: type,
         timeout: 3000,

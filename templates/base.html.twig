@@ -59,6 +59,11 @@
                         <i class="fa fa-pie-chart"></i> Dashboard
                     </a>
                 </li>
+                <li id="contentUploads" class="treeItem">
+                    <a href="{{ path('dailyUploads') }}" class="mLink">
+                        <i class="fa fa-upload"></i> Daily Uploads
+                    </a>
+                </li>
             </ul>
         </menu>
         <div class="separator"></div>
@@ -69,11 +74,6 @@
                         <i class="fa fa-chevron-right"></i> Settings
                     </a>
                     <ul class="treeMenu">
-                        <li id="contentSettingsUploads" class="treeItem">
-                            <a href="{{ path('settingsUploads') }}" class="mLink">
-                                <i class="fa fa-upload"></i> XML Upload
-                            </a>
-                        </li>
                         {% if is_granted('ROLE_ADMIN') %}
                             <li id="contentSettingsPrice" class="treeItem">
                                 <a href="{{ path('settingsRateplan') }}" class="mLink">

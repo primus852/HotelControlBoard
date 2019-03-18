@@ -3,12 +3,15 @@
 namespace App\Controller;
 
 use App\Entity\HcbSettings;
+use App\Util\Helper\Helper;
+use App\Util\Helper\HelperException;
 use App\Util\Rate\RateHandler;
 use App\Util\Room\RoomHandler;
 use App\Util\SecurityChecker;
 use Doctrine\Common\Persistence\ObjectManager;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
 
 class DefaultController extends AbstractController
@@ -40,11 +43,10 @@ class DefaultController extends AbstractController
     }
 
     /**
-     * @Route("/panel/settings/xml-uploads", name="settingsUploads")
-     * @param ObjectManager $em
+     * @Route("/panel/daily-uploads", name="dailyUploads")
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function settingsUploads(ObjectManager $em)
+    public function dailyUploads()
     {
 
         /* @var $security SecurityChecker */
@@ -59,11 +61,10 @@ class DefaultController extends AbstractController
     }
 
     /**
-     * @Route("/panel/settings/rateplan", name="settingsRateplan")
-     * @param ObjectManager $em
+     * @Route("/panel/settings/rateplan/{date_string}", name="settingsRateplan", defaults={"date_string"="0"})
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function settingsRateplan(ObjectManager $em)
+    public function settingsRateplan(string $date_string, ObjectManager $em)
     {
 
         /* @var $security SecurityChecker */
@@ -73,8 +74,36 @@ class DefaultController extends AbstractController
             return $this->redirectToRoute('login');
         }
 
-        return $this->render('default/settingsRoomtypes.html.twig', array(
-            'rooms' => RoomHandler::gather_all($em)
+        if ($date_string === '0') {
+            try {
+                $now = new \DateTime();
+            } catch (\Exception $e) {
+                throw new AccessDeniedHttpException('Could not create Datetime: ' . $e->getMessage());
+            }
+
+            $date_string = $now->format('F Y');
+        } else {
+
+            $now = \DateTime::createFromFormat('m-Y', $date_string);
+            if ($now === false) {
+                throw new AccessDeniedHttpException('Could not create Datetime: ' . $date_string);
+            }
+
+            $date_string = $now->format('F Y');
+
+        }
+
+        try{
+            $hfs = Helper::hf_by_date($now->format('m-Y'), $em);
+        }catch (HelperException $e){
+            throw new AccessDeniedHttpException('Helper Error: '.$e->getMessage());
+        }
+
+        return $this->render('default/settingsRateplan.html.twig', array(
+            'date_string' => $date_string,
+            'months' => Helper::month_list($em),
+            'currMonth' => $now->format('m-Y'),
+            'hfs' => $hfs,
         ));
 
     }
@@ -133,8 +162,6 @@ class DefaultController extends AbstractController
         if (!$security->hasRole($this->getUser())) {
             return $this->redirectToRoute('login');
         }
-
-
 
 
         return $this->render('default/settingsHcb.html.twig', array(

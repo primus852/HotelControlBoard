@@ -12,6 +12,7 @@ use Doctrine\Common\Persistence\ObjectManager;
 use primus852\ShortResponse\ShortResponse;
 use primus852\SimpleCrypt\SimpleCrypt;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
@@ -33,6 +34,7 @@ class AjaxController extends AbstractController
             $type = $request->get('report_type');
             $filename = $type . '.xml';
 
+            /* @var $file File */
             foreach ($files as $file) {
                 try {
                     $file->move('reports', $filename);
@@ -46,19 +48,14 @@ class AjaxController extends AbstractController
                  * Call the according XML Parser
                  */
                 try {
-                    $raw = HcbXmlReader::$type();
-                } catch (HcbXmlReaderException $e) {
+                    HcbXmlReader::$type($em);
+                } catch (\Exception $e) {
                     return ShortResponse::exception('Failed to parse Report', $e->getMessage());
                 }
             }
-
-            return ShortResponse::success('Upload succeeded, Report parsed', array(
-                'raw' => $raw
-            ));
-
         }
 
-        die;
+        return ShortResponse::success('Upload succeeded, Report parsed', array());
 
     }
 

@@ -9,15 +9,102 @@
 namespace App\Util\Helper;
 
 
+use App\Entity\HistoryForecast;
 use App\Entity\Ratetype;
 use App\Entity\Roomtype;
+use Doctrine\Common\Collections\Criteria;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\Mapping\MappingException;
 use Doctrine\ORM\ORMException;
 use primus852\SimpleCrypt\SimpleCrypt;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 class Helper
 {
+
+    /**
+     * @param string $date_string
+     * @param ObjectManager $em
+     * @return \Doctrine\Common\Collections\Collection
+     * @throws HelperException
+     */
+    public static function hf_by_date(string $date_string, ObjectManager $em)
+    {
+
+        $date = \DateTime::createFromFormat('d-m-Y', '01-'.$date_string);
+
+        if ($date === false) {
+            throw new HelperException('Could not create DateTime: ' . $date_string);
+        }
+
+        $start_date = \DateTime::createFromFormat('Y-m-d',$date->format('Y').'-'.$date->format('m').'-01');
+        $start_date->setTime(0,0,0);
+
+        try{
+            $end_date = new \DateTime('Last day of '.$date->format('F').' '.$date->format('Y'));
+            $end_date->setTime(23,59,59);
+        }catch (\Exception $e){
+            throw new HelperException('Could not create EndDate: '.$e->getMessage());
+        }
+
+        $criteria = Criteria::create();
+        $criteria->where(Criteria::expr()->andX(
+            Criteria::expr()->gte('bookDate',$start_date),
+            Criteria::expr()->lte('bookDate',$end_date)
+        ));
+
+        $list = $em->getRepository(HistoryForecast::class)->matching($criteria);
+
+        return $list;
+
+    }
+
+    /**
+     * @param ObjectManager $em
+     * @return array
+     */
+    public static function month_list(ObjectManager $em)
+    {
+        /**
+         * Select last Date of HF
+         */
+        $last = $em->getRepository(HistoryForecast::class)->findBy(
+            array(),
+            array('bookDate' => 'DESC'),
+            1
+        );
+
+        try {
+            $begin = new \DateTime();
+            $end = $last[0]->getBookDate();
+
+            $interval = \DateInterval::createFromDateString('1 day');
+            $period = new \DatePeriod($begin, $interval, $end);
+        } catch (\Exception $e) {
+            throw new AccessDeniedHttpException('Error creating DateTime: ' . $e->getMessage());
+        }
+
+        $lastMonth = null;
+        $months = array();
+
+        /* @var $dt \DateTime */
+        foreach ($period as $dt) {
+
+            if ($dt > $end) {
+                break;
+            }
+
+            if ($lastMonth !== $dt->format('m-Y')) {
+                $months[] = $dt->format('m-Y');
+
+            }
+
+            $lastMonth = $dt->format('m-Y');
+        }
+
+        return $months;
+
+    }
 
     /**
      * @param string $entity
@@ -42,7 +129,7 @@ class Helper
         /**
          * Check if we have "isActive"
          */
-        if(!method_exists($entity, 'getIsActive')){
+        if (!method_exists($entity, 'getIsActive')) {
             throw new HelperException('Entity has no "getIsActive" Method');
         }
 
@@ -56,10 +143,10 @@ class Helper
 
         $em->persist($entity);
 
-        try{
+        try {
             $em->flush();
-        }catch (\Exception $e){
-            throw new HelperException('MySQL Error: '.$e->getMessage());
+        } catch (\Exception $e) {
+            throw new HelperException('MySQL Error: ' . $e->getMessage());
         }
 
         return array(

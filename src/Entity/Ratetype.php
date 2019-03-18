@@ -48,6 +48,16 @@ class Ratetype
      */
     private $discountPercent;
 
+    /**
+     * @ORM\Column(type="integer")
+     */
+    private $minStay;
+
+    /**
+     * @ORM\Column(type="integer")
+     */
+    private $daysAdvance;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -121,6 +131,30 @@ class Ratetype
     public function setDiscountPercent(bool $discountPercent): self
     {
         $this->discountPercent = $discountPercent;
+
+        return $this;
+    }
+
+    public function getMinStay(): ?int
+    {
+        return $this->minStay;
+    }
+
+    public function setMinStay(int $minStay): self
+    {
+        $this->minStay = $minStay;
+
+        return $this;
+    }
+
+    public function getDaysAdvance(): ?int
+    {
+        return $this->daysAdvance;
+    }
+
+    public function setDaysAdvance(int $daysAdvance): self
+    {
+        $this->daysAdvance = $daysAdvance;
 
         return $this;
     }

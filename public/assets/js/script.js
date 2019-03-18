@@ -133,13 +133,13 @@ $(document).on('click', '#js-add-rate', function (e) {
     var $url = $btn.attr('data-url');
     var $table = $('#js-result-table');
 
-    var html = 'Would you like to add another Ratetype?<br />\n<div class="row">\n    <div class="col-10">\n        <input placeholder="Rate Name (e.g. Best available Rate)" value="" type="text" id="rate-name"/>\n    </div>\n</div>\n<div class="row">\n    <div class="col-10">\n        <input placeholder="Rate Name Short (e.g. BAR)" value="" type="text" id="rate-name-short"/>\n    </div>\n</div>\n<div class="row">\n    <div class="col-8">\n        <input placeholder="Discount from BaseRate" value="" type="text" id="rate-dc-amount"/>\n    </div>\n    <div class="col-2">\n        <select id="rate-dc-type" style="margin-top:30%;">\n            <option value="p">&percnt;</option>\n            <option value="e">&euro;</option>\n        </select>\n    </div>\n</div>\n<div class="row">\n    <div class="col-1">\n        <input style="position:relative;top:10px;" type="checkbox" id="rate-is-base">\n    </div>\n    <div class="col-9">\n        <span style="position:relative;top:10px;">is Baserate<br />(Discounts will be applied from this rate)</span>\n    </div>\n</div>';
+    var html = 'Would you like to add another Ratetype?<br />\n<div class="row">\n    <div class="col-10">\n        <input placeholder="Rate Name (e.g. Best available Rate)" value="" type="text" id="rate-name"/>\n    </div>\n</div>\n<div class="row">\n    <div class="col-10">\n        <input placeholder="Rate Name Short (e.g. BAR)" value="" type="text" id="rate-name-short"/>\n    </div>\n</div>\n<div class="row">\n    <div class="col-8">\n        <input placeholder="Discount from BaseRate" value="" type="text" id="rate-dc-amount"/>\n    </div>\n    <div class="col-2">\n        <select id="rate-dc-type" style="margin-top:30%;">\n            <option value="p">&percnt;</option>\n            <option value="e">&euro;</option>\n        </select>\n    </div>\n</div>\n<div class="row">\n    <div class="col-10">\n        <input placeholder="Minimum Stay" value="" type="text" id="rate-min-stay"/>\n    </div>\n</div>\n<div class="row">\n    <div class="col-10">\n        <input placeholder="Days in Advance" value="" type="text" id="rate-pre-days"/>\n    </div>\n</div>\n<div class="row">\n    <div class="col-1">\n        <input style="position:relative;top:10px;" type="checkbox" id="rate-is-base">\n    </div>\n    <div class="col-9">\n        <span style="position:relative;top:10px;">is Baserate<br />(Discounts will be applied from this rate)</span>\n    </div>\n</div>';
 
     x0p({
         title: 'Add Ratetype',
         text: html,
         html: true,
-        maxHeight: '400px',
+        maxHeight: '500px',
         maxWidth: '500px',
         animationType: 'fadeIn',
         buttons: [
@@ -161,6 +161,8 @@ $(document).on('click', '#js-add-rate', function (e) {
             var nameShort = $.trim($('#rate-name-short').val());
             var isBase = $('#rate-is-base:checked').val() ? 'yes' : 'no';
             var dcAmount = $.trim($('#rate-dc-amount').val());
+            var minStay = $.trim($('#rate-min-stay').val());
+            var preDays = $.trim($('#rate-pre-days').val());
             var dcType = $.trim($('#rate-dc-type').val());
 
             /* Ajax Call */
@@ -169,7 +171,9 @@ $(document).on('click', '#js-add-rate', function (e) {
                 nameShort: nameShort,
                 isBase: isBase,
                 dcAmount: dcAmount,
-                dcType: dcType
+                dcType: dcType,
+                minStay: minStay,
+                preDays: preDays
             })
                 .done(function (data) {
                     if (data.result === 'success') {
@@ -177,7 +181,9 @@ $(document).on('click', '#js-add-rate', function (e) {
                         $table.append('' +
                             '<div class="row table-font" style="border-bottom:1px solid #ccc;" id="row_'+data.extra.type+'_'+data.extra.id+'">\n    ' +
                             '   <div class="col-2" id="nameShort_'+data.extra.type+'_'+data.extra.id+'">'+data.extra.nameShort+'</div>\n    ' +
-                            '   <div class="col-6" id="name_'+data.extra.type+'_'+data.extra.id+'">'+data.extra.name+'</div>\n    ' +
+                            '   <div class="col-4" id="name_'+data.extra.type+'_'+data.extra.id+'">'+data.extra.name+'</div>\n    ' +
+                            '   <div class="col-1" id="minStay_'+data.extra.type+'_'+data.extra.id+'">'+data.extra.minStay+'</div>\n    ' +
+                            '   <div class="col-1" id="daysAdvance_'+data.extra.type+'_'+data.extra.id+'">'+data.extra.preDays+'</div>\n    ' +
                             '   <div class="col-1">'+data.extra.isBase+'</div>\n    ' +
                             '   <div class="col-1"><span class="badge badge-success" id="status_'+data.extra.type+'_'+data.extra.id+'">active</span></div>\n    ' +
                             '   <div class="col-1">\n        ' +
@@ -362,6 +368,8 @@ $(document).on('click', '#js-update-rate', function (e) {
     var $name = $('#rate-name');
     var $nameShort = $('#rate-name-short');
     var $isBase = $('#rate-base');
+    var $minStay = $('#rate-min-stay');
+    var $daysAdvance = $('#rate-days-advance');
     var $dcAmount = $('#rate-dc-amount');
     var $dcType = $('#rate-dc-type');
 
@@ -379,6 +387,8 @@ $(document).on('click', '#js-update-rate', function (e) {
     $.post(url, {
         name: $name.val(),
         nameShort: $nameShort.val(),
+        minStay: $minStay.val(),
+        daysAdvance: $daysAdvance.val(),
         isBase: $isBase.val(),
         id: id,
         dcAmount: $dcAmount.val(),
@@ -390,12 +400,16 @@ $(document).on('click', '#js-update-rate', function (e) {
                 closeDetails(function () {
                     var $nameRow = $('#name_' + data.extra.type + '_' + data.extra.id);
                     var $nameShortRow = $('#nameShort_' + data.extra.type + '_' + data.extra.id);
+                    var $minStayRow = $('#minStay_' + data.extra.type + '_' + data.extra.id);
+                    var $daysAdvanceRow = $('#daysAdvance_' + data.extra.type + '_' + data.extra.id);
                     var $isBaseRow = $('#base_' + data.extra.type + '_' + data.extra.id).parent();
                     var $dcAmountRow = $('#dc_amount_' + data.extra.type + '_' + data.extra.id);
                     var $dcTypeRow = $('#dc_type_' + data.extra.type + '_' + data.extra.id);
 
                     $nameRow.html(data.extra.name);
                     $nameShortRow.html(data.extra.nameShort);
+                    $minStayRow.html(data.extra.minStay);
+                    $daysAdvanceRow.html(data.extra.daysAdvance);
                     $isBaseRow.html(data.extra.isBase);
                     $dcAmountRow.html(data.extra.dcAmount);
                     $dcTypeRow.html(data.extra.dcType);
@@ -536,6 +550,44 @@ $(document).on('click', '.js-toggle-active', function (e) {
     ;
 
 });
+
+$(document).on('change','.inputfile',function(){
+
+    var $btn = $(this);
+    uploadReport($btn);
+
+});
+
+function uploadReport($btn){
+
+    var url = $btn.attr('data-url');
+    var form = $('#form_'+$btn.attr('data-report-type'))[0];
+    var formData = new FormData(form);
+
+    $.ajax({
+        url: url,
+        type: "POST",
+        data : formData,
+        processData: false,
+        contentType: false,
+        beforeSend: function() {
+
+        },
+        success: function(data){
+
+            openNoty('success', 'Upload succeeded');
+
+
+        },
+        error: function(xhr, ajaxOptions, thrownError) {
+            openNoty('error', 'Upload failed');
+            console.log(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+        }
+    });
+
+
+
+}
 
 /* Noty Function
  * type = {alert, success, error, warning, information}

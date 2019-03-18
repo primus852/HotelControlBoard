@@ -149,6 +149,9 @@
     "symfony/doctrine-bridge": {
         "version": "v4.2.3"
     },
+    "symfony/dom-crawler": {
+        "version": "v4.2.4"
+    },
     "symfony/dotenv": {
         "version": "v4.2.3"
     },
@@ -212,7 +215,13 @@
     "symfony/polyfill-intl-icu": {
         "version": "v1.10.0"
     },
+    "symfony/polyfill-intl-idn": {
+        "version": "v1.10.0"
+    },
     "symfony/polyfill-mbstring": {
+        "version": "v1.10.0"
+    },
+    "symfony/polyfill-php72": {
         "version": "v1.10.0"
     },
     "symfony/property-access": {
@@ -292,6 +301,9 @@
             "version": "4.1",
             "ref": "0cdc982334f45d554957a6167e030482795bf9d7"
         }
+    },
+    "symfony/var-dumper": {
+        "version": "v4.2.4"
     },
     "symfony/var-exporter": {
         "version": "v4.2.3"

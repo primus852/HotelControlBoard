@@ -1,0 +1,89 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <main id="main">
+        <div class="overlay"></div>
+        <header class="header">
+            <h1 class="page-title">
+                <a class="sidebar-toggle-btn trigger-toggle-sidebar">
+                    <span class="line"></span>
+                    <span class="line"></span>
+                    <span class="line"></span>
+                    <span class="line line-angle1"></span>
+                    <span class="line line-angle2"></span>
+                </a>Upload XML Reports
+            </h1>
+        </header>
+        <div id="main-nano-wrapper" class="nano">
+            <div class="nano-content" id="perfectScroll">
+                <div class="container-fluid" id="js-result-table">
+                    <div class="row">
+                        <div class="col-4">
+                            <form id="form_da">
+                                <input type="file" style="display:none;"
+                                       name="file-da[]"
+                                       id="file-da"
+                                       data-url="{{ path('ajaxUploadReports') }}"
+                                       data-report-type="da"
+                                       class="inputfile inputfile-1"
+                                       data-multiple-caption="{count} files selected"
+                                />
+                                <label for="file-da">
+                                    <i class="fa fa-upload"></i>
+                                    <span>Detailed Availability&hellip;</span>
+                                </label>
+                                <input type="hidden" name="report_type" value="da"/>
+                            </form>
+                        </div>
+                        <div class="col-4">
+                            <form id="form_hf">
+                                <input type="file" style="display:none;"
+                                       name="file-hf[]"
+                                       id="file-hf"
+                                       data-url="{{ path('ajaxUploadReports') }}"
+                                       data-report-type="hf"
+                                       class="inputfile inputfile-1"
+                                       data-multiple-caption="{count} files selected"
+                                />
+                                <label for="file-hf">
+                                    <i class="fa fa-upload"></i>
+                                    <span>History &amp; Forecast&hellip;</span>
+                                </label>
+                                <input type="hidden" name="report_type" value="hf"/>
+                            </form>
+                        </div>
+                        <div class="col-4">
+                            <form id="form_jb">
+                                <input type="file" style="display:none;"
+                                       name="file-jb[]"
+                                       id="file-jb"
+                                       data-url="{{ path('ajaxUploadReports') }}"
+                                       data-report-type="jb"
+                                       class="inputfile inputfile-1"
+                                       data-multiple-caption="{count} files selected"
+                                />
+                                <label for="file-jb">
+                                    <i class="fa fa-upload"></i>
+                                    <span>Journal Budget Month&hellip;</span>
+                                </label>
+                                <input type="hidden" name="report_type" value="jb"/>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <br/>
+        </div>
+    </main>
+{% endblock %}
+
+{% block stylesheets %}
+
+{% endblock stylesheets %}
+
+{% block javascripts %}
+    <script>
+        var GetNav = "contentSettingsUploads";
+    </script>
+{% endblock javascripts %}
+

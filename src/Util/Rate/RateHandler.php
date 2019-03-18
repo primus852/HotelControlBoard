@@ -33,6 +33,8 @@ class RateHandler
                 'nameShort' => $ratetype->getNameShort(),
                 'isActive' => $ratetype->getIsActive(),
                 'isBase' => $ratetype->getIsBase(),
+                'minStay' => $ratetype->getMinStay(),
+                'daysAdvance' => $ratetype->getDaysAdvance(),
                 'discountAmount' => $ratetype->getDiscountAmount(),
                 'discountPercent' => $ratetype->getDiscountPercent(),
                 'connections' => 0 //@todo: count connected x?

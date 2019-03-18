@@ -6,6 +6,8 @@ use App\Entity\Ratetype;
 use App\Entity\Roomtype;
 use App\Util\Helper\Helper;
 use App\Util\Helper\HelperException;
+use App\Util\Xml\HcbXmlReader;
+use App\Util\Xml\HcbXmlReaderException;
 use Doctrine\Common\Persistence\ObjectManager;
 use primus852\ShortResponse\ShortResponse;
 use primus852\SimpleCrypt\SimpleCrypt;
@@ -16,6 +18,49 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class AjaxController extends AbstractController
 {
+
+    /**
+     * @Route("/_ajax/_uploadReports", name="ajaxUploadReports")
+     * @param Request $request
+     * @param ObjectManager $em
+     * @return JsonResponse
+     */
+    public function uploadReports(Request $request, ObjectManager $em)
+    {
+
+        foreach ($request->files as $files) {
+
+            $type = $request->get('report_type');
+            $filename = $type . '.xml';
+
+            foreach ($files as $file) {
+                try {
+                    $file->move('reports', $filename);
+                } catch (\Exception $e) {
+                    return ShortResponse::error('Could not upload file', array(
+                        'error' => $e->getMessage(),
+                    ));
+                }
+
+                /**
+                 * Call the according XML Parser
+                 */
+                try {
+                    $raw = HcbXmlReader::$type();
+                } catch (HcbXmlReaderException $e) {
+                    return ShortResponse::exception('Failed to parse Report', $e->getMessage());
+                }
+            }
+
+            return ShortResponse::success('Upload succeeded, Report parsed', array(
+                'raw' => $raw
+            ));
+
+        }
+
+        die;
+
+    }
 
     /**
      * @Route("/_ajax/_updateRoomtype", name="ajaxUpdateRoomtype")
@@ -118,8 +163,10 @@ class AjaxController extends AbstractController
         $id = $request->get('id');
         $name = $request->get('name');
         $nameShort = $request->get('nameShort');
+        $minStay = (int)$request->get('minStay');
+        $daysAdvance = (int)$request->get('daysAdvance');
         $isBaseRate = $request->get('isBase') === 'yes' ? true : false;
-        $dcAmount = (float) str_replace(',','.',$request->get('dcAmount'));
+        $dcAmount = (float)str_replace(',', '.', $request->get('dcAmount'));
         $dcType = $request->get('dcType') === 'p' ? true : false;
 
         if ($name === null || trim($name) === '') {
@@ -186,13 +233,15 @@ class AjaxController extends AbstractController
         /**
          * If there is no BaseRate yet, no discount can be applied
          */
-        if($baseRate === null && $dcAmount > 0){
+        if ($baseRate === null && $dcAmount > 0) {
             return ShortResponse::error('There is no BaseRate defined. Please define a BaseRate before adding a discounted Rate');
         }
 
         $rate->setName($name);
         $rate->setNameShort($nameShort);
         $rate->setIsBase($isBaseRate);
+        $rate->setMinStay($minStay);
+        $rate->setDaysAdvance($daysAdvance);
         $rate->setDiscountAmount($dcAmount);
         $rate->setDiscountPercent($dcType);
 
@@ -208,6 +257,8 @@ class AjaxController extends AbstractController
             'id' => $rate->getId(),
             'type' => SimpleCrypt::enc('Ratetype'),
             'name' => $rate->getName(),
+            'minStay' => $rate->getMinStay(),
+            'daysAdvance' => $rate->getDaysAdvance(),
             'nameShort' => $rate->getNameShort(),
             'dcAmount' => $rate->getDiscountAmount(),
             'dcType' => $rate->getDiscountPercent() ? '&percnt;' : '&euro;',
@@ -274,7 +325,9 @@ class AjaxController extends AbstractController
         $name = $request->get('name');
         $short = $request->get('nameShort');
         $isBase = $request->get('isBase') === 'yes' ? true : false;
-        $dcAmount = (float) str_replace(',','.',$request->get('dcAmount'));
+        $dcAmount = (float)str_replace(',', '.', $request->get('dcAmount'));
+        $minStay = (int)$request->get('minStay');
+        $preDays = (int)$request->get('preDays');
         $dcType = $request->get('dcType') === 'p' ? true : false;
 
         /**
@@ -310,7 +363,7 @@ class AjaxController extends AbstractController
             /**
              * If the BaseRate is selected, no discount can be applied
              */
-            if($dcAmount > 0){
+            if ($dcAmount > 0) {
                 return ShortResponse::error('No Discount can be applied to the BaseRate');
             }
         }
@@ -318,7 +371,7 @@ class AjaxController extends AbstractController
         /**
          * If there is no BaseRate yet, no discount can be applied
          */
-        if($ratesBase === null && $dcAmount > 0){
+        if ($ratesBase === null && $dcAmount > 0) {
             return ShortResponse::error('There is no BaseRate defined. Please define a BaseRate before adding a discounted Rate');
         }
 
@@ -350,6 +403,8 @@ class AjaxController extends AbstractController
         $rate->setIsBase($isBase);
         $rate->setDiscountAmount($dcAmount);
         $rate->setDiscountPercent($dcType);
+        $rate->setDaysAdvance($preDays);
+        $rate->setMinStay($minStay);
         $rate->setIsActive(true);
 
         try {
@@ -364,6 +419,8 @@ class AjaxController extends AbstractController
             'name' => $rate->getName(),
             'nameShort' => $rate->getNameShort(),
             'dcAmount' => $rate->getDiscountAmount(),
+            'minStay' => $rate->getMinStay(),
+            'preDays' => $rate->getDaysAdvance(),
             'dcType' => $rate->getDiscountPercent() ? '&percnt;' : '&euro;',
             'isBase' => $rate->getIsBase() ? '<i class="fa fa-check" id="base_' . SimpleCrypt::enc('Ratetype') . '_' . $rate->getId() . '"></i>' : '<i class="fa fa-remove" id="base_' . SimpleCrypt::enc('Ratetype') . '_' . $rate->getId() . '"></i>',
             'link' => $this->generateUrl('renderRatetype', array(

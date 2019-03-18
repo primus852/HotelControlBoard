@@ -12,24 +12,30 @@
     <link type="text/css" rel="stylesheet" href="{{ asset('node_modules/bootstrap/dist/css/bootstrap.min.css') }}">
     <link type="text/css" rel="stylesheet" href="{{ asset('node_modules/font-awesome/css/font-awesome.min.css') }}">
     <link type="text/css" rel="stylesheet" href="{{ asset('node_modules/animate.css/animate.min.css') }}">
-    <link type="text/css" rel="stylesheet" href="{{ asset('node_modules/perfect-scrollbar/css/perfect-scrollbar.css') }}"/>
+    <link type="text/css" rel="stylesheet"
+          href="{{ asset('node_modules/perfect-scrollbar/css/perfect-scrollbar.css') }}"/>
     <link type="text/css" rel="stylesheet" href="{{ asset('node_modules/noty/lib/noty.css') }}">
     <link type="text/css" rel="stylesheet" href="{{ asset('node_modules/x0popup/dist/x0popup.min.css') }}">
-    <link type="text/css" rel="stylesheet" href="{{ asset('node_modules/tooltipster/dist/css/tooltipster.bundle.min.css') }}">
+    <link type="text/css" rel="stylesheet"
+          href="{{ asset('node_modules/tooltipster/dist/css/tooltipster.bundle.min.css') }}">
     <link type="text/css" rel="stylesheet" href="{{ asset('assets/css/tinymce.min.css') }}"/>
     <link type="text/css" rel="stylesheet" href="{{ asset('assets/css/style.min.css') }}"/>
     <link type="text/css" rel="stylesheet" href="{{ asset('assets/css/reset.css') }}"/>
     {% block stylesheets %}{% endblock %}
     <link type="text/css" rel="stylesheet" href="{{ asset('assets/css/overrides.min.css') }}"/>
+    <link type="text/css" rel="stylesheet" href="{{ asset('assets/css/custom-file-input.css') }}"/>
 </head>
 <body>
 
 <aside id="sidebar" class="nano">
     <div class="nano-content" id="pScrollerMenu">
         <div class="logo-container"><img src="{{ asset('assets/img/logo.png') }}" style="height:30px;" alt="Logo"/>HotelControlBoard
-            <div class="mw-version">User: {{ app.user ? app.user.username : 'NONE' }} <a href="{{ path('fos_user_security_logout') }}"><i class="fa fa-power-off tt" title="Logout"></i> </a> -
-                v{{ render(controller('App\\Controller\\RenderController::renderVersionAction')) }}<a href="{{ path('changelog') }}">&nbsp;<i class="fa fa-file tt"
-                                                                                                                                              title="Changelog"></i></a></div>
+            <div class="mw-version">User: {{ app.user ? app.user.username : 'NONE' }} <a
+                        href="{{ path('fos_user_security_logout') }}"><i class="fa fa-power-off tt" title="Logout"></i>
+                </a> -
+                v{{ render(controller('App\\Controller\\RenderController::renderVersionAction')) }}<a
+                        href="{{ path('changelog') }}">&nbsp;<i class="fa fa-file tt"
+                                                                title="Changelog"></i></a></div>
         </div>
         <div class="menu-segment">
             <div class="row">
@@ -49,41 +55,57 @@
         <menu class="menu-segment">
             <ul>
                 <li id="contentMain">
-                    <a href="#" class="mLink">
+                    <a href="{{ path('panel') }}" class="mLink">
                         <i class="fa fa-pie-chart"></i> Dashboard
                     </a>
                 </li>
             </ul>
         </menu>
         <div class="separator"></div>
-        {% if is_granted('ROLE_ADMIN') %}
-            <menu class="menu-segment">
-                <ul>
-                    <li>
-                        <a href="#" class="mLink toggleTree">
-                            <i class="fa fa-chevron-right"></i> Settings
-                        </a>
-                        <ul class="treeMenu">
+        <menu class="menu-segment">
+            <ul>
+                <li>
+                    <a href="#" class="mLink toggleTree">
+                        <i class="fa fa-chevron-right"></i> Settings
+                    </a>
+                    <ul class="treeMenu">
+                        <li id="contentSettingsUploads" class="treeItem">
+                            <a href="{{ path('settingsUploads') }}" class="mLink">
+                                <i class="fa fa-upload"></i> XML Upload
+                            </a>
+                        </li>
+                        {% if is_granted('ROLE_ADMIN') %}
+                            <li id="contentSettingsPrice" class="treeItem">
+                                <a href="{{ path('settingsRateplan') }}" class="mLink">
+                                    <i class="fa fa-calendar"></i> Rateplan
+                                </a>
+                            </li>
+                        {% endif %}
+                        {% if is_granted('ROLE_ADMIN') %}
                             <li id="contentSettingsRoomtypes" class="treeItem">
                                 <a href="{{ path('settingsRoomtypes') }}" class="mLink">
                                     <i class="fa fa-bed"></i> Roomtypes
                                 </a>
                             </li>
+                        {% endif %}
+                        {% if is_granted('ROLE_ADMIN') %}
                             <li id="contentSettingsRates" class="treeItem">
                                 <a href="{{ path('settingsRatetypes') }}" class="mLink">
                                     <i class="fa fa-money"></i> Ratetypes
                                 </a>
                             </li>
+                        {% endif %}
+                        {% if is_granted('ROLE_ADMIN') %}
                             <li id="contentSettingsHcb" class="treeItem">
                                 <a href="{{ path('settingsGlobal') }}" class="mLink">
                                     <i class="fa fa-cogs"></i> General
                                 </a>
                             </li>
-                        </ul>
-                    </li>
-                </ul>
-            </menu>
-        {% endif %}
+                        {% endif %}
+                    </ul>
+                </li>
+            </ul>
+        </menu>
         <div class="bottom-padding"></div>
     </div>
 </aside>
@@ -96,9 +118,11 @@
 <script type="text/javascript" src="{{ asset('node_modules/popper.js/dist/umd/popper.min.js') }}"></script>
 <script type="text/javascript" src="{{ asset('node_modules/bootstrap/dist/js/bootstrap.min.js') }}"></script>
 <script type="text/javascript" src="{{ asset('node_modules/x0popup/dist/x0popup.min.js') }}"></script>
-<script type="text/javascript" src="{{ asset('node_modules/perfect-scrollbar/dist/perfect-scrollbar.min.js') }}"></script>
+<script type="text/javascript"
+        src="{{ asset('node_modules/perfect-scrollbar/dist/perfect-scrollbar.min.js') }}"></script>
 <script type="text/javascript" src="{{ asset('node_modules/noty/lib/noty.min.js') }}"></script>
 <script type="text/javascript" src="{{ asset('node_modules/tooltipster/dist/js/tooltipster.bundle.min.js') }}"></script>
+<script type="text/javascript" src="{{ asset('assets/js/custom-file-input.js') }}"></script>
 <script type="text/javascript" src="{{ asset('assets/js/hashchange.min.js') }}"></script>
 {% block javascripts %}{% endblock %}
 <script type="text/javascript" src="{{ asset('assets/js/script.js') }}"></script>

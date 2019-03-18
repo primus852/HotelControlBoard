@@ -1,20 +1,37 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Hello DefaultController!{% endblock %}
-
 {% block body %}
-<style>
-    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
-    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
-</style>
+    <main id="main">
+        <div class="overlay"></div>
+        <header class="header">
+            <h1 class="page-title">
+                <a class="sidebar-toggle-btn trigger-toggle-sidebar">
+                    <span class="line"></span>
+                    <span class="line"></span>
+                    <span class="line"></span>
+                    <span class="line line-angle1"></span>
+                    <span class="line line-angle2"></span>
+                </a>Dashboard
+            </h1>
+        </header>
+        <div id="main-nano-wrapper" class="nano">
+            <div class="nano-content" id="perfectScroll">
+                <div class="container-fluid" id="js-result-table">
 
-<div class="example-wrapper">
-    <h1>Hello {{ controller_name }}! ✅</h1>
-
-    This friendly message is coming from:
-    <ul>
-        <li>Your controller at <code><a href="{{ '/var/www/html/src/Controller/DefaultController.php'|file_link(0) }}">src/Controller/DefaultController.php</a></code></li>
-        <li>Your template at <code><a href="{{ '/var/www/html/templates/default/index.html.twig'|file_link(0) }}">templates/default/index.html.twig</a></code></li>
-    </ul>
-</div>
+                </div>
+            </div>
+            <br/>
+        </div>
+    </main>
 {% endblock %}
+
+{% block stylesheets %}
+
+{% endblock stylesheets %}
+
+{% block javascripts %}
+    <script>
+        var GetNav = "contentMain";
+    </script>
+{% endblock javascripts %}
+

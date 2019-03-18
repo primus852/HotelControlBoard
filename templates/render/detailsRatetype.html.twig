@@ -39,15 +39,23 @@
                                                         <option value="no" {% if not rate.isBase %}selected="selected"{% endif %}>No</option>
                                                     </select>
                                                 </div>
-                                                <div class="col-5">
+                                                <div class="col-3">
                                                     <label for="rate-name">Name</label>
                                                     <input type="text" id="rate-name" value="{{ rate.name }}">
                                                 </div>
-                                                <div class="col-3">
-                                                    <label for="rate-name">Short Name</label>
+                                                <div class="col-2">
+                                                    <label for="rate-name-short">Short Name</label>
                                                     <input type="text" id="rate-name-short" value="{{ rate.nameShort }}">
                                                 </div>
                                                 <div class="col-2">
+                                                    <label for="rate-min-stay">Minimum Stay</label>
+                                                    <input type="text" id="rate-min-stay" value="{{ rate.minStay }}">
+                                                </div>
+                                                <div class="col-2">
+                                                    <label for="rate-days-advance">Days Advance</label>
+                                                    <input type="text" id="rate-days-advance" value="{{ rate.daysAdvance }}">
+                                                </div>
+                                                <div class="col-1">
                                                     <label for="rate-dc-amount">Discount</label>
                                                     <input type="text" id="rate-dc-amount" value="{{ rate.discountAmount }}">
                                                 </div>

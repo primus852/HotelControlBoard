@@ -40,6 +40,46 @@ class DefaultController extends AbstractController
     }
 
     /**
+     * @Route("/panel/settings/xml-uploads", name="settingsUploads")
+     * @param ObjectManager $em
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     */
+    public function settingsUploads(ObjectManager $em)
+    {
+
+        /* @var $security SecurityChecker */
+        $security = new SecurityChecker($this->getUser(), $this->container);
+
+        if (!$security->hasRole($this->getUser())) {
+            return $this->redirectToRoute('login');
+        }
+
+        return $this->render('default/settingsUpload.html.twig', array());
+
+    }
+
+    /**
+     * @Route("/panel/settings/rateplan", name="settingsRateplan")
+     * @param ObjectManager $em
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     */
+    public function settingsRateplan(ObjectManager $em)
+    {
+
+        /* @var $security SecurityChecker */
+        $security = new SecurityChecker($this->getUser(), $this->container);
+
+        if (!$security->hasRole($this->getUser())) {
+            return $this->redirectToRoute('login');
+        }
+
+        return $this->render('default/settingsRoomtypes.html.twig', array(
+            'rooms' => RoomHandler::gather_all($em)
+        ));
+
+    }
+
+    /**
      * @Route("/panel/settings/room-types", name="settingsRoomtypes")
      * @param ObjectManager $em
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response

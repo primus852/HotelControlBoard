@@ -20,16 +20,20 @@
                 <div class="container-fluid" id="js-result-table">
                     <div class="row table-font-thicker" style="border-bottom:2px solid #ccc;">
                         <div class="col-2">Short</div>
-                        <div class="col-6">Name</div>
+                        <div class="col-4">Name</div>
+                        <div class="col-1">min. Stay</div>
+                        <div class="col-1">pre Days</div>
                         <div class="col-1">BaseRate</div>
                         <div class="col-1">Status</div>
-                        <div class="col-1">Discount from Base</div>
+                        <div class="col-1">Discount</div>
                         <div class="col-1">Action</div>
                     </div>
                     {% for rate in rates %}
                         <div class="row table-font" style="border-bottom:1px solid #ccc;" id="row_{{ 'Ratetype'|encrypt }}_{{ rate.id }}">
                             <div class="col-2" id="nameShort_{{ 'Ratetype'|encrypt }}_{{ rate.id }}">{{ rate.nameShort }}</div>
-                            <div class="col-6" id="name_{{ 'Ratetype'|encrypt }}_{{ rate.id }}">{{ rate.name }}</div>
+                            <div class="col-4" id="name_{{ 'Ratetype'|encrypt }}_{{ rate.id }}">{{ rate.name }}</div>
+                            <div class="col-1" id="minStay_{{ 'Ratetype'|encrypt }}_{{ rate.id }}">{{ rate.minStay }}</div>
+                            <div class="col-1" id="daysAdvance_{{ 'Ratetype'|encrypt }}_{{ rate.id }}">{{ rate.daysAdvance }}</div>
                             <div class="col-1">{% if rate.isBase == true %}<i class="fa fa-check" id="base_{{ 'Ratetype'|encrypt }}_{{ rate.id }}"></i>{% else %}<i class="fa fa-remove" id="base_{{ 'Ratetype'|encrypt }}_{{ rate.id }}"></i>{% endif %}</div>
                             <div class="col-1">{% if rate.isActive %}<span class="badge badge-success" id="status_{{ 'Ratetype'|encrypt }}_{{ rate.id }}">active</span>{% else %}<span class="badge badge-danger" id="status_{{ 'Ratetype'|encrypt }}_{{ rate.id }}">inactive</span>{% endif %}</div>
                             <div class="col-1">

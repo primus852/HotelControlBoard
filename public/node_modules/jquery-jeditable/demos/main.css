@@ -1,0 +1,35 @@
+body {
+	text-align: center;
+	font-size: 120%;
+    background-color: #eee;
+}
+
+.jumbotron {
+    background-color: #fff;
+}
+
+.editable input[type=submit] {
+  color: #F00;
+  font-weight: bold;
+}
+.editable input[type=button] {
+  color: #0F0;
+  font-weight: bold;
+}
+
+.inline {
+    display: inline;
+}
+
+h4 {
+    text-align: left;
+}
+
+/* for the full example */
+label {
+    margin-right: 5px;
+}
+
+.custom-class {
+    font-size: 110%;
+}

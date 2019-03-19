@@ -33,8 +33,14 @@
                     </div>
                     <br/>
                     <div class="row" style="margin: 0 auto;">
-                        {% for hf in hfs %}
-                            <div class="col-2" style="border:1px solid #ddd;margin-bottom:5px;height:50px;line-height:50px;">B: {{ hf.bookedRooms }}</div>
+                        {% for bookDate, hf in hfs %}
+                            <div class="col-2 ratebox">
+                                <span class="ratebox-rate edit" id="{{ hf.id }}_{{ bookDate }}">{{ hf.rate|number_format(2) }}</span>
+                                <span class="ratebox-date">{{ bookDate|date('d.m.Y') }}</span>
+                                <span class="ratebox-suggested tt text-{{ hf.suggested.useClass }}" id="sugg_{{ hf.id }}_{{ bookDate }}" title="Suggested Rate">{{ hf.suggested.rate|number_format(0) }}&euro;</span>
+                                <span class="ratebox-stats tt" title="Arrivals/Departures/Occ/Pax"><i class="fa fa-arrow-down"></i> {{ hf.arrivals }} | <i class="fa fa-arrow-up"></i> {{ hf.departures }} | <i
+                                            class="fa fa-percent"></i> {{ hf.occ|number_format(2) }} | <i class="fa fa-users"></i> {{ hf.pax }}</span>
+                            </div>
                         {% endfor %}
                     </div>
                 </div>
@@ -53,8 +59,38 @@
         var GetNav = "contentSettingsPrice";
     </script>
     <script>
-        $(document).on('change','#js-select-rateplan-date',function(){
-            window.location.assign('{{ path('settingsRateplan') }}/'+$(this).val());
+
+        $(document).ready(function () {
+
+            $('.edit').each(function () {
+
+                var v = $(this);
+                var id = v.attr('id');
+
+                v.editable('{{ path('ajaxEditRateplan') }}', {
+                    select: true,
+                    callback: function (result, settings, submitdata) {
+                        var r = parseFloat(result);
+                        var $sugg = $('#sugg_' + id);
+                        var sugg = parseFloat($sugg.html().replace('€','').replace('&euro;',''));
+                        var diff = Math.abs(r - sugg);
+                        if (diff >= 10 && diff < 30) {
+                            $sugg.removeClass('text-success').removeClass('text-danger').addClass('text-warning');
+                        } else if (diff >= 30) {
+                            $sugg.removeClass('text-success').removeClass('text-warning').addClass('text-danger');
+                        } else {
+                            $sugg.removeClass('text-warning').removeClass('text-danger').addClass('text-success');
+                        }
+                    }
+                });
+
+            });
+
+
+        });
+
+        $(document).on('change', '#js-select-rateplan-date', function () {
+            window.location.assign('{{ path('settingsRateplan') }}/' + $(this).val());
         });
     </script>
 {% endblock javascripts %}

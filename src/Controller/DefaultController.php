@@ -6,6 +6,7 @@ use App\Entity\HcbSettings;
 use App\Util\Helper\Helper;
 use App\Util\Helper\HelperException;
 use App\Util\Rate\RateHandler;
+use App\Util\Rate\RateHandlerException;
 use App\Util\Room\RoomHandler;
 use App\Util\SecurityChecker;
 use Doctrine\Common\Persistence\ObjectManager;
@@ -94,8 +95,8 @@ class DefaultController extends AbstractController
         }
 
         try{
-            $hfs = Helper::hf_by_date($now->format('m-Y'), $em);
-        }catch (HelperException $e){
+            $hfs = RateHandler::hf_by_date($now->format('m-Y'), $em);
+        }catch (RateHandlerException $e){
             throw new AccessDeniedHttpException('Helper Error: '.$e->getMessage());
         }
 

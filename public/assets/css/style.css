@@ -1926,3 +1926,55 @@ input[type="text"]:disabled, input[type="password"]:disabled {
     border-right: 0 !important;
     border-bottom: 1px solid #ddd !important;
 }
+
+.ratebox{
+    border:1px solid #ddd;
+    margin-bottom:5px;
+    height:65px;
+    color:#9a9a9a;
+}
+
+.ratebox-rate{
+    position: absolute;
+    top:5px;
+    left:5px;
+    font-size:40px;
+    font-weight:100;
+}
+.ratebox-rate form{
+    position: absolute;
+    top:-12px;
+    left:-10px;
+    font-weight: 100;
+}
+
+.ratebox-rate form input{
+    border: 0;
+}
+
+.ratebox-stats{
+    position:absolute;
+    bottom:2px;
+    left:5px;
+    font-size:12px;
+    font-style: italic;
+    font-weight:200;
+}
+
+.ratebox-date{
+    position: absolute;
+    top:2px;
+    right:5px;
+    font-size:12px;
+    font-style: italic;
+    font-weight:300;
+}
+
+.ratebox-suggested{
+    position: absolute;
+    top:16px;
+    right:5px;
+    font-size:12px;
+    font-style: italic;
+    font-weight:300;
+}

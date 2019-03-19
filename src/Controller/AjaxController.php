@@ -2,12 +2,12 @@
 
 namespace App\Controller;
 
+use App\Entity\Rateplan;
 use App\Entity\Ratetype;
 use App\Entity\Roomtype;
 use App\Util\Helper\Helper;
 use App\Util\Helper\HelperException;
 use App\Util\Xml\HcbXmlReader;
-use App\Util\Xml\HcbXmlReaderException;
 use Doctrine\Common\Persistence\ObjectManager;
 use primus852\ShortResponse\ShortResponse;
 use primus852\SimpleCrypt\SimpleCrypt;
@@ -15,10 +15,55 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 class AjaxController extends AbstractController
 {
+
+    /**
+     * @Route("/_ajax/_editRateplan", name="ajaxEditRateplan")
+     * @param Request $request
+     * @param ObjectManager $em
+     * @return JsonResponse|Response
+     * @throws \Exception
+     */
+    public function editRateplan(Request $request, ObjectManager $em)
+    {
+
+        $value = (float) str_replace(',', '.', $request->get('value'));
+        $pre = explode('_',$request->get('id'));
+        $bookDate = \DateTime::createFromFormat('Y-m-d', $pre[1]);
+        $id = $pre[0];
+
+        if ($bookDate === false) {
+            return ShortResponse::error('Could not create Date: ' . $request->get('bookDate'));
+        }
+
+        if ($id === 'new') {
+            $rateplan = new Rateplan();
+            $rateplan->setBookDate($bookDate);
+        } else {
+
+            $rateplan = $em->getRepository(Rateplan::class)->find($id);
+
+            if ($rateplan === null) {
+                throw new \Exception('Could not find Rateplan ID: '.$id);
+            }
+        }
+
+        $rateplan->setPrice($value);
+        $em->persist($rateplan);
+
+        try{
+            $em->flush();
+        }catch (\Exception $e){
+            throw new \Exception($e->getMessage());
+        }
+
+        return new Response(number_format($rateplan->getPrice(),2));
+
+    }
 
     /**
      * @Route("/_ajax/_uploadReports", name="ajaxUploadReports")

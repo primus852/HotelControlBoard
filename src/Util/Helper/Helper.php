@@ -10,6 +10,7 @@ namespace App\Util\Helper;
 
 
 use App\Entity\HistoryForecast;
+use App\Entity\Rateplan;
 use App\Entity\Ratetype;
 use App\Entity\Roomtype;
 use Doctrine\Common\Collections\Criteria;
@@ -21,43 +22,6 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 class Helper
 {
-
-    /**
-     * @param string $date_string
-     * @param ObjectManager $em
-     * @return \Doctrine\Common\Collections\Collection
-     * @throws HelperException
-     */
-    public static function hf_by_date(string $date_string, ObjectManager $em)
-    {
-
-        $date = \DateTime::createFromFormat('d-m-Y', '01-'.$date_string);
-
-        if ($date === false) {
-            throw new HelperException('Could not create DateTime: ' . $date_string);
-        }
-
-        $start_date = \DateTime::createFromFormat('Y-m-d',$date->format('Y').'-'.$date->format('m').'-01');
-        $start_date->setTime(0,0,0);
-
-        try{
-            $end_date = new \DateTime('Last day of '.$date->format('F').' '.$date->format('Y'));
-            $end_date->setTime(23,59,59);
-        }catch (\Exception $e){
-            throw new HelperException('Could not create EndDate: '.$e->getMessage());
-        }
-
-        $criteria = Criteria::create();
-        $criteria->where(Criteria::expr()->andX(
-            Criteria::expr()->gte('bookDate',$start_date),
-            Criteria::expr()->lte('bookDate',$end_date)
-        ));
-
-        $list = $em->getRepository(HistoryForecast::class)->matching($criteria);
-
-        return $list;
-
-    }
 
     /**
      * @param ObjectManager $em

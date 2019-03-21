@@ -38,8 +38,8 @@
                                 <span class="ratebox-rate edit" id="{{ hf.id }}_{{ bookDate }}">{{ hf.rate|number_format(2) }}</span>
                                 <span class="ratebox-date">{{ bookDate|date('d.m.Y') }}</span>
                                 <span class="ratebox-suggested tt text-{{ hf.suggested.useClass }}" id="sugg_{{ hf.id }}_{{ bookDate }}" title="Suggested Rate">{{ hf.suggested.rate|number_format(0) }}&euro;</span>
-                                <span class="ratebox-stats tt" title="Arrivals/Departures/Occ/Pax"><i class="fa fa-arrow-down"></i> {{ hf.arrivals }} | <i class="fa fa-arrow-up"></i> {{ hf.departures }} | <i
-                                            class="fa fa-percent"></i> {{ hf.occ|number_format(2) }} | <i class="fa fa-users"></i> {{ hf.pax }}</span>
+                                <span class="ratebox-stats tt" title="Arrivals/Departures/Occ/Avail/Pax"><i class="fa fa-arrow-down"></i> {{ hf.arrivals }} | <i class="fa fa-arrow-up"></i> {{ hf.departures }} | <i
+                                            class="fa fa-percent"></i> {{ hf.occ|number_format(2) }} | <i class="fa fa-server"></i> {{ hf.avail }} | <i class="fa fa-users"></i> {{ hf.pax }}</span>
                             </div>
                         {% endfor %}
                     </div>
@@ -58,9 +58,24 @@
     <script>
         var GetNav = "contentSettingsPrice";
     </script>
+    <script type="text/javascript" src="{{ asset('node_modules/chartkick/dist/chartkick.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('node_modules/chart.js/dist/Chart.bundle.min.js') }}"></script>
     <script>
 
         $(document).ready(function () {
+
+            {% set chartRate = "" %}
+            {% set chartAvail = "" %}
+            {% for bookDate, hf in hfs %}
+            {% set chartRate = chartRate ~ "\""~ bookDate ~"\": "~ hf.rate~"," %}
+            {% set chartAvail = chartAvail ~ "\""~ bookDate ~"\": "~ hf.avail~"," %}
+            {% endfor %}
+
+            var data = [
+                {name: "Rate", data: {{ ("{"~chartRate~"}}")|raw }},
+                {name: "Available Rooms", data: {{ ("{"~chartAvail~"}}")|raw }}
+            ];
+            new Chartkick.LineChart("js-chart-month", data);
 
             $('.edit').each(function () {
 
@@ -72,7 +87,7 @@
                     callback: function (result, settings, submitdata) {
                         var r = parseFloat(result);
                         var $sugg = $('#sugg_' + id);
-                        var sugg = parseFloat($sugg.html().replace('€','').replace('&euro;',''));
+                        var sugg = parseFloat($sugg.html().replace('€', '').replace('&euro;', ''));
                         var diff = Math.abs(r - sugg);
                         if (diff >= 10 && diff < 30) {
                             $sugg.removeClass('text-success').removeClass('text-danger').addClass('text-warning');

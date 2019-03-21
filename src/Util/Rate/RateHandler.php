@@ -119,6 +119,7 @@ class RateHandler
                 'departures' => $hf->getDepartureRooms(),
                 'pax' => $hf->getPax(),
                 'occ' => (100 * $hf->getBookedRooms() / $hf->getTotalRooms()),
+                'avail' => $hf->getTotalRooms() - $hf->getBookedRooms(),
                 'field' => SimpleCrypt::enc('Rateplan'),
                 'id' => $id,
                 'suggested' => array(

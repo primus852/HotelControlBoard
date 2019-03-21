@@ -1974,7 +1974,7 @@ input[type="text"]:disabled, input[type="password"]:disabled {
     position: absolute;
     top:16px;
     right:5px;
-    font-size:12px;
+    font-size:15px;
     font-style: italic;
     font-weight:300;
 }

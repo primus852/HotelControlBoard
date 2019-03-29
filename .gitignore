@@ -119,3 +119,4 @@ fabric.properties
 /.web-server-pid
 /public/reports/
 /src/Migrations/
+/.env

@@ -116,10 +116,7 @@
                             date.setDate(date.getDate() + 1);
                         }
 
-
-
                         var newDate = moment(date).format('YYYY-MM-DD');
-                        console.log(newDate);
                         var r = parseFloat(result);
                         var $sugg = $('#sugg_' + id);
                         var sugg = parseFloat($sugg.html().replace('€', '').replace('&euro;', ''));

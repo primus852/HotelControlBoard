@@ -14,6 +14,7 @@
                             <span class="line line-angle1"></span>
                             <span class="line line-angle2"></span>
                         </a>Rateplan {{ date_string }}
+                        <a href="{{ path('openRatesheet',{'date_string':currMonth}) }}" class="btn btn-success btn-sm"><i class="fa fa-calendar"></i> Generate Ratesheet</a>
                     </h1>
                 </div>
                 <div class="col-1 text-right">
@@ -35,11 +36,12 @@
                     <div class="row" style="margin: 0 auto;">
                         {% for bookDate, hf in hfs %}
                             <div class="col-2 ratebox">
-                                <span class="ratebox-rate edit" id="{{ hf.id }}_{{ bookDate }}">{{ hf.rate|number_format(2) }}</span>
+                                <span class="ratebox-rate {% if is_granted('ROLE_SUPER_ADMIN') %}edit{% endif %}" id="{{ hf.id }}_{{ bookDate }}">{{ hf.rate|number_format(2) }}</span>
                                 <span class="ratebox-date">{{ bookDate|date('d.m.Y') }}</span>
                                 <span class="ratebox-suggested tt text-{{ hf.suggested.useClass }}" id="sugg_{{ hf.id }}_{{ bookDate }}" title="Suggested Rate">{{ hf.suggested.rate|number_format(0) }}&euro;</span>
                                 <span class="ratebox-stats tt" title="Arrivals/Departures/Occ/Avail/Pax"><i class="fa fa-arrow-down"></i> {{ hf.arrivals }} | <i class="fa fa-arrow-up"></i> {{ hf.departures }} | <i
                                             class="fa fa-percent"></i> {{ hf.occ|number_format(2) }} | <i class="fa fa-server"></i> {{ hf.avail }} | <i class="fa fa-users"></i> {{ hf.pax }}</span>
+                                <span class="ratebox-cxl cxl{{ hf.cxl }} tt" title="CXL: {{ hf.cxlText }}" data-id="{{ hf.id }}"></span>
                             </div>
                         {% endfor %}
                     </div>
@@ -60,20 +62,40 @@
     </script>
     <script type="text/javascript" src="{{ asset('node_modules/chartkick/dist/chartkick.js') }}"></script>
     <script type="text/javascript" src="{{ asset('node_modules/chart.js/dist/Chart.bundle.min.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('node_modules/moment/min/moment-with-locales.min.js') }}"></script>
     <script>
 
-        $(document).ready(function () {
+        var lastPress;
+        var shifted;
 
+        $(document).on('keyup', function (e) {
+            lastPress = e.key;
+        });
+
+
+        $(document).keydown(function (e) {
+            shifted = e.shiftKey;
+            if (e.keyCode === 9) {  //tab pressed
+                e.preventDefault();
+                $('input').blur();
+
+            }
+        });
+
+
+
+
+        $(document).ready(function () {
             {% set chartRate = "" %}
             {% set chartAvail = "" %}
             {% for bookDate, hf in hfs %}
             {% set chartRate = chartRate ~ "\""~ bookDate ~"\": "~ hf.rate~"," %}
-            {% set chartAvail = chartAvail ~ "\""~ bookDate ~"\": "~ hf.avail~"," %}
+            {% set chartAvail = chartAvail ~ "\""~ bookDate ~"\": "~ hf.booked~"," %}
             {% endfor %}
 
             var data = [
                 {name: "Rate", data: {{ ("{"~chartRate~"}}")|raw }},
-                {name: "Available Rooms", data: {{ ("{"~chartAvail~"}}")|raw }}
+                {name: "Booked Rooms", data: {{ ("{"~chartAvail~"}}")|raw }}
             ];
             new Chartkick.LineChart("js-chart-month", data);
 
@@ -84,7 +106,20 @@
 
                 v.editable('{{ path('ajaxEditRateplan') }}', {
                     select: true,
+                    onblur: 'submit',
                     callback: function (result, settings, submitdata) {
+
+                        var date = new Date(submitdata.id.substr(submitdata.id.length - 10, submitdata.id.length));
+                        if(shifted){
+                            date.setDate(date.getDate() - 1);
+                        }else{
+                            date.setDate(date.getDate() + 1);
+                        }
+
+
+
+                        var newDate = moment(date).format('YYYY-MM-DD');
+                        console.log(newDate);
                         var r = parseFloat(result);
                         var $sugg = $('#sugg_' + id);
                         var sugg = parseFloat($sugg.html().replace('€', '').replace('&euro;', ''));
@@ -96,13 +131,30 @@
                         } else {
                             $sugg.removeClass('text-warning').removeClass('text-danger').addClass('text-success');
                         }
+                        if (lastPress === 'Tab') {
+                            $("[id$=" + newDate + "]").trigger('click');
+                        }
+
                     }
                 });
 
             });
 
+        });
+        {% if is_granted('ROLE_SUPER_ADMIN') %}
+        $(document).on('click', '.ratebox-cxl', function (e) {
+            e.preventDefault();
+
+            var $btn = $(this);
+            var id = $btn.attr('data-id');
+
+            $.post('{{ path('ajaxEditCxl') }}', {id: id})
+                .done(function (data) {
+                    $btn.removeClass('cxlreg').removeClass('cxl2').removeClass('cxl4').addClass('cxl' + data.extra.cssClass);
+                });
 
         });
+        {% endif %}
 
         $(document).on('change', '#js-select-rateplan-date', function () {
             window.location.assign('{{ path('settingsRateplan') }}/' + $(this).val());

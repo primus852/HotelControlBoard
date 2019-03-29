@@ -34,6 +34,57 @@ class RateHandler
         '51-54' => 300,
     );
 
+    const RATE_COLORS = array(
+        150 => array(
+            'color' => '#F7FFF6',
+            'font' => '#000',
+        ),
+        160 => array(
+            'color' => '#BCEBCB',
+            'font' => '#000',
+        ),
+        170 => array(
+            'color' => '#87D68D',
+            'font' => '#000',
+        ),
+        180 => array(
+            'color' => '#93B48B',
+            'font' => '#000',
+        ),
+        190 => array(
+            'color' => '#7C9885',
+            'font' => '#000',
+        ),
+        200 => array(
+            'color' => '#DE9151',
+            'font' => '#000',
+        ),
+        210 => array(
+            'color' => '#D64933',
+            'font' => '#000',
+        ),
+        220 => array(
+            'color' => '#8491A3',
+            'font' => '#000',
+        ),
+        240 => array(
+            'color' => '#2E86AB',
+            'font' => '#000',
+        ),
+        260 => array(
+            'color' => '#564138',
+            'font' => '#fff',
+        ),
+        280 => array(
+            'color' => '#565554',
+            'font' => '#fff',
+        ),
+        300 => array(
+            'color' => '#090909',
+            'font' => '#fff',
+        ),
+    );
+
     /**
      * @param ObjectManager $em
      * @return array
@@ -44,7 +95,7 @@ class RateHandler
 
         $ratetypes = $em->getRepository(Ratetype::class)->findAll();
 
-        foreach($ratetypes as $ratetype){
+        foreach ($ratetypes as $ratetype) {
 
             $rates[] = array(
                 'id' => $ratetype->getId(),
@@ -75,26 +126,26 @@ class RateHandler
 
         $list = array();
 
-        $date = \DateTime::createFromFormat('d-m-Y', '01-'.$date_string);
+        $date = \DateTime::createFromFormat('d-m-Y', '01-' . $date_string);
 
         if ($date === false) {
             throw new RateHandlerException('Could not create DateTime: ' . $date_string);
         }
 
-        $start_date = \DateTime::createFromFormat('Y-m-d',$date->format('Y').'-'.$date->format('m').'-01');
-        $start_date->setTime(0,0,0);
+        $start_date = \DateTime::createFromFormat('Y-m-d', $date->format('Y') . '-' . $date->format('m') . '-01');
+        $start_date->setTime(0, 0, 0);
 
-        try{
-            $end_date = new \DateTime('Last day of '.$date->format('F').' '.$date->format('Y'));
-            $end_date->setTime(23,59,59);
-        }catch (\Exception $e){
-            throw new RateHandlerException('Could not create EndDate: '.$e->getMessage());
+        try {
+            $end_date = new \DateTime('Last day of ' . $date->format('F') . ' ' . $date->format('Y'));
+            $end_date->setTime(23, 59, 59);
+        } catch (\Exception $e) {
+            throw new RateHandlerException('Could not create EndDate: ' . $e->getMessage());
         }
 
         $criteria = Criteria::create();
         $criteria->where(Criteria::expr()->andX(
-            Criteria::expr()->gte('bookDate',$start_date),
-            Criteria::expr()->lte('bookDate',$end_date)
+            Criteria::expr()->gte('bookDate', $start_date),
+            Criteria::expr()->lte('bookDate', $end_date)
         ));
 
         $hfs = $em->getRepository(HistoryForecast::class)->matching($criteria);
@@ -103,7 +154,7 @@ class RateHandler
          * Combine them with Rateplan
          * @var $hf HistoryForecast
          */
-        foreach($hfs as $hf){
+        foreach ($hfs as $hf) {
 
             $rateplan = $em->getRepository(Rateplan::class)->findOneBy(array(
                 'bookDate' => $hf->getBookDate()
@@ -112,14 +163,19 @@ class RateHandler
             $price = $rateplan === null ? 0 : $rateplan->getPrice();
             $id = $rateplan === null ? 'new' : $rateplan->getId();
             $suggested = self::suggested_rate($hf->getBookedRooms());
+            $cxl = $rateplan === null ? 'reg' : ($rateplan->getCxl() === null ? 'reg' : $rateplan->getCxl());
+            $cxlText = $rateplan === null ? '24hrs' : ($rateplan->getCxl() === null ? '24hrs' : $rateplan->getCxl().' weeks');
 
             $list[$hf->getBookDate()->format('Y-m-d')] = array(
                 'rate' => $price,
                 'arrivals' => $hf->getArrivalRooms(),
                 'departures' => $hf->getDepartureRooms(),
                 'pax' => $hf->getPax(),
+                'cxl' => $cxl,
+                'cxlText' => $cxlText,
                 'occ' => (100 * $hf->getBookedRooms() / $hf->getTotalRooms()),
                 'avail' => $hf->getTotalRooms() - $hf->getBookedRooms(),
+                'booked' => $hf->getBookedRooms(),
                 'field' => SimpleCrypt::enc('Rateplan'),
                 'id' => $id,
                 'suggested' => array(
@@ -149,11 +205,11 @@ class RateHandler
 
         $useClass = 'success';
 
-        if($diff >= 10){
+        if ($diff >= 10) {
             $useClass = 'warning';
         }
 
-        if($diff >= 30){
+        if ($diff >= 30) {
             $useClass = 'danger';
         }
 
@@ -167,13 +223,13 @@ class RateHandler
     private static function suggested_rate(int $bookedRooms)
     {
 
-        foreach(self::RATE_STEPS as $val => $rate){
+        foreach (self::RATE_STEPS as $val => $rate) {
 
-            $pre = explode('-',$val);
-            $from = (int) $pre[0];
-            $to = (int) $pre[1];
+            $pre = explode('-', $val);
+            $from = (int)$pre[0];
+            $to = (int)$pre[1];
 
-            if($bookedRooms >= $from && $bookedRooms <= $to){
+            if ($bookedRooms >= $from && $bookedRooms <= $to) {
                 return $rate;
             }
 

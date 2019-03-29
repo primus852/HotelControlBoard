@@ -8,6 +8,8 @@
         "ext-iconv": "*",
         "erusev/parsedown": "^1.7",
         "friendsofsymfony/user-bundle": "~2.0",
+        "knplabs/knp-snappy": "^1.1",
+        "knplabs/knp-snappy-bundle": "^1.6",
         "primus852/simple-crypt": "^1.2",
         "primus852/symfony-short-response": "dev-master",
         "sensio/framework-extra-bundle": "^5.2",

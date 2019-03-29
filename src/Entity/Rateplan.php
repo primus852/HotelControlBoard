@@ -26,6 +26,11 @@ class Rateplan
      */
     private $price;
 
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    private $cxl;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -51,6 +56,18 @@ class Rateplan
     public function setPrice($price): self
     {
         $this->price = $price;
+
+        return $this;
+    }
+
+    public function getCxl(): ?int
+    {
+        return $this->cxl;
+    }
+
+    public function setCxl(?int $cxl): self
+    {
+        $this->cxl = $cxl;
 
         return $this;
     }

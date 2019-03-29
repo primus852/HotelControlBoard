@@ -8,7 +8,9 @@ use App\Entity\Roomtype;
 use App\Util\Helper\Helper;
 use App\Util\Helper\HelperException;
 use App\Util\Xml\HcbXmlReader;
+use DateTime;
 use Doctrine\Common\Persistence\ObjectManager;
+use Exception;
 use primus852\ShortResponse\ShortResponse;
 use primus852\SimpleCrypt\SimpleCrypt;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -22,18 +24,67 @@ class AjaxController extends AbstractController
 {
 
     /**
+     * @Route("/_ajax/_editCxl", name="ajaxEditCxl")
+     * @param Request $request
+     * @param ObjectManager $em
+     * @return JsonResponse|Response
+     * @throws Exception
+     */
+    public function editCxl(Request $request, ObjectManager $em)
+    {
+
+        if($request->get('id') === null || $request->get('id') === ''){
+            return ShortResponse::error('Could not find ID');
+        }
+
+        $rate = $em->getRepository(Rateplan::class)->find($request->get('id'));
+
+        if($rate === null){
+            return ShortResponse::error('Could not find Rate');
+        }
+
+        /**
+         * Toggle through the Policies
+         */
+        if($rate->getCxl() === null){
+            $rate->setCxl(2);
+            $cssClass = '2';
+        }elseif($rate->getCxl() === 2){
+            $rate->setCxl(4);
+            $cssClass = '4';
+        }else{
+            $rate->setCxl(null);
+            $cssClass = 'reg';
+        }
+
+        $em->persist($rate);
+
+        try{
+            $em->flush();
+        }catch (Exception $e){
+            return ShortResponse::mysql($e->getMessage());
+        }
+
+        return ShortResponse::success('Policy updated',array(
+            'cssClass' => $cssClass,
+        ));
+
+
+    }
+
+    /**
      * @Route("/_ajax/_editRateplan", name="ajaxEditRateplan")
      * @param Request $request
      * @param ObjectManager $em
      * @return JsonResponse|Response
-     * @throws \Exception
+     * @throws Exception
      */
     public function editRateplan(Request $request, ObjectManager $em)
     {
 
         $value = (float) str_replace(',', '.', $request->get('value'));
         $pre = explode('_',$request->get('id'));
-        $bookDate = \DateTime::createFromFormat('Y-m-d', $pre[1]);
+        $bookDate = DateTime::createFromFormat('Y-m-d', $pre[1]);
         $id = $pre[0];
 
         if ($bookDate === false) {
@@ -48,7 +99,7 @@ class AjaxController extends AbstractController
             $rateplan = $em->getRepository(Rateplan::class)->find($id);
 
             if ($rateplan === null) {
-                throw new \Exception('Could not find Rateplan ID: '.$id);
+                throw new Exception('Could not find Rateplan ID: '.$id);
             }
         }
 
@@ -57,8 +108,8 @@ class AjaxController extends AbstractController
 
         try{
             $em->flush();
-        }catch (\Exception $e){
-            throw new \Exception($e->getMessage());
+        }catch (Exception $e){
+            throw new Exception($e->getMessage());
         }
 
         return new Response(number_format($rateplan->getPrice(),2));
@@ -83,7 +134,7 @@ class AjaxController extends AbstractController
             foreach ($files as $file) {
                 try {
                     $file->move('reports', $filename);
-                } catch (\Exception $e) {
+                } catch (Exception $e) {
                     return ShortResponse::error('Could not upload file', array(
                         'error' => $e->getMessage(),
                     ));
@@ -94,7 +145,7 @@ class AjaxController extends AbstractController
                  */
                 try {
                     HcbXmlReader::$type($em);
-                } catch (\Exception $e) {
+                } catch (Exception $e) {
                     return ShortResponse::exception('Failed to parse Report', $e->getMessage());
                 }
             }
@@ -176,7 +227,7 @@ class AjaxController extends AbstractController
 
         try {
             $em->flush();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return ShortResponse::mysql($e->getMessage());
         }
 
@@ -291,7 +342,7 @@ class AjaxController extends AbstractController
 
         try {
             $em->flush();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return ShortResponse::mysql($e->getMessage());
         }
 
@@ -452,7 +503,7 @@ class AjaxController extends AbstractController
         try {
             $em->persist($rate);
             $em->flush();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return ShortResponse::mysql();
         }
 
@@ -542,7 +593,7 @@ class AjaxController extends AbstractController
         try {
             $em->persist($room);
             $em->flush();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return ShortResponse::mysql();
         }
 

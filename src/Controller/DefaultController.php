@@ -3,20 +3,155 @@
 namespace App\Controller;
 
 use App\Entity\HcbSettings;
+use App\Entity\Rateplan;
 use App\Util\Helper\Helper;
 use App\Util\Helper\HelperException;
 use App\Util\Rate\RateHandler;
 use App\Util\Rate\RateHandlerException;
 use App\Util\Room\RoomHandler;
 use App\Util\SecurityChecker;
+use DateInterval;
+use DatePeriod;
+use DateTime;
+use Doctrine\Common\Collections\Criteria;
 use Doctrine\Common\Persistence\ObjectManager;
+use Exception;
+use Knp\Snappy\Pdf;
+use Parsedown;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
 
 class DefaultController extends AbstractController
 {
+
+    /**
+     * @Route("/panel/_ratesheet/{date_string}", name="openRatesheet", defaults={"date_string"="0"})
+     * @param string $date_string
+     * @param ObjectManager $em
+     * @param Pdf $pdf
+     * @return BinaryFileResponse
+     * @throws HelperException
+     */
+    public function openRatesheet(string $date_string, ObjectManager $em, Pdf $pdf)
+    {
+
+        /**
+         * Delete current Ratesheet
+         */
+        $fs = new Filesystem();
+        if($fs->exists('pdfs/ratesheet.pdf')){
+            $fs->remove('pdfs/ratesheet.pdf');
+        }
+
+        /**
+         * Get current Years Rates
+         */
+        try {
+            $sentDate = DateTime::createFromFormat('m-Y', $date_string);
+        } catch (Exception $e) {
+            throw new Exception('Could not create Date from: ' . $date_string);
+        }
+
+        if($sentDate === false){
+            $sentDate = new DateTime();
+        }
+
+        try {
+            $begin = new DateTime('First Day of January '.$sentDate->format('Y'));
+            $end = new DateTime('Last Day of December '.$sentDate->format('Y'));
+            $interval = DateInterval::createFromDateString('1 day');
+            $period = new DatePeriod($begin, $interval, $end);
+        } catch (Exception $e) {
+            throw new Exception('Could not create Datetime' . $e->getMessage());
+        }
+
+        /**
+         * Search Prices for each day (inefficient?)
+         * @var $dt DateTime
+         */
+        $rates = array();
+        foreach ($period as $dt) {
+
+            $rate = $em->getRepository(Rateplan::class)->findOneBy(array(
+                'bookDate' => $dt,
+            ));
+
+            $rates[$dt->format('Y-m-d')] = $rate === null ? '-' :number_format($rate->getPrice(),2);
+
+        }
+
+        /*
+        return $this->render('default/pdf/pdfHeader.html.twig', array(
+            'year' => $sentDate->format('Y')
+        ));
+        */
+
+
+        /*
+        return $this->render('default/pdf:pdfFooter.html.twig', array(
+            'client' => $stats->getClient(),
+            'stats' => $stats,
+            'base_dir' => $this->get('kernel')->getProjectDir() . '/web' . $request->getBasePath(),
+        ));
+        */
+
+
+        /*
+        return $this->render('default/pdf/pdfBase.html.twig', array(
+            'calendar_jan' => Helper::generate_calendar(1,$sentDate->format('Y'), $em),
+            'calendar_feb' => Helper::generate_calendar(2,$sentDate->format('Y'), $em),
+            'calendar_mar' => Helper::generate_calendar(3,$sentDate->format('Y'), $em),
+            'calendar_apr' => Helper::generate_calendar(4,$sentDate->format('Y'), $em),
+            'calendar_may' => Helper::generate_calendar(5,$sentDate->format('Y'), $em),
+            'calendar_jun' => Helper::generate_calendar(6,$sentDate->format('Y'), $em),
+            'calendar_jul' => Helper::generate_calendar(7,$sentDate->format('Y'), $em),
+            'calendar_aug' => Helper::generate_calendar(8,$sentDate->format('Y'), $em),
+            'calendar_sep' => Helper::generate_calendar(9,$sentDate->format('Y'), $em),
+            'calendar_oct' => Helper::generate_calendar(10,$sentDate->format('Y'), $em),
+            'calendar_nov' => Helper::generate_calendar(11,$sentDate->format('Y'), $em),
+            'calendar_dec' => Helper::generate_calendar(12,$sentDate->format('Y'), $em),
+        ));
+        */
+
+        $pdf->setOption('header-html', $this->renderView('default/pdf/pdfHeader.html.twig', array(
+            'year' => $sentDate->format('Y')
+        )));
+        $pdf->setOption('footer-html', $this->renderView('default/pdf/pdfFooter.html.twig', array(
+            'ratecolors' => RateHandler::RATE_COLORS,
+        )));
+
+        $pdf->generateFromHtml($this->renderView('default/pdf/pdfBase.html.twig', array(
+            'calendar_jan' => Helper::generate_calendar(1,$sentDate->format('Y'), $em),
+            'calendar_feb' => Helper::generate_calendar(2,$sentDate->format('Y'), $em),
+            'calendar_mar' => Helper::generate_calendar(3,$sentDate->format('Y'), $em),
+            'calendar_apr' => Helper::generate_calendar(4,$sentDate->format('Y'), $em),
+            'calendar_may' => Helper::generate_calendar(5,$sentDate->format('Y'), $em),
+            'calendar_jun' => Helper::generate_calendar(6,$sentDate->format('Y'), $em),
+            'calendar_jul' => Helper::generate_calendar(7,$sentDate->format('Y'), $em),
+            'calendar_aug' => Helper::generate_calendar(8,$sentDate->format('Y'), $em),
+            'calendar_sep' => Helper::generate_calendar(9,$sentDate->format('Y'), $em),
+            'calendar_oct' => Helper::generate_calendar(10,$sentDate->format('Y'), $em),
+            'calendar_nov' => Helper::generate_calendar(11,$sentDate->format('Y'), $em),
+            'calendar_dec' => Helper::generate_calendar(12,$sentDate->format('Y'), $em),
+        )), 'pdfs/ratesheet.pdf');
+
+
+        /**
+         * Prepare Response
+         */
+        $response = new BinaryFileResponse('pdfs/ratesheet.pdf');
+        $response->trustXSendfileTypeHeader();
+        $response->setContentDisposition(ResponseHeaderBag::DISPOSITION_ATTACHMENT, 'RateSheet'.$sentDate->format('Y').'.pdf');
+        return $response;
+
+    }
+
     /**
      * @Route("/", name="default")
      */
@@ -45,7 +180,7 @@ class DefaultController extends AbstractController
 
     /**
      * @Route("/panel/daily-uploads", name="dailyUploads")
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @return RedirectResponse|Response
      */
     public function dailyUploads()
     {
@@ -63,7 +198,9 @@ class DefaultController extends AbstractController
 
     /**
      * @Route("/panel/settings/rateplan/{date_string}", name="settingsRateplan", defaults={"date_string"="0"})
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @param string $date_string
+     * @param ObjectManager $em
+     * @return RedirectResponse|Response
      */
     public function settingsRateplan(string $date_string, ObjectManager $em)
     {
@@ -77,15 +214,15 @@ class DefaultController extends AbstractController
 
         if ($date_string === '0') {
             try {
-                $now = new \DateTime();
-            } catch (\Exception $e) {
+                $now = new DateTime();
+            } catch (Exception $e) {
                 throw new AccessDeniedHttpException('Could not create Datetime: ' . $e->getMessage());
             }
 
             $date_string = $now->format('F Y');
         } else {
 
-            $now = \DateTime::createFromFormat('m-Y', $date_string);
+            $now = DateTime::createFromFormat('m-Y', $date_string);
             if ($now === false) {
                 throw new AccessDeniedHttpException('Could not create Datetime: ' . $date_string);
             }
@@ -94,10 +231,10 @@ class DefaultController extends AbstractController
 
         }
 
-        try{
+        try {
             $hfs = RateHandler::hf_by_date($now->format('m-Y'), $em);
-        }catch (RateHandlerException $e){
-            throw new AccessDeniedHttpException('Helper Error: '.$e->getMessage());
+        } catch (RateHandlerException $e) {
+            throw new AccessDeniedHttpException('Helper Error: ' . $e->getMessage());
         }
 
         return $this->render('default/settingsRateplan.html.twig', array(
@@ -112,7 +249,7 @@ class DefaultController extends AbstractController
     /**
      * @Route("/panel/settings/room-types", name="settingsRoomtypes")
      * @param ObjectManager $em
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @return RedirectResponse|Response
      */
     public function settingsRoomtypes(ObjectManager $em)
     {
@@ -132,7 +269,7 @@ class DefaultController extends AbstractController
     /**
      * @Route("/panel/settings/rate-types", name="settingsRatetypes")
      * @param ObjectManager $em
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @return RedirectResponse|Response
      */
     public function settingsRatetypes(ObjectManager $em)
     {
@@ -152,7 +289,7 @@ class DefaultController extends AbstractController
     /**
      * @Route("/panel/settings/global", name="settingsGlobal")
      * @param ObjectManager $em
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @return RedirectResponse|Response
      */
     public function settingsGlobal(ObjectManager $em)
     {
@@ -191,7 +328,7 @@ class DefaultController extends AbstractController
             throw new AccessDeniedHttpException('Keine Berechtigung');
         }
 
-        $Parsedown = new \Parsedown();
+        $Parsedown = new Parsedown();
 
         $log = $Parsedown->text((file_get_contents(__DIR__ . '/../../README.md')));
 

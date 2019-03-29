@@ -13,15 +13,120 @@ use App\Entity\HistoryForecast;
 use App\Entity\Rateplan;
 use App\Entity\Ratetype;
 use App\Entity\Roomtype;
+use App\Util\Rate\RateHandler;
+use DateInterval;
+use DatePeriod;
+use DateTime;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\Mapping\MappingException;
 use Doctrine\ORM\ORMException;
+use Exception;
 use primus852\SimpleCrypt\SimpleCrypt;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 class Helper
 {
+
+    /**
+     * @param int $month
+     * @param int $year
+     * @return string
+     */
+    public static function generate_calendar(int $month, int $year, ObjectManager $em)
+    {
+
+        try {
+            $now = DateTime::createFromFormat('Y-m-d', $year . '-' . $month . '-01');
+        } catch (Exception $e) {
+            throw new HelperException('Could not create Datetime: ' . $e->getMessage());
+        }
+
+        /* draw table */
+        $calendar = '<table class="calendar"><tr><td colspan="7" class="calendar-month">' . $now->format('M') . '</td></tr>';
+
+        /* table headings */
+        $headings = array('Mon', 'Tue', 'Wed', 'Thur', 'Fri', 'Sat', 'Sun');
+        $calendar .= '<tr class="calendar-row"><th class="calendar-day-head">' . implode('</th><th class="calendar-day-head">', $headings) . '</th></tr>';
+
+        /* days and weeks vars now ... */
+        $running_day = date('w', mktime(0, 0, 0, $month, 0, $year));
+        $days_in_month = date('t', mktime(0, 0, 0, $month, 0, $year));
+        $days_in_this_week = 1;
+        $day_counter = 0;
+
+        /* row for week one */
+        $calendar .= '<tr class="calendar-row">';
+
+        /* print "blank" days until the first of the current week */
+        for ($x = 0; $x < $running_day; $x++):
+            $calendar .= '<td class="calendar-day-np"> </td>';
+            $days_in_this_week++;
+        endfor;
+
+        /* keep going with days.... */
+        for ($list_day = 1; $list_day <= $days_in_month; $list_day++):
+
+            try {
+                $today = DateTime::createFromFormat('Y-m-d', $year . '-' . $month . '-' . $list_day);
+            } catch (Exception $e) {
+                throw new HelperException('Could not create Datetime: ' . $e->getMessage());
+            }
+
+            $rate = $em->getRepository(Rateplan::class)->findOneBy(array(
+                'bookDate' => $today,
+            ));
+
+            $dsp_rate = $rate === null ? '-' : number_format($rate->getPrice(), 0);
+
+            /**
+             * Color & CSS Classes
+             */
+            $color = array_key_exists($dsp_rate, RateHandler::RATE_COLORS) ? RateHandler::RATE_COLORS[$dsp_rate]['color'] : '#fff';
+            $fontColor = array_key_exists($dsp_rate, RateHandler::RATE_COLORS) ? RateHandler::RATE_COLORS[$dsp_rate]['font'] : '#000';
+            $cxl = 'cxlreg';
+            if ($rate !== null) {
+                if ($rate->getCxl() !== null) {
+                    $cxl = 'cxl' . $rate->getCxl();
+                }
+            }
+
+            $calendar .= '<td class="calendar-day" style="background: ' . $color . ';color:'.$fontColor.';">';
+            /* add in the day number */
+            $calendar .= '<div class="day-number ' . $cxl . '">' . $list_day . '</div>';
+
+            $calendar .= $dsp_rate;
+
+            $calendar .= '</td>';
+            if ($running_day == 6):
+                $calendar .= '</tr>';
+                if (($day_counter + 1) != $days_in_month):
+                    $calendar .= '<tr class="calendar-row">';
+                endif;
+                $running_day = -1;
+                $days_in_this_week = 0;
+            endif;
+            $days_in_this_week++;
+            $running_day++;
+            $day_counter++;
+        endfor;
+
+        /* finish the rest of the days in the week */
+        if ($days_in_this_week < 8):
+            for ($x = 1; $x <= (8 - $days_in_this_week); $x++):
+                $calendar .= '<td class="calendar-day-np"> </td>';
+            endfor;
+        endif;
+
+        /* final row */
+        $calendar .= '</tr>';
+
+        /* end the table */
+        $calendar .= '</table>';
+
+        /* all done, return result */
+        return $calendar;
+    }
 
     /**
      * @param ObjectManager $em
@@ -39,19 +144,19 @@ class Helper
         );
 
         try {
-            $begin = new \DateTime();
+            $begin = new DateTime();
             $end = $last[0]->getBookDate();
 
-            $interval = \DateInterval::createFromDateString('1 day');
-            $period = new \DatePeriod($begin, $interval, $end);
-        } catch (\Exception $e) {
+            $interval = DateInterval::createFromDateString('1 day');
+            $period = new DatePeriod($begin, $interval, $end);
+        } catch (Exception $e) {
             throw new AccessDeniedHttpException('Error creating DateTime: ' . $e->getMessage());
         }
 
         $lastMonth = null;
         $months = array();
 
-        /* @var $dt \DateTime */
+        /* @var $dt DateTime */
         foreach ($period as $dt) {
 
             if ($dt > $end) {
@@ -86,7 +191,7 @@ class Helper
          */
         try {
             $entity = self::repo($entity, $em, $id);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             throw new HelperException('Could not find Repository');
         }
 
@@ -109,7 +214,7 @@ class Helper
 
         try {
             $em->flush();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             throw new HelperException('MySQL Error: ' . $e->getMessage());
         }
 
@@ -137,7 +242,7 @@ class Helper
          */
         try {
             $entity = self::repo($entity, $em, $id);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             throw new HelperException('Could not find Repository');
         }
 
@@ -184,7 +289,7 @@ class Helper
 
         try {
             $name = $em->getRepository($bundle . ':' . $val);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             if ($e instanceof MappingException || $e instanceof ORMException) {
                 return false;
             }

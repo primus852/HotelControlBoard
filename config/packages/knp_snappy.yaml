@@ -1,0 +1,14 @@
+knp_snappy:
+    pdf:
+        enabled:    true
+        binary:     '%env(WKHTMLTOPDF_PATH)%'
+        options:
+            disable_smart_shrinking: true
+            margin-top: 20mm
+            margin-left: 5mm
+            margin-right: 5mm
+            margin-bottom: 10mm
+    image:
+        enabled:    true
+        binary:     '%env(WKHTMLTOIMAGE_PATH)%'
+        options:    []

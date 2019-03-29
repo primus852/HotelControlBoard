@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title>HCB::Ratesheet</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="HCB Ratesheet">
+    <meta name="author" content="Torsten Wolter">
+
+    <!-- LOAD CSS FILES -->
+    <link href="{{ public_html ~'/assets/css/ratesheet_pdf.css' }}" rel="stylesheet" type="text/css">
+    <link type="text/css" rel="stylesheet" href="{{ public_html ~'/node_modules/font-awesome/css/font-awesome.min.css' }}">
+    <style>
+        /* calendar */
+        table.calendar {
+            border-left: 1px solid #999;
+            float:left;
+            table-layout:fixed;
+        }
+
+        td.calendar-month {
+            border-right:1px solid #999 !important;
+            border-top:1px solid #999 !important;
+        }
+
+        td.calendar-day {
+            min-height: 17px;
+            line-height: 13px;
+            font-size: 0.5rem;
+            position: relative;
+        }
+
+        td.calendar-day:hover {
+            background: #eceff5;
+        }
+
+        td.calendar-day-np {
+            background: #eee;
+            min-height: 20px;
+        }
+
+        * html div.calendar-day-np {
+            height: 20px;
+        }
+
+        th.calendar-day-head {
+            display: inline-block;
+            background: #ccc;
+            font-weight: bold;
+            font-size:0.5rem;
+            text-align: center;
+            width: 47px;
+            padding: 3px;
+            border-bottom: 1px solid #999;
+            border-top: 1px solid #999;
+            border-right: 1px solid #999;
+        }
+
+        div.day-number {
+            padding: 1px;
+            color: #fff;
+            font-weight: 100;
+            float: right;
+            margin:-1px -1px 0 0;
+            width: 10px;
+            text-align: center;
+            font-size:0.3rem;
+        }
+        div.cxlreg{
+            background: #5bac52;
+        }
+        div.cxl2{
+            background: #ffa40b;
+        }
+        div.cxl4{
+            background: #9d200b;
+        }
+
+        /* shared */
+        td.calendar-day, td.calendar-day-np {
+            display: inline-block;
+            width: 47px;
+            padding: 1px;
+            border-bottom: 1px solid #999;
+            border-right: 1px solid #999;
+        }
+        .row{
+            padding-bottom:15px;
+        }
+    </style>
+</head>
+
+
+<body style="line-height: 0.9 !important;">
+<div class="container">
+    <div class="row">
+        <div class="col-6 text-center">
+            {{ calendar_jan|raw }}
+        </div>
+        <div class="col-6 text-center">
+            {{ calendar_feb|raw }}
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-6 text-center">
+            {{ calendar_mar|raw }}
+        </div>
+        <div class="col-6 text-center">
+            {{ calendar_apr|raw }}
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-6 text-center">
+            {{ calendar_may|raw }}
+        </div>
+        <div class="col-6 text-center">
+            {{ calendar_jun|raw }}
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-6 text-center">
+            {{ calendar_jul|raw }}
+        </div>
+        <div class="col-6 text-center">
+            {{ calendar_aug|raw }}
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-6 text-center">
+            {{ calendar_sep|raw }}
+        </div>
+        <div class="col-6 text-center">
+            {{ calendar_oct|raw }}
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-6 text-center">
+            {{ calendar_nov|raw }}
+        </div>
+        <div class="col-6 text-center">
+            {{ calendar_dec|raw }}
+        </div>
+    </div>
+</div>
+</body>
+</html>

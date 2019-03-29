@@ -139,7 +139,8 @@ $(document).on('click', '#js-add-rate', function (e) {
         title: 'Add Ratetype',
         text: html,
         html: true,
-        maxHeight: '500px',
+        height:'70%',
+        maxHeight: '550px',
         maxWidth: '500px',
         animationType: 'fadeIn',
         buttons: [

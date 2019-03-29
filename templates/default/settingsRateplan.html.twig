@@ -72,6 +72,9 @@
             lastPress = e.key;
         });
 
+        $(document).on('mouseup', function (e) {
+            lastPress = 'mouse';
+        });
 
         $(document).keydown(function (e) {
             shifted = e.shiftKey;

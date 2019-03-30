@@ -10,6 +10,7 @@ namespace App\Util\Competitors;
 
 
 use DateTime;
+use Symfony\Component\Filesystem\Filesystem;
 
 class CompetitorBooking
 {
@@ -69,8 +70,10 @@ class CompetitorBooking
         /**
          * Regex Rooms Available
          */
-        preg_match('@b_rooms_available_and_soldout: (.*?)\nb_photo_pid@', $result['result'], $room_str);
+        preg_match('@b_rooms_available_and_soldout: (.*?)\nb_@', $result['result'], $room_str);
         if (!array_key_exists(1, $room_str)) {
+            $fs = new Filesystem();
+            $fs->appendToFile('tmp/temp.html', $result['result']);
             throw new CompetitorException('Could not extract Rooms');
         }
 

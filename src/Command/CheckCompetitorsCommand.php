@@ -60,7 +60,7 @@ class CheckCompetitorsCommand extends Command
         $pax = 1;
         $result = array();
 
-        $debug ? $io->success('Started Booking.com Crawl. Start: '.$ci->format('d.m.Y').' | End: '.$co->format('d.m.Y')) : null;
+        $debug ? $io->success('Started Booking.com Crawl. Date: '.$ci->format('d.m.Y')) : null;
 
         foreach ($competiors as $slug) {
 

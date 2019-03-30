@@ -28,7 +28,7 @@
                     {% for c in competitors %}
                         <div class="row table-font" style="border-bottom:1px solid #ccc;" id="row_{{ 'CompetitorCheck'|encrypt }}_{{ c.id }}">
                             <div class="col-3" id="name_{{ 'CompetitorCheck'|encrypt }}_{{ c.id }}">{{ c.name }}</div>
-                            <div class="col-7" id="link_{{ 'CompetitorCheck'|encrypt }}_{{ c.id }}">{{ c.name }}</div>
+                            <div class="col-7" id="link_{{ 'CompetitorCheck'|encrypt }}_{{ c.id }}">{{ c.link }}</div>
                             <div class="col-1">{% if c.isActive %}<span class="badge badge-success" id="status_{{ 'CompetitorCheck'|encrypt }}_{{ c.id }}">active</span>{% else %}<span class="badge badge-danger" id="status_{{ 'CompetitorCheck'|encrypt }}_{{ c.id }}">inactive</span>{% endif %}</div>
                             <div class="col-1">
                                 <a href="#"
@@ -54,7 +54,7 @@
 
 {% block javascripts %}
     <script>
-        var GetNav = "contentSettingsHcb";
+        var GetNav = "contentSettingsComp";
     </script>
 {% endblock javascripts %}
 

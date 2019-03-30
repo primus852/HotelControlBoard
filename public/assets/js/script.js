@@ -516,6 +516,9 @@ $(document).on('click','#js-check-competitors',function (e) {
         started += 1;
 
         $('#room_'+id).html('<i class="fa fa-spin fa-spinner"></i> <span class="text-success">Started Query...</span>');
+        $('#incl_'+id).html('');
+        $('#pax_'+id).html('');
+        $('#price_'+id).html('');
 
         $.post(url, {
             id: id,

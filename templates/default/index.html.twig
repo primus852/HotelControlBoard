@@ -17,7 +17,55 @@
         <div id="main-nano-wrapper" class="nano">
             <div class="nano-content" id="perfectScroll">
                 <div class="container-fluid" id="js-result-table">
+                    <div class="row">
+                        <div class="col-4">
+                            <div class="card">
+                                <div class="card-header text-white bg-dark rounded-0">
+                                    <div class="row">
+                                        <div class="col-5" style="line-height:30px;font-weight:100;font-size:25px;">
+                                            CompCheck
+                                        </div>
+                                        <div class="col-5">
+                                            <input type="text" data-toggle="datepicker" id="js-competitor-date" value="2019-04-01">
+                                        </div>
+                                        <div class="col-2">
+                                            <a class="btn btn-success" id="js-check-competitors"><i
+                                                        class="fa fa-refresh"></i></a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card-body" style="padding:0.5rem;">
+                                    <div class="row">
+                                        <div class="col-12">
+                                            {% for c in competitors %}
+                                                <div class="row competitor-row"
+                                                     data-url="{{ path('ajaxMakeCompCheck') }}"
+                                                     data-id="{{ c.id }}"
+                                                >
+                                                    <div class="col-12">
+                                                        <div class="row">
+                                                            <div class="col-6">
+                                                                {{ c.name }}
+                                                            </div>
+                                                            <div class="col-2 text-center" id="incl_{{ c.id }}"></div>
+                                                            <div class="col-1 text-center" id="pax_{{ c.id }}"></div>
+                                                            <div class="col-3 text-center" id="price_{{ c.id }}"></div>
+                                                        </div>
+                                                        <div class="row">
+                                                            <div class="col-12">
+                                                                <span class="competitor-roomtype" id="room_{{ c.id }}">&nbsp;</span>
+                                                            </div>
+                                                        </div>
 
+                                                    </div>
+                                                </div>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
             <br/>
@@ -32,6 +80,15 @@
 {% block javascripts %}
     <script>
         var GetNav = "contentMain";
+    </script>
+    <script>
+        $(document).ready(function () {
+            $('[data-toggle="datepicker"]').datepicker({
+                format: 'yyyy-mm-dd',
+                weekStart: 1,
+                autoHide: true
+            });
+        });
     </script>
 {% endblock javascripts %}
 

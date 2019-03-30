@@ -2,9 +2,12 @@
 
 namespace App\Controller;
 
+use App\Entity\CompetitorCheck;
 use App\Entity\Rateplan;
 use App\Entity\Ratetype;
 use App\Entity\Roomtype;
+use App\Util\Competitors\CompetitorBooking;
+use App\Util\Competitors\CompetitorException;
 use App\Util\Helper\Helper;
 use App\Util\Helper\HelperException;
 use App\Util\Xml\HcbXmlReader;
@@ -24,6 +27,52 @@ class AjaxController extends AbstractController
 {
 
     /**
+     * @Route("/_ajax/_make_comp_check", name="ajaxMakeCompCheck")
+     * @param Request $request
+     * @param ObjectManager $em
+     * @return JsonResponse|Response
+     * @throws Exception
+     */
+    public function makeCompCheck(Request $request, ObjectManager $em)
+    {
+
+        if ($request->get('id') === null || $request->get('id') === '') {
+            return ShortResponse::error('Could not find ID');
+        }
+
+        $competition = $em->getRepository(CompetitorCheck::class)->find($request->get('id'));
+
+        if ($competition === null) {
+            return ShortResponse::error('Could not find Competitor');
+        }
+
+        /**
+         * Create Date
+         */
+        $date = DateTime::createFromFormat('Y-m-d', $request->get('date'));
+        if ($date === false) {
+            return ShortResponse::error('Could not create date');
+        }
+
+        try {
+            $crawl = CompetitorBooking::crawl_hotel($competition->getLink(), $date, 1);
+        } catch (CompetitorException $e) {
+            return ShortResponse::exception('Could not Crawl', $e->getMessage());
+        }
+
+        $price = $price = $crawl['price'] === 'booked' ? '<span class="text-danger">booked</span>' : '<span class="text-success">'.$crawl['price'].'</span>';
+
+        return ShortResponse::success('Hotel crawled', array(
+            'room' => $crawl['roomName'],
+            'incl' => $crawl['isIncl'] === true ? 'incl' : 'excl',
+            'pax' => $crawl['pax'],
+            'price' => $price,
+        ));
+
+
+    }
+
+    /**
      * @Route("/_ajax/_editCxl", name="ajaxEditCxl")
      * @param Request $request
      * @param ObjectManager $em
@@ -33,39 +82,39 @@ class AjaxController extends AbstractController
     public function editCxl(Request $request, ObjectManager $em)
     {
 
-        if($request->get('id') === null || $request->get('id') === ''){
+        if ($request->get('id') === null || $request->get('id') === '') {
             return ShortResponse::error('Could not find ID');
         }
 
         $rate = $em->getRepository(Rateplan::class)->find($request->get('id'));
 
-        if($rate === null){
+        if ($rate === null) {
             return ShortResponse::error('Could not find Rate');
         }
 
         /**
          * Toggle through the Policies
          */
-        if($rate->getCxl() === null){
+        if ($rate->getCxl() === null) {
             $rate->setCxl(2);
             $cssClass = '2';
-        }elseif($rate->getCxl() === 2){
+        } elseif ($rate->getCxl() === 2) {
             $rate->setCxl(4);
             $cssClass = '4';
-        }else{
+        } else {
             $rate->setCxl(null);
             $cssClass = 'reg';
         }
 
         $em->persist($rate);
 
-        try{
+        try {
             $em->flush();
-        }catch (Exception $e){
+        } catch (Exception $e) {
             return ShortResponse::mysql($e->getMessage());
         }
 
-        return ShortResponse::success('Policy updated',array(
+        return ShortResponse::success('Policy updated', array(
             'cssClass' => $cssClass,
         ));
 
@@ -82,8 +131,8 @@ class AjaxController extends AbstractController
     public function editRateplan(Request $request, ObjectManager $em)
     {
 
-        $value = (float) str_replace(',', '.', $request->get('value'));
-        $pre = explode('_',$request->get('id'));
+        $value = (float)str_replace(',', '.', $request->get('value'));
+        $pre = explode('_', $request->get('id'));
         $bookDate = DateTime::createFromFormat('Y-m-d', $pre[1]);
         $id = $pre[0];
 
@@ -99,20 +148,20 @@ class AjaxController extends AbstractController
             $rateplan = $em->getRepository(Rateplan::class)->find($id);
 
             if ($rateplan === null) {
-                throw new Exception('Could not find Rateplan ID: '.$id);
+                throw new Exception('Could not find Rateplan ID: ' . $id);
             }
         }
 
         $rateplan->setPrice($value);
         $em->persist($rateplan);
 
-        try{
+        try {
             $em->flush();
-        }catch (Exception $e){
+        } catch (Exception $e) {
             throw new Exception($e->getMessage());
         }
 
-        return new Response(number_format($rateplan->getPrice(),2));
+        return new Response(number_format($rateplan->getPrice(), 2));
 
     }
 
@@ -362,6 +411,81 @@ class AjaxController extends AbstractController
     }
 
     /**
+     * @Route("/_ajax/_updateCompetitor", name="ajaxUpdateCompetitor")
+     * @param Request $request
+     * @param ObjectManager $em
+     * @return JsonResponse
+     */
+    public function updateCompetitor(Request $request, ObjectManager $em)
+    {
+
+        /**
+         * Gather Vars
+         */
+        $id = $request->get('id');
+        $name = $request->get('name');
+        $link = $request->get('link');
+
+        if ($name === null || trim($name) === '') {
+            return ShortResponse::error('Name cannot be empty');
+        }
+
+        if ($link === null || trim($link) === '') {
+            return ShortResponse::error('Link cannot be empty');
+        }
+
+        /**
+         * Get Competitor
+         */
+        $competitor = $em->getRepository(CompetitorCheck::class)->find($id);
+
+        if ($competitor === null) {
+            return ShortResponse::error('Competitor not found');
+        }
+
+        /**
+         * Check if we have the name already
+         */
+        $nameCompetitor = $em->getRepository(CompetitorCheck::class)->findOneBy(array(
+            'name' => $name,
+        ));
+
+        if ($nameCompetitor !== null && $nameCompetitor !== $competitor) {
+            return ShortResponse::error('Same Name already exists in Database');
+        }
+
+        /**
+         * Check if we have the nameShort already
+         */
+        $nameLink = $em->getRepository(CompetitorCheck::class)->findOneBy(array(
+            'link' => $link,
+        ));
+
+        if ($nameLink !== null && $nameLink !== $competitor) {
+            return ShortResponse::error('Same Link already exists in Database');
+        }
+
+        $competitor->setName($name);
+        $competitor->setLink($link);
+
+        $em->persist($competitor);
+
+        try {
+            $em->flush();
+        } catch (Exception $e) {
+            return ShortResponse::mysql($e->getMessage());
+        }
+
+        return ShortResponse::success('Competitor updated', array(
+            'id' => $competitor->getId(),
+            'type' => SimpleCrypt::enc('CompetitorCheck'),
+            'name' => $competitor->getName(),
+            'link' => $competitor->getLink(),
+        ));
+
+    }
+
+    /**
      * @Route("/_ajax/_toggleActive", name="ajaxToggleActive")
      * @param Request $request
      * @param ObjectManager $em
@@ -606,6 +730,83 @@ class AjaxController extends AbstractController
                 'id' => $room->getId(),
             )),
             'type' => SimpleCrypt::enc('Roomtype'),
+        ));
+
+
+    }
+
+    /**
+     * @Route("/_ajax/_addCompetitor", name="ajaxAddCompetitor")
+     * @param Request $request
+     * @param ObjectManager $em
+     * @return JsonResponse
+     */
+    public function addCompetitor(Request $request, ObjectManager $em)
+    {
+
+        /**
+         * Get Vars
+         */
+        $name = $request->get('name');
+        $link = $request->get('link');
+
+        /**
+         * Check $name
+         */
+        if (trim($name) === "" || $name === null) {
+            return ShortResponse::error('Competitor Name cannot be empty');
+        }
+
+        /**
+         * Check $short
+         */
+        if (trim($link) === "" || $link === null) {
+            return ShortResponse::error('Link cannot be empty');
+        }
+
+
+        /**
+         * Check if the same $name is already available
+         */
+        $competitor = $em->getRepository(CompetitorCheck::class)->findOneBy(array(
+            'name' => $name
+        ));
+
+        if ($competitor !== null) {
+            return ShortResponse::error('Competitor with name <strong>' . $name . '</strong> already in Database');
+        }
+
+        /**
+         * Check if the same $link is already available
+         */
+        $competitorLink = $em->getRepository(CompetitorCheck::class)->findOneBy(array(
+            'link' => $link
+        ));
+
+        if ($competitorLink !== null) {
+            return ShortResponse::error('Competitor Link<strong>' . $link . '</strong> already in Database');
+        }
+
+        $competitor = new CompetitorCheck();
+        $competitor->setName($name);
+        $competitor->setLink($link);
+        $competitor->setIsActive(true);
+
+        try {
+            $em->persist($competitor);
+            $em->flush();
+        } catch (Exception $e) {
+            return ShortResponse::mysql();
+        }
+
+        return ShortResponse::success('Competitor added', array(
+            'id' => $competitor->getId(),
+            'name' => $competitor->getName(),
+            'sublink' => $competitor->getLink(),
+            'link' => $this->generateUrl('renderCompetitor', array(
+                'id' => $competitor->getId(),
+            )),
+            'type' => SimpleCrypt::enc('CompetitorCheck'),
         ));
 
 

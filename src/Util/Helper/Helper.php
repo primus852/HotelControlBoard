@@ -9,6 +9,7 @@
 namespace App\Util\Helper;
 
 
+use App\Entity\CompetitorCheck;
 use App\Entity\HistoryForecast;
 use App\Entity\Rateplan;
 use App\Entity\Ratetype;
@@ -257,8 +258,11 @@ class Helper
                 case $entity instanceof Ratetype:
                     return RemoveHelper::remove_ratetype($entity, $em);
                     break;
+                case $entity instanceof CompetitorCheck:
+                    return RemoveHelper::remove_competitor($entity, $em);
+                    break;
                 default:
-                    throw new HelperException('Invalid Switch');
+                    throw new HelperException('Missing Entity in Detection');
             }
         } catch (HelperException $e) {
             throw new HelperException($e->getMessage());

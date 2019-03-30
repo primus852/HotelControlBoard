@@ -7,6 +7,7 @@ String.prototype.escapeHTML = function () {
 
 /* Global Vars */
 var $version = '0.5.0';
+var started = 0;
 
 var cols = {},
     messageIsOpen = false;
@@ -357,6 +358,194 @@ $(document).on('click', '#js-update-room', function (e) {
             openNoty('error', 'Ajax Error');
         })
     ;
+});
+
+$(document).on('click', '#js-add-competitor', function (e) {
+
+    e.preventDefault();
+    var $btn = $(this);
+    var $url = $btn.attr('data-url');
+    var $table = $('#js-result-table');
+
+    var html = 'Would you like to add another Competitor?<br />\n<div class="row">\n    <div class="col-10">\n        <input placeholder="Competitor Name" value="" type="text" id="competitor-name"/>\n    </div>\n</div>\n<div class="row">\n    <div class="col-10">\n        <input placeholder="Booking.com Subsite" value="" type="text" id="competitor-link"/>\n    </div>\n</div>';
+
+    x0p({
+        title: 'Add Competitor',
+        text: html,
+        html: true,
+        maxHeight: '400px',
+        maxWidth: '500px',
+        animationType: 'fadeIn',
+        buttons: [
+            {
+                type: 'ok',
+                text: 'Save',
+                showLoading: true
+            },
+            {
+                type: 'error',
+                text: 'Cancel',
+                showLoading: false
+            }
+        ]
+    }).then(function (data) {
+        if (data.button === 'ok') {
+
+            var name = $.trim($('#competitor-name').val());
+            var link = $.trim($('#competitor-link').val());
+
+
+            /* Ajax Call */
+            $.post($url, {
+                name: name,
+                link: link
+            })
+                .done(function (data) {
+                    if (data.result === 'success') {
+
+                        $table.append('' +
+                            '<div class="row table-font" style="border-bottom:1px solid #ccc;" id="row_'+data.extra.type+'_'+data.extra.id+'">\n    ' +
+                            '   <div class="col-3" id="name_'+data.extra.type+'_'+data.extra.id+'">'+data.extra.name+'</div>\n    ' +
+                            '   <div class="col-7" id="link_'+data.extra.type+'_'+data.extra.id+'">'+data.extra.sublink+'</div>\n    ' +
+                            '   <div class="col-1"><span class="badge badge-success" id="status_'+data.extra.type+'_'+data.extra.id+'">active</span></div>\n    ' +
+                            '   <div class="col-1">\n        ' +
+                            '       <a href="#" class="btn btn-success btn-sm rounded-0 tt clickable" title="View Details"' +
+                            '           data-url="'+data.extra.link+'"' +
+                            '           data-hash="details-competitor-'+data.extra.id+'"' +
+                            '           data-trigger="'+data.extra.id+'"' +
+                            '       >\n            ' +
+                            '           <i class="fa fa-info-circle"></i> Details\n        ' +
+                            '       </a>\n    ' +
+                            '   </div>\n' +
+                            '</div>');
+
+                        x0p('Success',
+                            data.extra.name + ' added',
+                            'ok', false);
+                    } else {
+                        x0p('Error',
+                            data.message,
+                            'error', false);
+                    }
+                })
+                .fail(function () {
+                    openNoty('error', 'Ajax Error');
+                })
+            ;
+        }
+    });
+});
+
+$(document).on('click', '#js-update-competitor', function (e) {
+
+    e.preventDefault();
+    var $btn = $(this);
+    var url = $btn.attr('data-url');
+    var id = $btn.attr('data-id');
+
+    var $name = $('#competitor-name');
+    var $link = $('#competitor-link');
+
+    if($.trim($name.val()) === ''){
+        openNoty('error','Name cannot be empty');
+        return false;
+    }
+
+    if($.trim($link.val()) === ''){
+        openNoty('error','Link cannot be empty');
+        return false;
+    }
+
+    /* Ajax Call */
+    $.post(url, {
+        name: $name.val(),
+        link: $link.val(),
+        id: id
+    })
+        .done(function (data) {
+            if (data.result === 'success') {
+
+                closeDetails(function () {
+                    var $nameRow = $('#name_' + data.extra.type + '_' + data.extra.id);
+                    var $linkRow = $('#link_' + data.extra.type + '_' + data.extra.id);
+
+                    $nameRow.html(data.extra.name);
+                    $linkRow.html(data.extra.link);
+
+                });
+
+                x0p('Success',
+                    $name_.val() + ' updated',
+                    'ok', false);
+            } else {
+                x0p('Error',
+                    data.message,
+                    'error', false);
+            }
+        })
+        .fail(function () {
+            openNoty('error', 'Ajax Error');
+        })
+    ;
+});
+
+$(document).on('click','#js-check-competitors',function (e) {
+    e.preventDefault();
+
+    var $btn = $(this);
+    var date = $('#js-competitor-date');
+
+    if($btn.hasClass('disabled')){
+        return false;
+    }
+
+    if($.trim(date.val()) === '' || date.val() === null){
+        openNoty('error', 'Date cannot be empty');
+        return false;
+    }
+
+    $btn.addClass('disabled').html('<i class="fa fa-spin fa-spinner"></i>');
+
+    /**
+     * Gather all Competitor Rows
+     */
+    $('.competitor-row').each(function(i,v){
+
+        var id = $(v).attr('data-id');
+        var url = $(v).attr('data-url');
+        started += 1;
+
+        $('#room_'+id).html('<i class="fa fa-spin fa-spinner"></i> <span class="text-success">Started Query...</span>');
+
+        $.post(url, {
+            id: id,
+            date: date.val()
+        })
+            .done(function (data) {
+                if (data.result === 'success') {
+                    $('#room_'+id).html(data.extra.room);
+                    $('#incl_'+id).html(data.extra.incl);
+                    $('#pax_'+id).html(data.extra.pax);
+                    $('#price_'+id).html(data.extra.price);
+                } else {
+                    $('#room_'+id).html('<i class="text-danger">'+data.message+'</i>');
+                }
+                started -= 1;
+                if(started === 0){
+                    $btn.removeClass('disabled').html('<i class="fa fa-refresh"></i>')
+                }
+            })
+            .fail(function () {
+                started -= 1;
+                if(started === 0){
+                    $btn.removeClass('disabled').html('<i class="fa fa-refresh"></i>')
+                }
+                openNoty('error', 'Ajax Error');
+            })
+        ;
+
+    });
+
 });
 
 $(document).on('click', '#js-update-rate', function (e) {

@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\CompetitorCheck;
 use App\Entity\Ratetype;
 use App\Entity\Roomtype;
 use Doctrine\Common\Persistence\ObjectManager;
@@ -39,6 +40,28 @@ class RenderController extends AbstractController
 
         return $this->render('render/detailsRoomtype.html.twig', array(
             'room' => $room
+        ));
+    }
+
+    /**
+     * @Route("/panel/_render/_competitor/{id}", name="renderCompetitor", defaults={"id"="0"})
+     * @param int $id
+     * @param ObjectManager $em
+     * @return Response
+     */
+    public function renderDetailsCompetitor(int $id, ObjectManager $em)
+    {
+        /**
+         * Find Competitor
+         */
+        $competitor = $em->getRepository(CompetitorCheck::class)->find($id);
+
+        if($competitor === null){
+            return $this->render('render/detailsNotFound.html.twig', array('id' => $id));
+        }
+
+        return $this->render('render/detailsCompetitor.html.twig', array(
+            'c' => $competitor
         ));
     }
 

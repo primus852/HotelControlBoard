@@ -9,6 +9,7 @@
 namespace App\Util\Helper;
 
 
+use App\Entity\CompetitorCheck;
 use App\Entity\Ratetype;
 use App\Entity\Roomtype;
 use Doctrine\Common\Persistence\ObjectManager;
@@ -64,6 +65,35 @@ class RemoveHelper
          * Delete Ratetype
          */
         $em->remove($ratetype);
+
+        try{
+            $em->flush();
+        }catch (\Exception $e){
+            throw new HelperException('MySQL Error: '.$e->getMessage());
+        }
+
+        return $id;
+
+    }
+
+    /**
+     * @param CompetitorCheck $competitor
+     * @param ObjectManager $em
+     * @return int|null
+     * @throws HelperException
+     */
+    public static function remove_competitor(CompetitorCheck $competitor, ObjectManager $em)
+    {
+
+        /**
+         * "Save" old $id
+         */
+        $id = $competitor->getId();
+
+        /**
+         * Delete Competitor
+         */
+        $em->remove($competitor);
 
         try{
             $em->flush();

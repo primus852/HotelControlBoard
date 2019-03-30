@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\CompetitorCheck;
 use App\Entity\HcbSettings;
 use App\Entity\Rateplan;
 use App\Util\Helper\Helper;
@@ -13,7 +14,6 @@ use App\Util\SecurityChecker;
 use DateInterval;
 use DatePeriod;
 use DateTime;
-use Doctrine\Common\Collections\Criteria;
 use Doctrine\Common\Persistence\ObjectManager;
 use Exception;
 use Knp\Snappy\Pdf;
@@ -160,10 +160,13 @@ class DefaultController extends AbstractController
         return $this->redirectToRoute('panel');
     }
 
+
     /**
      * @Route("/panel", name="panel")
+     * @param ObjectManager $em
+     * @return RedirectResponse|Response
      */
-    public function panel()
+    public function panel(ObjectManager $em)
     {
 
         /* @var $security SecurityChecker */
@@ -173,8 +176,12 @@ class DefaultController extends AbstractController
             return $this->redirectToRoute('login');
         }
 
+        $competitors = $em->getRepository(CompetitorCheck::class)->findBy(array(
+            'isActive' => true,
+        ));
+
         return $this->render('default/index.html.twig', [
-            'controller_name' => 'DefaultController',
+            'competitors' => $competitors,
         ]);
     }
 
@@ -287,9 +294,33 @@ class DefaultController extends AbstractController
     }
 
     /**
+     * @Route("/panel/settings/competitors", name="settingsCompetitors")
+     * @param ObjectManager $em
+     * @return RedirectResponse|Response
+     */
+    public function settingsCompetitors(ObjectManager $em)
+    {
+
+        /* @var $security SecurityChecker */
+        $security = new SecurityChecker($this->getUser(), $this->container);
+
+        if (!$security->hasRole($this->getUser())) {
+            return $this->redirectToRoute('login');
+        }
+
+        $competitors = $em->getRepository(CompetitorCheck::class)->findAll();
+
+
+        return $this->render('default/settingsCompetitors.html.twig', array(
+            'competitors' => $competitors,
+        ));
+    }
+
+    /**
      * @Route("/panel/settings/global", name="settingsGlobal")
      * @param ObjectManager $em
      * @return RedirectResponse|Response
+     * @throws Exception
      */
     public function settingsGlobal(ObjectManager $em)
     {
@@ -299,6 +330,60 @@ class DefaultController extends AbstractController
 
         if (!$security->hasRole($this->getUser())) {
             return $this->redirectToRoute('login');
+        }
+
+        /**
+         * Add Settings if the dont exists
+         * TODO: Move this to Fixtures
+         */
+
+        $settings = $em->getRepository(HcbSettings::class)->findAll();
+
+        $addDouble = true;
+        $addExtra = true;
+        $addTriple = true;
+        foreach($settings as $setting){
+
+
+            if($setting->getName() === 'add_double'){
+                $addDouble = false;
+            }
+
+            if($setting->getName() === 'add_extra'){
+                $addExtra = false;
+            }
+
+            if($setting->getName() === 'add_triple'){
+                $addTriple = false;
+            }
+        }
+
+
+        if(!$addDouble){
+            $settingDouble = new HcbSettings();
+            $settingDouble->setName('add_double');
+            $settingDouble->setSetting(0);
+            $em->persist($settingDouble);
+        }
+
+        if(!$addExtra){
+            $settingExtra = new HcbSettings();
+            $settingExtra->setName('add_extra');
+            $settingExtra->setSetting(0);
+            $em->persist($settingExtra);
+        }
+
+        if(!$addTriple){
+            $settingTriple = new HcbSettings();
+            $settingTriple->setName('add_triple');
+            $settingTriple->setSetting(0);
+            $em->persist($settingTriple);
+        }
+
+        try{
+            $em->flush();
+        }catch (Exception $e){
+            throw new Exception('Could not insert:' .$e->getMessage());
         }
 
 

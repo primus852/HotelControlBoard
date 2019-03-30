@@ -1,0 +1,60 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <main id="main">
+        <div class="overlay"></div>
+        <header class="header">
+            <h1 class="page-title">
+                <a class="sidebar-toggle-btn trigger-toggle-sidebar">
+                    <span class="line"></span>
+                    <span class="line"></span>
+                    <span class="line"></span>
+                    <span class="line line-angle1"></span>
+                    <span class="line line-angle2"></span>
+                </a>Competitor Settings
+                <a class="btn btn-info btn-sm rounded-0" data-url="{{ path('ajaxAddCompetitor') }}" id="js-add-competitor" href="#"><i class="fa fa-plus"></i> Add Competitor</a>
+            </h1>
+        </header>
+        <div id="main-nano-wrapper" class="nano">
+            <div class="nano-content" id="perfectScroll">
+                <div class="container-fluid" id="js-result-table">
+
+                    <div class="row table-font-thicker" style="border-bottom:2px solid #ccc;">
+                        <div class="col-3">Name</div>
+                        <div class="col-7">Link</div>
+                        <div class="col-1">Status</div>
+                        <div class="col-1">Action</div>
+                    </div>
+                    {% for c in competitors %}
+                        <div class="row table-font" style="border-bottom:1px solid #ccc;" id="row_{{ 'CompetitorCheck'|encrypt }}_{{ c.id }}">
+                            <div class="col-3" id="name_{{ 'CompetitorCheck'|encrypt }}_{{ c.id }}">{{ c.name }}</div>
+                            <div class="col-7" id="link_{{ 'CompetitorCheck'|encrypt }}_{{ c.id }}">{{ c.name }}</div>
+                            <div class="col-1">{% if c.isActive %}<span class="badge badge-success" id="status_{{ 'CompetitorCheck'|encrypt }}_{{ c.id }}">active</span>{% else %}<span class="badge badge-danger" id="status_{{ 'CompetitorCheck'|encrypt }}_{{ c.id }}">inactive</span>{% endif %}</div>
+                            <div class="col-1">
+                                <a href="#"
+                                   class="btn btn-success btn-sm rounded-0 tt clickable"
+                                   title="View Details"
+                                   data-url="{{ path('renderCompetitor',{'id':c.id}) }}"
+                                   data-hash="details-competitor-{{ c.id }}" data-trigger="{{ c.id }}">
+                                    <i class="fa fa-info-circle"></i> Details
+                                </a>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+            <br/>
+        </div>
+    </main>
+{% endblock %}
+
+{% block stylesheets %}
+
+{% endblock stylesheets %}
+
+{% block javascripts %}
+    <script>
+        var GetNav = "contentSettingsHcb";
+    </script>
+{% endblock javascripts %}
+

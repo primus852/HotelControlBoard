@@ -2000,3 +2000,16 @@ input[type="text"]:disabled, input[type="password"]:disabled {
 .cxl4{
     background: #9d200b;
 }
+
+.competitor-row{
+    padding-bottom:12px;
+    border-bottom:1px solid #ddd;
+    margin:0;
+}
+
+.competitor-roomtype{
+    font-size:0.8rem;
+    position: absolute;
+    bottom: -10px;
+    left: 18px;
+}

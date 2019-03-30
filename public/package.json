@@ -22,6 +22,7 @@
   },
   "homepage": "https://github.com/primus852/HotelControlBoard#readme",
   "dependencies": {
+    "@chenfengyuan/datepicker": "^1.0.7",
     "animate.css": "^3.7.0",
     "bootstrap": "^4.2.1",
     "chart.js": "^2.8.0",
@@ -29,6 +30,7 @@
     "font-awesome": "^4.7.0",
     "jquery": "^3.3.1",
     "jquery-jeditable": "^2.0.7",
+    "moment": "^2.24.0",
     "noty": "^3.2.0-beta",
     "perfect-scrollbar": "^1.4.0",
     "popper.js": "^1.14.7",

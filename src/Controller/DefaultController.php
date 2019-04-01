@@ -161,13 +161,7 @@ class DefaultController extends AbstractController
         return $this->redirectToRoute('panel');
     }
 
-    /**
-     * @Route("/login", name="login")
-     */
-    public function login()
-    {
-        return $this->redirectToRoute('panel');
-    }
+
 
 
     /**
@@ -182,7 +176,7 @@ class DefaultController extends AbstractController
         $security = new SecurityChecker($this->getUser(), $this->container);
 
         if (!$security->hasRole($this->getUser(), 'ROLE_USER')) {
-            return $this->redirectToRoute('login');
+            return $this->redirectToRoute('fos_user_security_login');
         }
 
         /**
@@ -216,7 +210,7 @@ class DefaultController extends AbstractController
         $security = new SecurityChecker($this->getUser(), $this->container);
 
         if (!$security->hasRole($this->getUser(), 'ROLE_USER')) {
-            return $this->redirectToRoute('login');
+            return $this->redirectToRoute('fos_user_security_login');
         }
 
         return $this->render('default/settingsUpload.html.twig', array());
@@ -236,7 +230,7 @@ class DefaultController extends AbstractController
         $security = new SecurityChecker($this->getUser(), $this->container);
 
         if (!$security->hasRole($this->getUser())) {
-            return $this->redirectToRoute('login');
+            return $this->redirectToRoute('fos_user_security_login');
         }
 
         if ($date_string === '0') {
@@ -285,7 +279,7 @@ class DefaultController extends AbstractController
         $security = new SecurityChecker($this->getUser(), $this->container);
 
         if (!$security->hasRole($this->getUser())) {
-            return $this->redirectToRoute('login');
+            return $this->redirectToRoute('fos_user_security_login');
         }
 
         return $this->render('default/settingsRoomtypes.html.twig', array(
@@ -305,7 +299,7 @@ class DefaultController extends AbstractController
         $security = new SecurityChecker($this->getUser(), $this->container);
 
         if (!$security->hasRole($this->getUser())) {
-            return $this->redirectToRoute('login');
+            return $this->redirectToRoute('fos_user_security_login');
         }
 
         return $this->render('default/settingsRatetypes.html.twig', array(
@@ -325,7 +319,7 @@ class DefaultController extends AbstractController
         $security = new SecurityChecker($this->getUser(), $this->container);
 
         if (!$security->hasRole($this->getUser())) {
-            return $this->redirectToRoute('login');
+            return $this->redirectToRoute('fos_user_security_login');
         }
 
         $competitors = $em->getRepository(CompetitorCheck::class)->findAll();
@@ -349,7 +343,7 @@ class DefaultController extends AbstractController
         $security = new SecurityChecker($this->getUser(), $this->container);
 
         if (!$security->hasRole($this->getUser())) {
-            return $this->redirectToRoute('login');
+            return $this->redirectToRoute('fos_user_security_login');
         }
 
         /**

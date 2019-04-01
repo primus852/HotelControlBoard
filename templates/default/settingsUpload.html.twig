@@ -18,7 +18,7 @@
             <div class="nano-content" id="perfectScroll">
                 <div class="container-fluid" id="js-result-table">
                     <div class="row">
-                        <div class="col-4">
+                        <div class="col-3">
                             <form id="form_da">
                                 <input type="file" style="display:none;"
                                        name="file-da[]"
@@ -30,12 +30,12 @@
                                 />
                                 <label for="file-da">
                                     <i class="fa fa-upload"></i>
-                                    <span>Detailed Availability&hellip;</span>
+                                    <span>Detailed Availability</span>
                                 </label>
                                 <input type="hidden" name="report_type" value="da"/>
                             </form>
                         </div>
-                        <div class="col-4">
+                        <div class="col-3">
                             <form id="form_hf">
                                 <input type="file" style="display:none;"
                                        name="file-hf[]"
@@ -47,12 +47,12 @@
                                 />
                                 <label for="file-hf">
                                     <i class="fa fa-upload"></i>
-                                    <span>History &amp; Forecast&hellip;</span>
+                                    <span>History &amp; Forecast</span>
                                 </label>
                                 <input type="hidden" name="report_type" value="hf"/>
                             </form>
                         </div>
-                        <div class="col-4">
+                        <div class="col-3">
                             <form id="form_jb">
                                 <input type="file" style="display:none;"
                                        name="file-jb[]"
@@ -64,9 +64,26 @@
                                 />
                                 <label for="file-jb">
                                     <i class="fa fa-upload"></i>
-                                    <span>Journal Budget Month&hellip;</span>
+                                    <span>Journal Budget Month</span>
                                 </label>
                                 <input type="hidden" name="report_type" value="jb"/>
+                            </form>
+                        </div>
+                        <div class="col-3">
+                            <form id="form_ct">
+                                <input type="file" style="display:none;"
+                                       name="file-ct[]"
+                                       id="file-ct"
+                                       data-url="{{ path('ajaxUploadReports') }}"
+                                       data-report-type="ct"
+                                       class="inputfile inputfile-1"
+                                       data-multiple-caption="{count} files selected"
+                                />
+                                <label for="file-ct">
+                                    <i class="fa fa-upload"></i>
+                                    <span>City Tax</span>
+                                </label>
+                                <input type="hidden" name="report_type" value="ct"/>
                             </form>
                         </div>
                     </div>

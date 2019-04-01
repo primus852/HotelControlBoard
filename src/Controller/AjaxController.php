@@ -14,9 +14,13 @@ use App\Util\Xml\HcbXmlReader;
 use DateTime;
 use Doctrine\Common\Persistence\ObjectManager;
 use Exception;
+use iio\libmergepdf\Merger;
+use Knp\Snappy\Pdf;
 use primus852\ShortResponse\ShortResponse;
 use primus852\SimpleCrypt\SimpleCrypt;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -27,6 +31,88 @@ class AjaxController extends AbstractController
 {
 
     /**
+     * @Route("/_ajax/_generateTaxForms", name="ajaxTaxForms")
+     * @param Pdf $pdf
+     * @param ObjectManager $em
+     * @return JsonResponse
+     */
+    public function taxForms(Pdf $pdf, ObjectManager $em)
+    {
+        /**
+         * Call the CT Parser
+         */
+        try {
+            $result = HcbXmlReader::ct($em);
+        } catch (Exception $e) {
+            return ShortResponse::exception('Failed to parse Report', $e->getMessage());
+        }
+
+        /**
+         * Remove all PDFs
+         */
+        $fs = new Filesystem();
+        $finder = new Finder();
+        $finder->files()->in('pdfs');
+
+        if ($finder->hasResults()) {
+            foreach ($finder as $fileInfo) {
+                $absoluteFilePath = $fileInfo->getRealPath();
+                $fs->remove($absoluteFilePath);
+            }
+        }
+
+        /**
+         * Merging output PDFs
+         */
+        $merger = new Merger();
+
+        $id = 0;
+        foreach ($result as $r) {
+
+            $id++;
+
+            $pdf->setOption('header-html', $this->renderView('default/pdf/pdfTaxFormsHeader.html.twig', array()));
+            $pdf->setOption('footer-html', $this->renderView('default/pdf/pdfTaxFormFooter.html.twig', array()));
+
+            $lang = $r['isGerman'] === true ? 'de' : 'en';
+
+            $pdf->generateFromHtml($this->renderView('default/pdf/pdfTaxFormBase.' . $lang . '.html.twig', array(
+                'checkin' => $r['checkin'],
+                'checkout' => $r['checkout'],
+                'name' => $r['guest'],
+                'dob' => $r['dob'],
+                'zip' => $r['zip_private'],
+                'city' => $r['city_private'],
+                'street' => $r['street_private'],
+                'company' => $r['company']
+
+            )), 'pdfs/taxforms.' . $id . '.pdf');
+
+            $merger->addFile('pdfs/taxforms.' . $id . '.pdf');
+        }
+
+        /**
+         * Merge the files
+         */
+        try {
+            $pdf_merged = $merger->merge();
+        } catch (Exception $e) {
+            return ShortResponse::exception('Could not merge PDFs', $e->getMessage());
+        }
+
+        /**
+         * Create merged Doku
+         */
+        $fs->dumpFile('pdfs/taxforms.pdf', $pdf_merged);
+
+
+        return ShortResponse::success('TaxForms generated', array(
+            'link' => $this->generateUrl('taxFormsPdf', array()),
+        ));
+
+    }
+
+    /**
      * @Route("/_ajax/_check_rate", name="ajaxCheckRate")
      * @param Request $request
      * @param ObjectManager $em
@@ -35,7 +121,6 @@ class AjaxController extends AbstractController
      */
     public function checkRate(Request $request, ObjectManager $em)
     {
-
 
 
     }
@@ -74,7 +159,7 @@ class AjaxController extends AbstractController
             return ShortResponse::exception('Could not Crawl', $e->getMessage());
         }
 
-        $price = $price = $crawl['price'] === 'booked' ? '<span class="text-danger">booked</span>' : '<span class="text-success">'.$crawl['price'].'</span>';
+        $price = $price = $crawl['price'] === 'booked' ? '<span class="text-danger">booked</span>' : '<span class="text-success">' . $crawl['price'] . '</span>';
 
         return ShortResponse::success('Hotel crawled', array(
             'room' => $crawl['roomName'],

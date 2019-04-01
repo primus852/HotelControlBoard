@@ -13,7 +13,9 @@ use App\Entity\Availability;
 use App\Entity\HistoryForecast;
 use App\Entity\JournalBudget;
 use App\Entity\Roomtype;
+use DateTime;
 use Doctrine\Common\Persistence\ObjectManager;
+use Exception;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\Filesystem\Filesystem;
 
@@ -21,6 +23,74 @@ class HcbXmlReader
 {
 
     const FOLDER = 'reports';
+
+    /**
+     * @param ObjectManager $em
+     * @return array
+     * @throws HcbXmlReaderException
+     */
+    public static function ct(ObjectManager $em)
+    {
+
+        $results = array();
+
+        try {
+            $crawler = self::xml('ct');
+        } catch (HcbXmlReaderException $e) {
+            throw new HcbXmlReaderException($e->getMessage());
+        }
+
+        /**
+         * Get Report Type
+         */
+        $r_type = $crawler->filterXPath('//MODULE1');
+
+        if ($r_type->count() === 0) {
+            throw new HcbXmlReaderException('Invalid Report Type');
+        }
+
+        $persons = $crawler->filterXPath('//G_C6');
+        foreach ($persons->getIterator() as $person) {
+
+            $pCrawler = new Crawler($person);
+
+            /**
+             * Get Checkin
+             */
+            $checkin = DateTime::createFromFormat('d-M-y', $pCrawler->filterXPath('//C9')->text());
+
+            if ($checkin === false) {
+                throw new HcbXmlReaderException('Could not convert to Checkin: ' . $pCrawler->filterXPath('//C9')->text());
+            }
+
+            /**
+             * Get Checkout
+             */
+            $checkout = DateTime::createFromFormat('d-M-y', $pCrawler->filterXPath('//C15')->text());
+
+            if ($checkout === false) {
+                throw new HcbXmlReaderException('Could not convert to Checkout: ' . $pCrawler->filterXPath('//C15')->text());
+            }
+
+            $results[] = array(
+                'checkin' => $checkin,
+                'checkout' => $checkout,
+                'isGerman' => $pCrawler->filterXPath('//C12')->text() === 'GE' ? true : false,
+                'guest' => $pCrawler->filterXPath('//C18')->text(),
+                'street_private' => $pCrawler->filterXPath('//C24')->text(),
+                'unknown1' => $pCrawler->filterXPath('//C30')->text(),
+                'company' => $pCrawler->filterXPath('//C42')->text(),
+                'unknown2' => $pCrawler->filterXPath('//C45')->text(),
+                'dob' => $pCrawler->filterXPath('//C60')->text(),
+                'zip_private' => $pCrawler->filterXPath('//C66')->text(),
+                'city_private' => $pCrawler->filterXPath('//C69')->text()
+            );
+
+        }
+
+        return $results;
+
+    }
 
     /**
      * @param ObjectManager $em
@@ -41,7 +111,7 @@ class HcbXmlReader
          */
         $r_type = $crawler->filterXPath('//FINJRNLBYTRANS');
 
-        if($r_type->count() === 0){
+        if ($r_type->count() === 0) {
             throw new HcbXmlReaderException('Invalid Report Type');
         }
 
@@ -51,20 +121,19 @@ class HcbXmlReader
 
             $dayCrawler = new Crawler($day);
 
-
             /**
              * Get Date
              */
-            $date = \DateTime::createFromFormat('d-M-y',$dayCrawler->filterXPath('//BUSINESS_DATE')->text());
+            $date = DateTime::createFromFormat('d-M-y', $dayCrawler->filterXPath('//BUSINESS_DATE')->text());
 
-            if($date === false){
-                throw new HcbXmlReaderException('Could not convert to Date: '.$dayCrawler->filterXPath('//BUSINESS_DATE')->text());
+            if ($date === false) {
+                throw new HcbXmlReaderException('Could not convert to Date: ' . $dayCrawler->filterXPath('//BUSINESS_DATE')->text());
             }
 
             $transNo = $dayCrawler->filterXPath('//TRX_NO')->text();
             $transDesc = $dayCrawler->filterXPath('//TRX_DESC')->text();
-            $transDebit = (float) $dayCrawler->filterXPath('//CASHIER_DEBIT')->text();
-            $transCredit = (float) $dayCrawler->filterXPath('//CASHIER_CREDIT')->text();
+            $transDebit = (float)$dayCrawler->filterXPath('//CASHIER_DEBIT')->text();
+            $transCredit = (float)$dayCrawler->filterXPath('//CASHIER_CREDIT')->text();
             $transTotal = $transDebit - $transCredit;
 
             /**
@@ -74,7 +143,7 @@ class HcbXmlReader
                 'transNo' => $transNo,
             ));
 
-            if($jb === null){
+            if ($jb === null) {
                 $jb = new JournalBudget();
                 $jb->setTransNo($transNo);
             }
@@ -86,15 +155,15 @@ class HcbXmlReader
 
         }
 
-        try{
+        try {
             $em->flush();
-        }catch (\Exception $e){
-            throw new HcbXmlReaderException('MySQL Error: '.$e->getMessage());
+        } catch (Exception $e) {
+            throw new HcbXmlReaderException('MySQL Error: ' . $e->getMessage());
         }
 
     }
 
-            /**
+    /**
      * @param ObjectManager $em
      * @throws HcbXmlReaderException
      */
@@ -113,7 +182,7 @@ class HcbXmlReader
          */
         $r_type = $crawler->filterXPath('//HISTORY_FORECAST');
 
-        if($r_type->count() === 0){
+        if ($r_type->count() === 0) {
             throw new HcbXmlReaderException('Invalid Report Type');
         }
 
@@ -126,17 +195,17 @@ class HcbXmlReader
             /**
              * Get Date
              */
-            $date = \DateTime::createFromFormat('d-M-y',$dayCrawler->filterXPath('//CONSIDERED_DATE')->text());
+            $date = DateTime::createFromFormat('d-M-y', $dayCrawler->filterXPath('//CONSIDERED_DATE')->text());
 
-            if($date === false){
-                throw new HcbXmlReaderException('Could not convert to Date: '.$dayCrawler->filterXPath('//CONSIDERED_DATE')->text());
+            if ($date === false) {
+                throw new HcbXmlReaderException('Could not convert to Date: ' . $dayCrawler->filterXPath('//CONSIDERED_DATE')->text());
             }
 
-            $bookedRooms = (int) $dayCrawler->filterXPath('//NO_ROOMS')->text();
-            $totalRooms = (int) $dayCrawler->filterXPath('//INVENTORY_ROOMS')->text();
-            $pax = (int) $dayCrawler->filterXPath('//NO_PERSONS')->text();
-            $arrivalRooms = (int) $dayCrawler->filterXPath('//ARRIVAL_ROOMS')->text();
-            $departureRoome = (int) $dayCrawler->filterXPath('//DEPARTURE_ROOMS')->text();
+            $bookedRooms = (int)$dayCrawler->filterXPath('//NO_ROOMS')->text();
+            $totalRooms = (int)$dayCrawler->filterXPath('//INVENTORY_ROOMS')->text();
+            $pax = (int)$dayCrawler->filterXPath('//NO_PERSONS')->text();
+            $arrivalRooms = (int)$dayCrawler->filterXPath('//ARRIVAL_ROOMS')->text();
+            $departureRoome = (int)$dayCrawler->filterXPath('//DEPARTURE_ROOMS')->text();
 
             /**
              * Try to find an entry for the same date
@@ -145,7 +214,7 @@ class HcbXmlReader
                 'bookDate' => $date,
             ));
 
-            if($hf === null){
+            if ($hf === null) {
                 $hf = new HistoryForecast();
                 $hf->setBookDate($date);
             }
@@ -159,10 +228,10 @@ class HcbXmlReader
 
         }
 
-        try{
+        try {
             $em->flush();
-        }catch (\Exception $e){
-            throw new HcbXmlReaderException('MySQL Error: '.$e->getMessage());
+        } catch (Exception $e) {
+            throw new HcbXmlReaderException('MySQL Error: ' . $e->getMessage());
         }
 
     }
@@ -186,7 +255,7 @@ class HcbXmlReader
          */
         $r_type = $crawler->filterXPath('//DETAIL_AVAIL');
 
-        if($r_type->count() === 0){
+        if ($r_type->count() === 0) {
             throw new HcbXmlReaderException('Invalid Report Type');
         }
 
@@ -199,20 +268,20 @@ class HcbXmlReader
             /**
              * Get Date
              */
-            if($dayCrawler->filterXPath('//BUSINESS_DATE')->text() === 'Total Available'){
+            if ($dayCrawler->filterXPath('//BUSINESS_DATE')->text() === 'Total Available') {
                 continue;
             }
-            $date = \DateTime::createFromFormat('d.m.y',$dayCrawler->filterXPath('//BUSINESS_DATE')->text());
+            $date = DateTime::createFromFormat('d.m.y', $dayCrawler->filterXPath('//BUSINESS_DATE')->text());
 
-            if($date === false){
-                throw new HcbXmlReaderException('Could not convert to Date: '.$dayCrawler->filterXPath('//BUSINESS_DATE')->text());
+            if ($date === false) {
+                throw new HcbXmlReaderException('Could not convert to Date: ' . $dayCrawler->filterXPath('//BUSINESS_DATE')->text());
             }
 
             /**
              * Get Rooms
              */
             $rooms = $dayCrawler->filterXPath('//ROOM_TYPE');
-            foreach($rooms->getIterator() as $room){
+            foreach ($rooms->getIterator() as $room) {
 
                 $roomCrawler = new Crawler($room);
 
@@ -228,7 +297,7 @@ class HcbXmlReader
                     'nameShort' => $short,
                 ));
 
-                if($room === null){
+                if ($room === null) {
                     continue;
                 }
 
@@ -245,7 +314,7 @@ class HcbXmlReader
                     'roomType' => $room,
                 ));
 
-                if($available === null){
+                if ($available === null) {
                     $available = new Availability();
                     $available->setBookDate($date);
                     $available->setRoomType($room);
@@ -259,11 +328,58 @@ class HcbXmlReader
 
         }
 
-        try{
+        try {
             $em->flush();
-        }catch (\Exception $e){
-            throw new HcbXmlReaderException('MySQL Error: '.$e->getMessage());
+        } catch (Exception $e) {
+            throw new HcbXmlReaderException('MySQL Error: ' . $e->getMessage());
         }
+
+    }
+
+    /**
+     * @return bool|DateTime|null
+     * @throws HcbXmlReaderException
+     */
+    public static function latest_tax_forms()
+    {
+
+        $date = null;
+
+        try {
+            $crawler = self::xml('ct');
+        } catch (HcbXmlReaderException $e) {
+            throw new HcbXmlReaderException($e->getMessage());
+        }
+
+        /**
+         * Get Report Type
+         */
+        $r_type = $crawler->filterXPath('//MODULE1');
+
+        if ($r_type->count() === 0) {
+            throw new HcbXmlReaderException('Invalid Report Type');
+        }
+
+        $persons = $crawler->filterXPath('//G_C6');
+
+        foreach ($persons->getIterator() as $person) {
+
+            $pCrawler = new Crawler($person);
+
+            /**
+             * Get Checkin
+             */
+            $checkin = DateTime::createFromFormat('d-M-y', $pCrawler->filterXPath('//C9')->text());
+
+            if ($checkin === false) {
+                throw new HcbXmlReaderException('Could not convert to Checkin: ' . $pCrawler->filterXPath('//C9')->text());
+            }
+
+            $date = $checkin->format('d.m.Y');
+
+        }
+
+        return $date;
 
     }
 
@@ -284,7 +400,7 @@ class HcbXmlReader
 
         try {
             $crawler = new Crawler($raw);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             throw new HcbXmlReaderException('Could not load XML to Crawler: ' . $e->getMessage());
         }
 

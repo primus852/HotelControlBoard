@@ -140,7 +140,7 @@ $(document).on('click', '#js-add-rate', function (e) {
         title: 'Add Ratetype',
         text: html,
         html: true,
-        height:'70%',
+        height: '70%',
         maxHeight: '550px',
         maxWidth: '500px',
         animationType: 'fadeIn',
@@ -181,21 +181,21 @@ $(document).on('click', '#js-add-rate', function (e) {
                     if (data.result === 'success') {
 
                         $table.append('' +
-                            '<div class="row table-font" style="border-bottom:1px solid #ccc;" id="row_'+data.extra.type+'_'+data.extra.id+'">\n    ' +
-                            '   <div class="col-2" id="nameShort_'+data.extra.type+'_'+data.extra.id+'">'+data.extra.nameShort+'</div>\n    ' +
-                            '   <div class="col-4" id="name_'+data.extra.type+'_'+data.extra.id+'">'+data.extra.name+'</div>\n    ' +
-                            '   <div class="col-1" id="minStay_'+data.extra.type+'_'+data.extra.id+'">'+data.extra.minStay+'</div>\n    ' +
-                            '   <div class="col-1" id="daysAdvance_'+data.extra.type+'_'+data.extra.id+'">'+data.extra.preDays+'</div>\n    ' +
-                            '   <div class="col-1">'+data.extra.isBase+'</div>\n    ' +
-                            '   <div class="col-1"><span class="badge badge-success" id="status_'+data.extra.type+'_'+data.extra.id+'">active</span></div>\n    ' +
+                            '<div class="row table-font" style="border-bottom:1px solid #ccc;" id="row_' + data.extra.type + '_' + data.extra.id + '">\n    ' +
+                            '   <div class="col-2" id="nameShort_' + data.extra.type + '_' + data.extra.id + '">' + data.extra.nameShort + '</div>\n    ' +
+                            '   <div class="col-4" id="name_' + data.extra.type + '_' + data.extra.id + '">' + data.extra.name + '</div>\n    ' +
+                            '   <div class="col-1" id="minStay_' + data.extra.type + '_' + data.extra.id + '">' + data.extra.minStay + '</div>\n    ' +
+                            '   <div class="col-1" id="daysAdvance_' + data.extra.type + '_' + data.extra.id + '">' + data.extra.preDays + '</div>\n    ' +
+                            '   <div class="col-1">' + data.extra.isBase + '</div>\n    ' +
+                            '   <div class="col-1"><span class="badge badge-success" id="status_' + data.extra.type + '_' + data.extra.id + '">active</span></div>\n    ' +
                             '   <div class="col-1">\n        ' +
-                            '       <span id="dc_amount_'+data.extra.type+'_'+data.extra.id+'">'+data.extra.dcAmount+'</span><span id="dc_type_'+data.extra.type+'_'+data.extra.id+'">'+data.extra.dcType+'</span>\n    ' +
+                            '       <span id="dc_amount_' + data.extra.type + '_' + data.extra.id + '">' + data.extra.dcAmount + '</span><span id="dc_type_' + data.extra.type + '_' + data.extra.id + '">' + data.extra.dcType + '</span>\n    ' +
                             '   </div>\n    ' +
                             '   <div class="col-1">\n        ' +
                             '       <a href="#" class="btn btn-success btn-sm rounded-0 tt clickable" title="View Details"' +
-                            '           data-url="'+data.extra.link+'"' +
-                            '           data-hash="details-ratetype-'+data.extra.id+'"' +
-                            '           data-trigger="'+data.extra.id+'"' +
+                            '           data-url="' + data.extra.link + '"' +
+                            '           data-hash="details-ratetype-' + data.extra.id + '"' +
+                            '           data-trigger="' + data.extra.id + '"' +
                             '       >\n            ' +
                             '           <i class="fa fa-info-circle"></i> Details\n        ' +
                             '       </a>\n    ' +
@@ -265,16 +265,16 @@ $(document).on('click', '#js-add-room', function (e) {
                     if (data.result === 'success') {
 
                         $table.append('' +
-                            '<div class="row table-font" style="border-bottom:1px solid #ccc;" id="row_'+data.extra.type+'_'+data.extra.id+'">\n    ' +
-                            '   <div class="col-2" id="nameShort_'+data.extra.type+'_'+data.extra.id+'">'+data.extra.nameShort+'</div>\n    ' +
-                            '   <div class="col-6" id="name_'+data.extra.type+'_'+data.extra.id+'">'+data.extra.name+'</div>\n    ' +
-                            '   <div class="col-1" id="maxOcc_'+data.extra.type+'_'+data.extra.id+'">'+data.extra.maxOcc+'</div>\n    ' +
-                            '   <div class="col-1"><span class="badge badge-success" id="status_'+data.extra.type+'_'+data.extra.id+'">active</span></div>\n    ' +
+                            '<div class="row table-font" style="border-bottom:1px solid #ccc;" id="row_' + data.extra.type + '_' + data.extra.id + '">\n    ' +
+                            '   <div class="col-2" id="nameShort_' + data.extra.type + '_' + data.extra.id + '">' + data.extra.nameShort + '</div>\n    ' +
+                            '   <div class="col-6" id="name_' + data.extra.type + '_' + data.extra.id + '">' + data.extra.name + '</div>\n    ' +
+                            '   <div class="col-1" id="maxOcc_' + data.extra.type + '_' + data.extra.id + '">' + data.extra.maxOcc + '</div>\n    ' +
+                            '   <div class="col-1"><span class="badge badge-success" id="status_' + data.extra.type + '_' + data.extra.id + '">active</span></div>\n    ' +
                             '   <div class="col-1">\n        ' +
                             '       <a href="#" class="btn btn-success btn-sm rounded-0 tt clickable" title="View Details"' +
-                            '           data-url="'+data.extra.link+'"' +
-                            '           data-hash="details-roomtype-'+data.extra.id+'"' +
-                            '           data-trigger="'+data.extra.id+'"' +
+                            '           data-url="' + data.extra.link + '"' +
+                            '           data-hash="details-roomtype-' + data.extra.id + '"' +
+                            '           data-trigger="' + data.extra.id + '"' +
                             '       >\n            ' +
                             '           <i class="fa fa-info-circle"></i> Details\n        ' +
                             '       </a>\n    ' +
@@ -309,18 +309,18 @@ $(document).on('click', '#js-update-room', function (e) {
     var $nameShort = $('#room-name-short');
     var $maxOcc = $('#room-occ');
 
-    if($.trim($name.val()) === ''){
-        openNoty('error','Name cannot be empty');
+    if ($.trim($name.val()) === '') {
+        openNoty('error', 'Name cannot be empty');
         return false;
     }
 
-    if($.trim($nameShort.val()) === ''){
-        openNoty('error','Name (Short) cannot be empty');
+    if ($.trim($nameShort.val()) === '') {
+        openNoty('error', 'Name (Short) cannot be empty');
         return false;
     }
 
-    if($.trim($maxOcc.val()) === ''){
-        openNoty('error','Max. Occupancy cannot be empty');
+    if ($.trim($maxOcc.val()) === '') {
+        openNoty('error', 'Max. Occupancy cannot be empty');
         return false;
     }
 
@@ -404,15 +404,15 @@ $(document).on('click', '#js-add-competitor', function (e) {
                     if (data.result === 'success') {
 
                         $table.append('' +
-                            '<div class="row table-font" style="border-bottom:1px solid #ccc;" id="row_'+data.extra.type+'_'+data.extra.id+'">\n    ' +
-                            '   <div class="col-3" id="name_'+data.extra.type+'_'+data.extra.id+'">'+data.extra.name+'</div>\n    ' +
-                            '   <div class="col-7" id="link_'+data.extra.type+'_'+data.extra.id+'">'+data.extra.sublink+'</div>\n    ' +
-                            '   <div class="col-1"><span class="badge badge-success" id="status_'+data.extra.type+'_'+data.extra.id+'">active</span></div>\n    ' +
+                            '<div class="row table-font" style="border-bottom:1px solid #ccc;" id="row_' + data.extra.type + '_' + data.extra.id + '">\n    ' +
+                            '   <div class="col-3" id="name_' + data.extra.type + '_' + data.extra.id + '">' + data.extra.name + '</div>\n    ' +
+                            '   <div class="col-7" id="link_' + data.extra.type + '_' + data.extra.id + '">' + data.extra.sublink + '</div>\n    ' +
+                            '   <div class="col-1"><span class="badge badge-success" id="status_' + data.extra.type + '_' + data.extra.id + '">active</span></div>\n    ' +
                             '   <div class="col-1">\n        ' +
                             '       <a href="#" class="btn btn-success btn-sm rounded-0 tt clickable" title="View Details"' +
-                            '           data-url="'+data.extra.link+'"' +
-                            '           data-hash="details-competitor-'+data.extra.id+'"' +
-                            '           data-trigger="'+data.extra.id+'"' +
+                            '           data-url="' + data.extra.link + '"' +
+                            '           data-hash="details-competitor-' + data.extra.id + '"' +
+                            '           data-trigger="' + data.extra.id + '"' +
                             '       >\n            ' +
                             '           <i class="fa fa-info-circle"></i> Details\n        ' +
                             '       </a>\n    ' +
@@ -446,13 +446,13 @@ $(document).on('click', '#js-update-competitor', function (e) {
     var $name = $('#competitor-name');
     var $link = $('#competitor-link');
 
-    if($.trim($name.val()) === ''){
-        openNoty('error','Name cannot be empty');
+    if ($.trim($name.val()) === '') {
+        openNoty('error', 'Name cannot be empty');
         return false;
     }
 
-    if($.trim($link.val()) === ''){
-        openNoty('error','Link cannot be empty');
+    if ($.trim($link.val()) === '') {
+        openNoty('error', 'Link cannot be empty');
         return false;
     }
 
@@ -489,17 +489,17 @@ $(document).on('click', '#js-update-competitor', function (e) {
     ;
 });
 
-$(document).on('click','#js-check-competitors',function (e) {
+$(document).on('click', '#js-check-competitors', function (e) {
     e.preventDefault();
 
     var $btn = $(this);
     var date = $('#js-competitor-date');
 
-    if($btn.hasClass('disabled')){
+    if ($btn.hasClass('disabled')) {
         return false;
     }
 
-    if($.trim(date.val()) === '' || date.val() === null){
+    if ($.trim(date.val()) === '' || date.val() === null) {
         openNoty('error', 'Date cannot be empty');
         return false;
     }
@@ -509,16 +509,16 @@ $(document).on('click','#js-check-competitors',function (e) {
     /**
      * Gather all Competitor Rows
      */
-    $('.competitor-row').each(function(i,v){
+    $('.competitor-row').each(function (i, v) {
 
         var id = $(v).attr('data-id');
         var url = $(v).attr('data-url');
         started += 1;
 
-        $('#room_'+id).html('<i class="fa fa-spin fa-spinner"></i> <span class="text-success">Started Query...</span>');
-        $('#incl_'+id).html('');
-        $('#pax_'+id).html('');
-        $('#price_'+id).html('');
+        $('#room_' + id).html('<i class="fa fa-spin fa-spinner"></i> <span class="text-success">Started Query...</span>');
+        $('#incl_' + id).html('');
+        $('#pax_' + id).html('');
+        $('#price_' + id).html('');
 
         $.post(url, {
             id: id,
@@ -526,21 +526,21 @@ $(document).on('click','#js-check-competitors',function (e) {
         })
             .done(function (data) {
                 if (data.result === 'success') {
-                    $('#room_'+id).html(data.extra.room);
-                    $('#incl_'+id).html(data.extra.incl);
-                    $('#pax_'+id).html(data.extra.pax);
-                    $('#price_'+id).html(data.extra.price);
+                    $('#room_' + id).html(data.extra.room);
+                    $('#incl_' + id).html(data.extra.incl);
+                    $('#pax_' + id).html(data.extra.pax);
+                    $('#price_' + id).html(data.extra.price);
                 } else {
-                    $('#room_'+id).html('<i class="text-danger">'+data.message+'</i>');
+                    $('#room_' + id).html('<i class="text-danger">' + data.message + '</i>');
                 }
                 started -= 1;
-                if(started === 0){
+                if (started === 0) {
                     $btn.removeClass('disabled').html('<i class="fa fa-refresh"></i>')
                 }
             })
             .fail(function () {
                 started -= 1;
-                if(started === 0){
+                if (started === 0) {
                     $btn.removeClass('disabled').html('<i class="fa fa-refresh"></i>')
                 }
                 openNoty('error', 'Ajax Error');
@@ -566,13 +566,13 @@ $(document).on('click', '#js-update-rate', function (e) {
     var $dcAmount = $('#rate-dc-amount');
     var $dcType = $('#rate-dc-type');
 
-    if($.trim($name.val()) === ''){
-        openNoty('error','Name cannot be empty');
+    if ($.trim($name.val()) === '') {
+        openNoty('error', 'Name cannot be empty');
         return false;
     }
 
-    if($.trim($nameShort.val()) === ''){
-        openNoty('error','Name (Short) cannot be empty');
+    if ($.trim($nameShort.val()) === '') {
+        openNoty('error', 'Name (Short) cannot be empty');
         return false;
     }
 
@@ -691,6 +691,55 @@ $(document).on('click', '#js-remove-entity', function (e) {
     });
 });
 
+$(document).on('click', '#js-generate-tax-forms', function (e) {
+
+    e.preventDefault();
+    var $btn = $(this);
+    var $html = $btn.html();
+    var url = $btn.attr('data-url');
+    var status = $btn.attr('data-status');
+
+    if(status === 'Error'){
+        x0p('Error',
+            'No XML found, please Upload Report first',
+            'error', false);
+        return false;
+    }
+
+    if ($btn.hasClass('disabled')) {
+        return false;
+    }
+
+    $btn.children().removeClass('fa-file-pdf-o').addClass('fa-spin').addClass('fa-spinner');
+    $btn.addClass('disabled');
+
+    $.post(url)
+        .done(function (r) {
+            $btn.removeClass('disabled').html($html);
+            if (r.result === 'success') {
+                x0p('Success',
+                    'Forms generated',
+                    'ok', false).then(function (inner) {
+                    window.location = r.extra.link;
+                });
+            } else {
+                x0p('Error',
+                    r.message,
+                    'error', false);
+            }
+            $btn.children().addClass('fa-file-pdf-o').removeClass('fa-spin').removeClass('fa-spinner').removeClass('disabled');
+            $btn.removeClass('disabled');
+
+        })
+        .fail(function () {
+            openNoty('error', 'Ajax Error');
+            $btn.children().addClass('fa-file-pdf-o').removeClass('fa-spin').removeClass('fa-spinner').removeClass('disabled');
+            $btn.removeClass('disabled');
+        })
+    ;
+
+});
+
 $(document).on('click', '.js-toggle-active', function (e) {
 
     e.preventDefault();
@@ -701,7 +750,7 @@ $(document).on('click', '.js-toggle-active', function (e) {
     var type = $btn.attr('data-type');
     var id = $btn.attr('data-id');
 
-    if($btn.hasClass('disabled')){
+    if ($btn.hasClass('disabled')) {
         return false;
     }
 
@@ -722,14 +771,14 @@ $(document).on('click', '.js-toggle-active', function (e) {
                  * If there is a badge with a label, update it
                  */
                 var $status = $('#status_' + type + '_' + id);
-                if($status.length){
-                    $status.removeClass('badge-danger').removeClass('badge-success').addClass('badge-'+data.extra.b_class).html(data.extra.b_html);
+                if ($status.length) {
+                    $status.removeClass('badge-danger').removeClass('badge-success').addClass('badge-' + data.extra.b_class).html(data.extra.b_html);
                 }
 
                 /**
                  * Toggle the Button
                  */
-                $btn.attr('data-set',data.extra.to_set_new).html(data.extra.html_new);
+                $btn.attr('data-set', data.extra.to_set_new).html(data.extra.html_new);
 
             } else {
                 x0p('Error',
@@ -744,22 +793,22 @@ $(document).on('click', '.js-toggle-active', function (e) {
 
 });
 
-$(document).on('change','.inputfile',function(e){
+$(document).on('change', '.inputfile', function (e) {
 
     var $btn = $(this);
-    var $label = $('label[for="'+$btn.attr('id')+'"]');
+    var $label = $('label[for="' + $btn.attr('id') + '"]');
     uploadReport($btn, $label.html());
 
 });
 
-function uploadReport($btn, html){
+function uploadReport($btn, html) {
 
     var url = $btn.attr('data-url');
-    var form = $('#form_'+$btn.attr('data-report-type'))[0];
+    var form = $('#form_' + $btn.attr('data-report-type'))[0];
     var formData = new FormData(form);
-    var $label = $('label[for="'+$btn.attr('id')+'"]');
+    var $label = $('label[for="' + $btn.attr('id') + '"]');
 
-    if($label.hasClass('disabled')){
+    if ($label.hasClass('disabled')) {
         return false;
     }
 
@@ -768,25 +817,24 @@ function uploadReport($btn, html){
     $.ajax({
         url: url,
         type: "POST",
-        data : formData,
+        data: formData,
         processData: false,
         contentType: false,
-        beforeSend: function() {
+        beforeSend: function () {
 
         },
-        success: function(data){
+        success: function (data) {
             $label.removeClass('disabled').html(html);
-            openNoty('success', 'Upload succeeded');
+            openNoty(data.result, data.message);
 
 
         },
-        error: function(xhr, ajaxOptions, thrownError) {
+        error: function (xhr, ajaxOptions, thrownError) {
             openNoty('error', 'Upload failed');
             $label.removeClass('disabled').html(html);
             console.log(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
         }
     });
-
 
 
 }

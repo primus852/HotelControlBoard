@@ -12,6 +12,8 @@ use App\Util\Rate\RateHandler;
 use App\Util\Rate\RateHandlerException;
 use App\Util\Room\RoomHandler;
 use App\Util\SecurityChecker;
+use App\Util\Xml\HcbXmlReader;
+use App\Util\Xml\HcbXmlReaderException;
 use DateInterval;
 use DatePeriod;
 use DateTime;
@@ -21,6 +23,7 @@ use Knp\Snappy\Pdf;
 use Parsedown;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Finder\Exception\AccessDeniedException;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -30,6 +33,27 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class DefaultController extends AbstractController
 {
+
+    /**
+     * @Route("/tax-forms/pdf", name="taxFormsPdf")
+     * @return BinaryFileResponse|RedirectResponse
+     */
+    public function taxFormsPdfAction()
+    {
+
+        /* @var $security SecurityChecker */
+        $security = new SecurityChecker($this->getUser(), $this->container);
+
+        if (!$security->hasRole($this->getUser(), 'ROLE_USER')) {
+            return $this->redirectToRoute('fos_user_security_login');
+        }
+
+        $response = new BinaryFileResponse('pdfs/taxforms.pdf');
+        $response->trustXSendfileTypeHeader();
+        $response->setContentDisposition(ResponseHeaderBag::DISPOSITION_INLINE, 'TaxForms.pdf');
+        return $response;
+
+    }
 
     /**
      * @Route("/panel/_ratesheet/{date_string}", name="openRatesheet", defaults={"date_string"="0"})
@@ -46,7 +70,7 @@ class DefaultController extends AbstractController
          * Delete current Ratesheet
          */
         $fs = new Filesystem();
-        if($fs->exists('pdfs/ratesheet.pdf')){
+        if ($fs->exists('pdfs/ratesheet.pdf')) {
             $fs->remove('pdfs/ratesheet.pdf');
         }
 
@@ -59,13 +83,13 @@ class DefaultController extends AbstractController
             throw new Exception('Could not create Date from: ' . $date_string);
         }
 
-        if($sentDate === false){
+        if ($sentDate === false) {
             $sentDate = new DateTime();
         }
 
         try {
-            $begin = new DateTime('First Day of January '.$sentDate->format('Y'));
-            $end = new DateTime('Last Day of December '.$sentDate->format('Y'));
+            $begin = new DateTime('First Day of January ' . $sentDate->format('Y'));
+            $end = new DateTime('Last Day of December ' . $sentDate->format('Y'));
             $interval = DateInterval::createFromDateString('1 day');
             $period = new DatePeriod($begin, $interval, $end);
         } catch (Exception $e) {
@@ -83,7 +107,7 @@ class DefaultController extends AbstractController
                 'bookDate' => $dt,
             ));
 
-            $rates[$dt->format('Y-m-d')] = $rate === null ? '-' :number_format($rate->getPrice(),2);
+            $rates[$dt->format('Y-m-d')] = $rate === null ? '-' : number_format($rate->getPrice(), 2);
 
         }
 
@@ -128,18 +152,18 @@ class DefaultController extends AbstractController
         )));
 
         $pdf->generateFromHtml($this->renderView('default/pdf/pdfBase.html.twig', array(
-            'calendar_jan' => Helper::generate_calendar(1,$sentDate->format('Y'), $em),
-            'calendar_feb' => Helper::generate_calendar(2,$sentDate->format('Y'), $em),
-            'calendar_mar' => Helper::generate_calendar(3,$sentDate->format('Y'), $em),
-            'calendar_apr' => Helper::generate_calendar(4,$sentDate->format('Y'), $em),
-            'calendar_may' => Helper::generate_calendar(5,$sentDate->format('Y'), $em),
-            'calendar_jun' => Helper::generate_calendar(6,$sentDate->format('Y'), $em),
-            'calendar_jul' => Helper::generate_calendar(7,$sentDate->format('Y'), $em),
-            'calendar_aug' => Helper::generate_calendar(8,$sentDate->format('Y'), $em),
-            'calendar_sep' => Helper::generate_calendar(9,$sentDate->format('Y'), $em),
-            'calendar_oct' => Helper::generate_calendar(10,$sentDate->format('Y'), $em),
-            'calendar_nov' => Helper::generate_calendar(11,$sentDate->format('Y'), $em),
-            'calendar_dec' => Helper::generate_calendar(12,$sentDate->format('Y'), $em),
+            'calendar_jan' => Helper::generate_calendar(1, $sentDate->format('Y'), $em),
+            'calendar_feb' => Helper::generate_calendar(2, $sentDate->format('Y'), $em),
+            'calendar_mar' => Helper::generate_calendar(3, $sentDate->format('Y'), $em),
+            'calendar_apr' => Helper::generate_calendar(4, $sentDate->format('Y'), $em),
+            'calendar_may' => Helper::generate_calendar(5, $sentDate->format('Y'), $em),
+            'calendar_jun' => Helper::generate_calendar(6, $sentDate->format('Y'), $em),
+            'calendar_jul' => Helper::generate_calendar(7, $sentDate->format('Y'), $em),
+            'calendar_aug' => Helper::generate_calendar(8, $sentDate->format('Y'), $em),
+            'calendar_sep' => Helper::generate_calendar(9, $sentDate->format('Y'), $em),
+            'calendar_oct' => Helper::generate_calendar(10, $sentDate->format('Y'), $em),
+            'calendar_nov' => Helper::generate_calendar(11, $sentDate->format('Y'), $em),
+            'calendar_dec' => Helper::generate_calendar(12, $sentDate->format('Y'), $em),
         )), 'pdfs/ratesheet.pdf');
 
 
@@ -148,7 +172,7 @@ class DefaultController extends AbstractController
          */
         $response = new BinaryFileResponse('pdfs/ratesheet.pdf');
         $response->trustXSendfileTypeHeader();
-        $response->setContentDisposition(ResponseHeaderBag::DISPOSITION_ATTACHMENT, 'RateSheet'.$sentDate->format('Y').'.pdf');
+        $response->setContentDisposition(ResponseHeaderBag::DISPOSITION_ATTACHMENT, 'RateSheet' . $sentDate->format('Y') . '.pdf');
         return $response;
 
     }
@@ -160,8 +184,6 @@ class DefaultController extends AbstractController
     {
         return $this->redirectToRoute('panel');
     }
-
-
 
 
     /**
@@ -193,9 +215,24 @@ class DefaultController extends AbstractController
             'isActive' => true,
         ));
 
+        /**
+         * Get latest TaxForm Date
+         */
+        try {
+            $latest_forms = HcbXmlReader::latest_tax_forms();
+        } catch (HcbXmlReaderException $e) {
+            $latest_forms = 'Error';
+        }
+
+        $latest_date = 'Error';
+        if($latest_forms !== null){
+            $latest_date = $latest_forms;
+        }
+
         return $this->render('default/index.html.twig', [
             'competitors' => $competitors,
             'rooms' => $rooms,
+            'forms' => $latest_date,
         ]);
     }
 
@@ -356,48 +393,48 @@ class DefaultController extends AbstractController
         $addDouble = true;
         $addExtra = true;
         $addTriple = true;
-        foreach($settings as $setting){
+        foreach ($settings as $setting) {
 
 
-            if($setting->getName() === 'add_double'){
+            if ($setting->getName() === 'add_double') {
                 $addDouble = false;
             }
 
-            if($setting->getName() === 'add_extra'){
+            if ($setting->getName() === 'add_extra') {
                 $addExtra = false;
             }
 
-            if($setting->getName() === 'add_triple'){
+            if ($setting->getName() === 'add_triple') {
                 $addTriple = false;
             }
         }
 
 
-        if(!$addDouble){
+        if (!$addDouble) {
             $settingDouble = new HcbSettings();
             $settingDouble->setName('add_double');
             $settingDouble->setSetting(0);
             $em->persist($settingDouble);
         }
 
-        if(!$addExtra){
+        if (!$addExtra) {
             $settingExtra = new HcbSettings();
             $settingExtra->setName('add_extra');
             $settingExtra->setSetting(0);
             $em->persist($settingExtra);
         }
 
-        if(!$addTriple){
+        if (!$addTriple) {
             $settingTriple = new HcbSettings();
             $settingTriple->setName('add_triple');
             $settingTriple->setSetting(0);
             $em->persist($settingTriple);
         }
 
-        try{
+        try {
             $em->flush();
-        }catch (Exception $e){
-            throw new Exception('Could not insert:' .$e->getMessage());
+        } catch (Exception $e) {
+            throw new Exception('Could not insert:' . $e->getMessage());
         }
 
 

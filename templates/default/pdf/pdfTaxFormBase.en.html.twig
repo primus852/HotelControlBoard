@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title>HCB::TaxForm</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="HCB TaxForm">
+    <meta name="author" content="Torsten Wolter">
+
+    <!-- LOAD CSS FILES -->
+    <link href="{{ public_html ~'/assets/css/ratesheet_pdf.css' }}" rel="stylesheet" type="text/css">
+    <link type="text/css" rel="stylesheet" href="{{ public_html ~'/node_modules/font-awesome/css/font-awesome.min.css' }}">
+
+</head>
+
+
+<body style="line-height: 1rem; !important;">
+<div class="container">
+    <div class="row">
+        <div class="col-12 text-center">
+            <br/>
+            <h5>Self-Attestation of the Professional Necessity of an Overnight Stay</h5>
+        </div>
+    </div>
+    <div class="row" style="padding-top:45px;">
+        <div class="col-3">Period from:</div>
+        <div class="col-4 text-center" style="border-bottom:1px solid #ddd;">{{ checkin|date('d.m.Y') }}</div>
+        <div class="col-2 text-center">to</div>
+        <div class="col-3 text-center" style="border-bottom:1px solid #ddd;">{{ checkout|date('d.m.Y') }}</div>
+    </div>
+    <div class="row" style="padding-top:20px;">
+        <div class="col-2">Name:</div>
+        <div class="col-5 text-left" style="border-bottom:1px solid #ddd;">{{ name }}</div>
+        <div class="col-3 text-right">Date of Birth:</div>
+        <div class="col-2 text-center" style="border-bottom:1px solid #ddd;">{{ dob }}</div>
+    </div>
+    <div class="row" style="padding-top:20px;">
+        <div class="col-2">Street:</div>
+        <div class="col-10 text-left" style="border-bottom:1px solid #ddd;">{% if street is null or street == '' %}&nbsp;{% else %}{{ street }}{% endif %}</div>
+    </div>
+    <div class="row" style="padding-top:20px;">
+        <div class="col-2">Zip, City:</div>
+        <div class="col-10 text-left" style="border-bottom:1px solid #ddd;">{% if zip is null or zip == '' %}&nbsp;{% else %}{{ zip }}{% endif %} {% if city is null or city == '' %}&nbsp;{% else %}{{ city }}{% endif %}</div>
+    </div>
+    <div class="row" style="padding-top:20px;">
+        <div class="col-2">I am</div>
+        <div class="col-10 text-left" style="border-bottom:1px solid #ddd;"></div>
+    </div>
+    <div class="row" style="padding-top:20px;">
+        <div class="col-6 text-center">
+            <div style="height:20px;width:20px;border:1px solid #ddd;display:inline-block;position: relative;top:5px;"></div>
+            a dependent employee
+        </div>
+        <div class="col-6 text-center">
+            <div style="height:20px;width:20px;border:1px solid #ddd;display:inline-block;position: relative;top:5px;"></div>
+            a commercial/independent agent
+        </div>
+    </div>
+    <div class="row" style="padding-top:20px;">
+        <div class="col-12">
+            and hereby confirm that my stay is for professional reasons.
+        </div>
+    </div>
+    <div class="row" style="padding-top:20px;">
+        <div class="col-12">
+            <span style="font-weight:700;text-decoration: underline;">Professional Details</span>
+        </div>
+    </div>
+    <div class="row" style="padding-top:20px;">
+        <div class="col-12" style="font-style: italic;">
+            In the case of dependent employees, name and address of employer:
+        </div>
+    </div>
+    <div class="row" style="padding-top:20px;">
+        <div class="col-12" style="border-bottom:1px solid #ddd;">
+            {% if company is null or company == '' %}&nbsp;{% else %}{{ company|raw }}{% endif %}
+        </div>
+    </div>
+    <div class="row" style="padding-top:35px;">
+        <div class="col-12" style="border-bottom:1px solid #ddd;"></div>
+    </div>
+    <div class="row" style="padding-top:35px;">
+        <div class="col-12" style="font-style: italic;">
+            In the case of commercial/independent agents:
+        </div>
+    </div>
+    <div class="row" style="padding-top:35px;">
+        <div class="col-4">
+            Professional address:
+        </div>
+        <div class="col-8" style="border-bottom:1px solid #ddd;"></div>
+    </div>
+    <div class="row" style="padding-top:20px;">
+        <div class="col-4">
+            Registered for income tax with the Fiscal Office:
+        </div>
+        <div class="col-8" style="border-bottom:1px solid #ddd;"></div>
+    </div>
+    <div class="row" style="padding-top:20px;">
+        <div class="col-12">
+            <span style="font-weight:700;">Notification pursuant to Data Protection</span>
+        </div>
+    </div>
+    <div class="row" style="padding-top:5px;font-size:12px;line-height: 1rem;">
+        <div class="col-12">
+            <p style="justify-content: center">
+                The submission of this self-attestation to the enterprise providing the accommodation is
+                voluntary and serves exclusively the purpose of establishing the liability for tax. The data
+                collected will be forwarded in individual cases upon request to the Fiscal Office Marzahn-
+                Hellersdorf, which reserves the right to review the statements made therein.
+            </p>
+            <p style="justify-content: center">
+                If this procedure should not be agreed with, the accommodation tax will be levied as a
+                general rule, inasmuch as the professional or company reason for the overnight stay is not
+                asserted plausibly in any other way. One does have the possibility, however, of subsequently
+                applying for the refunding of any retained accommodation tax to the responsible Fiscal Office
+                Marzahn-Hellersdorf, thereby presenting the appropriate proofs.
+            </p>
+            <p style="justify-content: center">
+                The submission of this attestation constitutes consent to the processing and usage of the data.
+            </p>
+        </div>
+    </div>
+    <div class="row" style="padding-top:15px;">
+        <div class="col-12">
+            <span style="font-weight:700;">Further Pointers</span>
+        </div>
+    </div>
+    <div class="row" style="padding-top:5px;font-size:12px;line-height: 1rem;">
+        <div class="col-12">
+            <p style="justify-content: center;">
+                In the event of an incorrect or forged attestation the guest may be held liable for the unpaid
+                tax. The issuing of an incorrect attestation may be punished as either an administrative or a
+                criminal offence.
+            </p>
+        </div>
+    </div>
+    <div class="row" style="padding-top:35px;">
+        <div class="col-3" style="border-bottom:1px solid #ddd;">
+            Berlin, {{ 'now'|date('d.m.Y') }}
+        </div>
+        <div class="col-4">
+            &nbsp;
+        </div>
+        <div class="col-5" style="border-bottom:1px solid #ddd;">
+            &nbsp;
+        </div>
+    </div>
+    <div class="row" style="padding-top:5px;font-style: italic;">
+        <div class="col-3">
+            Place, Date
+        </div>
+        <div class="col-4">
+            &nbsp;
+        </div>
+        <div class="col-5">
+            Signature
+        </div>
+    </div>
+</div>
+</body>
+</html>

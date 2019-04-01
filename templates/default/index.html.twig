@@ -4,15 +4,23 @@
     <main id="main">
         <div class="overlay"></div>
         <header class="header">
-            <h1 class="page-title">
-                <a class="sidebar-toggle-btn trigger-toggle-sidebar">
-                    <span class="line"></span>
-                    <span class="line"></span>
-                    <span class="line"></span>
-                    <span class="line line-angle1"></span>
-                    <span class="line line-angle2"></span>
-                </a>Dashboard
-            </h1>
+            <div class="row">
+                <div class="col-8">
+                    <h1 class="page-title">
+                        <a class="sidebar-toggle-btn trigger-toggle-sidebar">
+                            <span class="line"></span>
+                            <span class="line"></span>
+                            <span class="line"></span>
+                            <span class="line line-angle1"></span>
+                            <span class="line line-angle2"></span>
+                        </a>Dashboard
+                    </h1>
+                </div>
+                <div class="col-4 text-right">
+                    <a href="#" class="btn btn-sm btn-success" id="js-generate-tax-forms" data-status="{{ forms }}" data-url="{{ path('ajaxTaxForms') }}"><i class="fa fa-file-pdf-o"></i> TaxForms ({{ forms }})</a>
+                </div>
+            </div>
+
         </header>
         <div id="main-nano-wrapper" class="nano">
             <div class="nano-content" id="perfectScroll">
@@ -28,9 +36,8 @@
                                         <div class="col-5">
                                             <input type="text" data-toggle="datepicker" id="js-competitor-date" value="{{ 'now'|date('Y-m-d') }}">
                                         </div>
-                                        <div class="col-2">
-                                            <a class="btn btn-success" id="js-check-competitors"><i
-                                                        class="fa fa-refresh"></i></a>
+                                        <div class="col-2 text-right">
+                                            <a class="btn btn-success" id="js-check-competitors"><i class="fa fa-refresh"></i></a>
                                         </div>
                                     </div>
                                 </div>
@@ -64,6 +71,45 @@
                                     </div>
                                 </div>
                             </div>
+                        </div>
+                        <div class="col-8">
+                            <!--
+                            <div class="card">
+                                <div class="card-header text-white bg-dark rounded-0">
+                                    <div class="row">
+                                        <div class="col-5" style="line-height:30px;font-weight:100;font-size:25px;">
+                                            PriceCheck
+                                        </div>
+                                        <div class="col-2">
+                                            <input type="text" data-toggle="datepicker" id="js-checkin-date" value="" placeholder="Checkin">
+                                        </div>
+                                        <div class="col-1">
+                                            <input type="text" id="js-stay-nights" placeholder="Nights" />
+                                        </div>
+                                        <div class="col-1">
+                                            <input type="text" id="js-stay-pax" placeholder="Pax" />
+                                        </div>
+                                        <div class="col-2">
+                                            <select id="js-stay-room">
+                                                {% for room in rooms %}
+                                                    <option value="{{ room.id }}">{{ room.nameShort }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                        <div class="col-1 text-right">
+                                            <a class="btn btn-success" id="js-check-rate" data-url="{{ path('ajaxCheckRate') }}"><i class="fa fa-refresh"></i></a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card-body" style="padding:0.5rem;">
+                                    <div class="row">
+                                        <div class="col-12">
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            -->
                         </div>
                     </div>
                 </div>

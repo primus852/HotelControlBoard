@@ -68,6 +68,7 @@
             </ul>
         </menu>
         <div class="separator"></div>
+        {% if is_granted('ROLE_ADMIN') %}
         <menu class="menu-segment">
             <ul>
                 <li>
@@ -114,6 +115,7 @@
                 </li>
             </ul>
         </menu>
+        {% endif %}
         <div class="bottom-padding"></div>
     </div>
 </aside>

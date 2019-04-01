@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\CompetitorCheck;
+use App\Entity\HcbSettings;
 use App\Entity\Rateplan;
 use App\Entity\Ratetype;
 use App\Entity\Roomtype;
@@ -29,6 +30,95 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class AjaxController extends AbstractController
 {
+
+    /**
+     * @Route("/_ajax/_saveSettings", name="ajaxSaveSettings")
+     * @param Request $request
+     * @param ObjectManager $em
+     * @return JsonResponse
+     */
+    public function saveSettings(Request $request, ObjectManager $em)
+    {
+
+        /**
+         * Gather Vars
+         */
+        $add_double = $request->get('add_double');
+        $add_triple = $request->get('add_triple');
+        $add_extra = $request->get('add_extra');
+        $bf = $request->get('bf');
+
+        /**
+         * Clean
+         */
+        $add_double = (float)str_replace(',', '.', $add_double);
+        if ($add_double <= 0) {
+            return ShortResponse::error('Invalid Double Room Modifier');
+        }
+
+        $add_triple = (float)str_replace(',', '.', $add_triple);
+        if ($add_triple <= 0) {
+            return ShortResponse::error('Invalid Triple Room Modifier');
+        }
+
+        $add_extra = (float)str_replace(',', '.', $add_extra);
+        if ($add_extra <= 0) {
+            return ShortResponse::error('Invalid Extra Person Modifier');
+        }
+
+        $bf = (float)str_replace(',', '.', $bf);
+        if ($bf <= 0) {
+            return ShortResponse::error('Invalid Breakfast Amount');
+        }
+
+        /**
+         * 4 Queries (ugly)
+         */
+        $q_double = $em->getRepository(HcbSettings::class)->findOneBy(array(
+            'name' => 'add_double',
+        ));
+        if ($q_double === null) {
+            return ShortResponse::error('Invalid DB for "add_double"');
+        }
+        $q_double->setSetting($add_double);
+        $em->persist($q_double);
+
+        $q_triple = $em->getRepository(HcbSettings::class)->findOneBy(array(
+            'name' => 'add_triple',
+        ));
+        if ($q_triple === null) {
+            return ShortResponse::error('Invalid DB for "add_triple"');
+        }
+        $q_triple->setSetting($add_triple);
+        $em->persist($q_triple);
+
+        $q_extra = $em->getRepository(HcbSettings::class)->findOneBy(array(
+            'name' => 'add_extra',
+        ));
+        if ($q_extra === null) {
+            return ShortResponse::error('Invalid DB for "add_extra"');
+        }
+        $q_extra->setSetting($add_extra);
+        $em->persist($q_extra);
+
+        $q_bf = $em->getRepository(HcbSettings::class)->findOneBy(array(
+            'name' => 'bf',
+        ));
+        if ($q_bf === null) {
+            return ShortResponse::error('Invalid DB for "bf"');
+        }
+        $q_bf->setSetting($bf);
+        $em->persist($q_bf);
+
+        try {
+            $em->flush();
+        } catch (Exception $e) {
+            return ShortResponse::mysql($e->getMessage());
+        }
+
+        return ShortResponse::success('Settings saved');
+
+    }
 
     /**
      * @Route("/_ajax/_generateTaxForms", name="ajaxTaxForms")

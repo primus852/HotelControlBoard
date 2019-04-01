@@ -31,9 +31,14 @@
                             <input type="text" id="add_extra" value="{{ add_extra.setting }}">
                         </div>
                         <div class="col-3 text-center">
-                            <br />
-                            <!-- TODO: ADD BUTTON FUNCTIONALITY -->
-                            <a href="#" class="btn btn-success" id="js-save-settings"><i class="fa fa-save"></i> Save</a>
+                            <label for="add_extra">Breakfast p. Person</label>
+                            <input type="text" id="bf" value="{{ bf.setting }}">
+                        </div>
+                    </div>
+                    <br />
+                    <div class="row">
+                        <div class="col-12 text-right">
+                            <a href="#" class="btn btn-success" data-url="{{ path('ajaxSaveSettings') }}" id="js-save-settings"><i class="fa fa-save"></i> Save</a>
                         </div>
                     </div>
                 </div>

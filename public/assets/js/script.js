@@ -691,6 +691,67 @@ $(document).on('click', '#js-remove-entity', function (e) {
     });
 });
 
+$(document).on('click', '#js-save-settings', function (e) {
+
+    e.preventDefault();
+    var $btn = $(this);
+    var $html = $btn.html();
+    var url = $btn.attr('data-url');
+
+    if($btn.hasClass('disabled')){
+        return false;
+    }
+
+    var $add_triple = $('#add_triple');
+    var triple_val = parseFloat($add_triple.val().replace(',','.'));
+    if(triple_val <= 0 || isNaN(triple_val)){
+        openNoty('error','Invalid Triple Room Modifier');
+        return false;
+    }
+
+    var $add_double = $('#add_double');
+    var double_val = parseFloat($add_double.val().replace(',','.'));
+    if(double_val <= 0 || isNaN(double_val)){
+        openNoty('error','Invalid Double Room Modifier');
+        return false;
+    }
+
+    var $add_extra = $('#add_extra');
+    var extra_val = parseFloat($add_extra.val().replace(',','.'));
+    if(extra_val <= 0 || isNaN(extra_val)){
+        openNoty('error','Invalid Extra Person Modifier');
+        return false;
+    }
+
+    var $bf = $('#bf');
+    var bf_val = parseFloat($bf.val().replace(',','.'));
+    if(bf_val <= 0 || isNaN(bf_val)){
+        openNoty('error','Invalid Breakfast Amount');
+        return false;
+    }
+
+    $btn.addClass('disabled');
+
+    $.post(url, {
+        add_double: double_val,
+        add_triple: triple_val,
+        add_extra: extra_val,
+        bf: bf_val
+    })
+        .done(function (data) {
+            openNoty(data.result, data.message);
+            $btn.removeClass('disabled').html($html);
+        })
+        .fail(function () {
+            openNoty('error', 'Ajax Error');
+            $btn.removeClass('disabled').html($html);
+        })
+    ;
+
+
+
+});
+
 $(document).on('click', '#js-generate-tax-forms', function (e) {
 
     e.preventDefault();

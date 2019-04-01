@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\CompetitorCheck;
 use App\Entity\HcbSettings;
 use App\Entity\Rateplan;
+use App\Entity\Ratetype;
 use App\Entity\Roomtype;
 use App\Util\Helper\Helper;
 use App\Util\Helper\HelperException;
@@ -216,6 +217,13 @@ class DefaultController extends AbstractController
         ));
 
         /**
+         * Get all RateCodes
+         */
+        $rates = $em->getRepository(Ratetype::class)->findBy(array(
+            'isActive' => true,
+        ));
+
+        /**
          * Get latest TaxForm Date
          */
         try {
@@ -233,6 +241,7 @@ class DefaultController extends AbstractController
             'competitors' => $competitors,
             'rooms' => $rooms,
             'forms' => $latest_date,
+            'rates' => $rates,
         ]);
     }
 
@@ -393,6 +402,7 @@ class DefaultController extends AbstractController
         $addDouble = true;
         $addExtra = true;
         $addTriple = true;
+        $addBf = true;
         foreach ($settings as $setting) {
 
 
@@ -407,28 +417,39 @@ class DefaultController extends AbstractController
             if ($setting->getName() === 'add_triple') {
                 $addTriple = false;
             }
+
+            if ($setting->getName() === 'bf') {
+                $addBf = false;
+            }
         }
 
 
-        if (!$addDouble) {
+        if ($addDouble) {
             $settingDouble = new HcbSettings();
             $settingDouble->setName('add_double');
             $settingDouble->setSetting(0);
             $em->persist($settingDouble);
         }
 
-        if (!$addExtra) {
+        if ($addExtra) {
             $settingExtra = new HcbSettings();
             $settingExtra->setName('add_extra');
             $settingExtra->setSetting(0);
             $em->persist($settingExtra);
         }
 
-        if (!$addTriple) {
+        if ($addTriple) {
             $settingTriple = new HcbSettings();
             $settingTriple->setName('add_triple');
             $settingTriple->setSetting(0);
             $em->persist($settingTriple);
+        }
+
+        if ($addBf) {
+            $settingBf = new HcbSettings();
+            $settingBf->setName('bf');
+            $settingBf->setSetting(0);
+            $em->persist($settingBf);
         }
 
         try {
@@ -447,6 +468,9 @@ class DefaultController extends AbstractController
             )),
             'add_extra' => $em->getRepository(HcbSettings::class)->findOneBy(array(
                 'name' => 'add_extra'
+            )),
+            'bf' => $em->getRepository(HcbSettings::class)->findOneBy(array(
+                'name' => 'bf'
             )),
         ));
     }

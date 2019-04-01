@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\CompetitorCheck;
 use App\Entity\HcbSettings;
 use App\Entity\Rateplan;
+use App\Entity\Roomtype;
 use App\Util\Helper\Helper;
 use App\Util\Helper\HelperException;
 use App\Util\Rate\RateHandler;
@@ -160,6 +161,14 @@ class DefaultController extends AbstractController
         return $this->redirectToRoute('panel');
     }
 
+    /**
+     * @Route("/login", name="login")
+     */
+    public function login()
+    {
+        return $this->redirectToRoute('panel');
+    }
+
 
     /**
      * @Route("/panel", name="panel")
@@ -176,12 +185,23 @@ class DefaultController extends AbstractController
             return $this->redirectToRoute('login');
         }
 
+        /**
+         * Get all added Competitors
+         */
         $competitors = $em->getRepository(CompetitorCheck::class)->findBy(array(
+            'isActive' => true,
+        ));
+
+        /**
+         * Get all Roomtypes
+         */
+        $rooms = $em->getRepository(Roomtype::class)->findBy(array(
             'isActive' => true,
         ));
 
         return $this->render('default/index.html.twig', [
             'competitors' => $competitors,
+            'rooms' => $rooms,
         ]);
     }
 
@@ -195,7 +215,7 @@ class DefaultController extends AbstractController
         /* @var $security SecurityChecker */
         $security = new SecurityChecker($this->getUser(), $this->container);
 
-        if (!$security->hasRole($this->getUser())) {
+        if (!$security->hasRole($this->getUser(), 'ROLE_USER')) {
             return $this->redirectToRoute('login');
         }
 

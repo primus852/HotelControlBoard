@@ -27,6 +27,20 @@ class AjaxController extends AbstractController
 {
 
     /**
+     * @Route("/_ajax/_check_rate", name="ajaxCheckRate")
+     * @param Request $request
+     * @param ObjectManager $em
+     * @return JsonResponse|Response
+     * @throws Exception
+     */
+    public function checkRate(Request $request, ObjectManager $em)
+    {
+
+
+
+    }
+
+    /**
      * @Route("/_ajax/_make_comp_check", name="ajaxMakeCompCheck")
      * @param Request $request
      * @param ObjectManager $em

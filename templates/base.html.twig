@@ -18,6 +18,7 @@
     <link type="text/css" rel="stylesheet" href="{{ asset('node_modules/@chenfengyuan/datepicker/dist/datepicker.min.css') }}">
     <link type="text/css" rel="stylesheet" href="{{ asset('node_modules/x0popup/dist/x0popup.min.css') }}">
     <link type="text/css" rel="stylesheet" href="{{ asset('node_modules/tooltipster/dist/css/tooltipster.bundle.min.css') }}">
+    <link type="text/css" rel="stylesheet" href="{{ asset('node_modules/open-weather-icons/dist/css/open-weather-icons.css') }}">
     <link type="text/css" rel="stylesheet" href="{{ asset('assets/css/tinymce.min.css') }}"/>
     <link type="text/css" rel="stylesheet" href="{{ asset('assets/css/style.min.css') }}"/>
     <link type="text/css" rel="stylesheet" href="{{ asset('assets/css/reset.css') }}"/>
@@ -110,11 +111,20 @@
                                 </a>
                             </li>
                         {% endif %}
+                        {% if is_granted('ROLE_MANAGER') %}
+                            <li id="contentSettingsBudget" class="treeItem">
+                                <a href="{{ path('settingsBudget') }}" class="mLink">
+                                    <i class="fa fa-euro"></i> Budget
+                                </a>
+                            </li>
+                        {% endif %}
                     </ul>
                 </li>
             </ul>
         </menu>
         {% endif %}
+        <div class="separator"></div>
+        {{ render(controller('App\\Controller\\RenderController::renderWeatherAction')) }}
         <div class="bottom-padding"></div>
     </div>
 </aside>

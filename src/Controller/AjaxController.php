@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Budget;
 use App\Entity\CompetitorCheck;
 use App\Entity\HcbSettings;
 use App\Entity\Rateplan;
@@ -11,6 +12,8 @@ use App\Util\Competitors\CompetitorBooking;
 use App\Util\Competitors\CompetitorException;
 use App\Util\Helper\Helper;
 use App\Util\Helper\HelperException;
+use App\Util\Rate\RateHandler;
+use App\Util\Rate\RateHandlerException;
 use App\Util\Xml\HcbXmlReader;
 use DateTime;
 use Doctrine\Common\Persistence\ObjectManager;
@@ -30,6 +33,78 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class AjaxController extends AbstractController
 {
+
+    /**
+     * @Route("/_ajax/_calcCityTaxGeneral", name="ajaxCalcCityTaxGeneral")
+     * @param Request $request
+     * @param ObjectManager $em
+     * @return JsonResponse
+     * @throws RateHandlerException
+     */
+    public function calcCityTaxGeneral(Request $request, ObjectManager $em)
+    {
+
+        /**
+         * Get Pax + add Price
+         */
+        $pax = (int)$request->get('pax');
+
+        /**
+         * Get Amount
+         */
+        $rate = (float)str_replace(',', '.', $request->get('rate'));
+        if ($rate <= 0) {
+            return ShortResponse::error('Invalid Rate Amount');
+        }
+
+        /**
+         * BF Setting
+         */
+        $settingBf = $em->getRepository(HcbSettings::class)->findOneBy(array(
+            'name' => 'bf'
+        ));
+        if ($settingBf === null) {
+            return ShortResponse::error('Invalid Breakfast Setting');
+        }
+
+
+        /**
+         * Expedia only Discount 1
+         */
+        $dc1 = null;
+        if ($request->get('dc1') !== 'None') {
+            $dc1 = (float)$request->get('dc1');
+            $rate = $rate * ((100 - $dc1) / 100);
+        }
+
+        /**
+         * Expedia only Discount 2
+         */
+        $dc2 = null;
+        if ($request->get('dc2') !== 'None') {
+            $dc2 = (float)$request->get('dc2');
+            $rate = $rate * ((100 - $dc2) / 100);
+        }
+
+        /**
+         * Calc CityTax
+         */
+        $taxes = RateHandler::city_tax($rate, $pax, $em);
+
+        /**
+         * Subtract Commission Expedia only
+         */
+        if ($dc1 !== null || $dc2 !== null) {
+            $rate = $taxes['rate_no_tax'] * 0.82;
+        }
+
+
+        return ShortResponse::success('CT calculated', array(
+            'rate' => number_format($rate, 2),
+            'rate_no_tax' => number_format($taxes['rate_no_tax'], 2),
+            'citytax' => number_format($taxes['city_tax'], 2),
+        ));
+    }
 
     /**
      * @Route("/_ajax/_saveSettings", name="ajaxSaveSettings")
@@ -219,8 +294,7 @@ class AjaxController extends AbstractController
      * @Route("/_ajax/_make_comp_check", name="ajaxMakeCompCheck")
      * @param Request $request
      * @param ObjectManager $em
-     * @return JsonResponse|Response
-     * @throws Exception
+     * @return JsonResponse
      */
     public function makeCompCheck(Request $request, ObjectManager $em)
     {
@@ -712,6 +786,83 @@ class AjaxController extends AbstractController
 
         return ShortResponse::success('Entry deleted', array(
             'id' => $del_id,
+        ));
+
+    }
+
+    /**
+     * @Route("/_ajax/_addBudget", name="ajaxAddBudget")
+     * @param Request $request
+     * @param ObjectManager $em
+     * @return JsonResponse
+     * @throws Exception
+     */
+    public function addBudget(Request $request, ObjectManager $em)
+    {
+
+        /**
+         * Get Vars
+         */
+        $month = $request->get('month');
+        $year = $request->get('year');
+        $acc = (float)str_replace(',', '.', $request->get('acc'));
+        $other = (float)str_replace(',', '.', $request->get('other'));
+        $occ = (float)str_replace(',', '.', $request->get('occ'));
+        $rate = (float)str_replace(',', '.', $request->get('rate'));
+
+        $today = new DateTime();
+
+        /**
+         * Check $month
+         */
+        if (trim($month) === "" || $month === null || (int)$month > 12 || (int)$month < 1) {
+            return ShortResponse::error('Invalid Month');
+        }
+
+        /**
+         * Check $year
+         */
+        if (trim($year) === "" || $year === null || (int)$year < (int)$today->format('Y')) {
+            return ShortResponse::error('Invalid Year');
+        }
+
+        /**
+         * Check if we have the same year already
+         */
+        $budget = $em->getRepository(Budget::class)->findOneBy(array(
+            'year' => $year,
+            'month' => $month,
+        ));
+
+        if ($budget !== null) {
+            return ShortResponse::error('Budget for month already in Database');
+        }
+
+        $budget = new Budget();
+        $budget->setMonth($month);
+        $budget->setYear($year);
+        $budget->setAccomodation($acc);
+        $budget->setOtherRevenue($other);
+        $budget->setOccupancy($occ);
+        $budget->setRate($rate);
+        $em->persist($budget);
+
+        try {
+            $em->flush();
+        } catch (Exception $e) {
+            return ShortResponse::mysql($e->getMessage());
+        }
+
+        return ShortResponse::success('Budget saved', array(
+            'id' => $budget->getId(),
+            'date' => $budget->getYear() . '/' . $budget->getMonth(),
+            'acc' => number_format($budget->getAccomodation(), 2),
+            'occ' => number_format($budget->getOccupancy(), 2),
+            'other' => number_format($budget->getOtherRevenue(), 2),
+            'rate' => number_format($budget->getRate(), 2),
+            'link' => $this->generateUrl('renderRatetype',array(
+                'id' => $budget->getId(),
+            ))
         ));
 
     }

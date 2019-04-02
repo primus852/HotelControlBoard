@@ -46,6 +46,11 @@ class HistoryForecast
      */
     private $departureRooms;
 
+    /**
+     * @ORM\Column(type="decimal", precision=10, scale=2)
+     */
+    private $revenue;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -119,6 +124,18 @@ class HistoryForecast
     public function setDepartureRooms(int $departureRooms): self
     {
         $this->departureRooms = $departureRooms;
+
+        return $this;
+    }
+
+    public function getRevenue()
+    {
+        return $this->revenue;
+    }
+
+    public function setRevenue($revenue): self
+    {
+        $this->revenue = $revenue;
 
         return $this;
     }

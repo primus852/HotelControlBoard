@@ -5,6 +5,8 @@ namespace App\Controller;
 use App\Entity\CompetitorCheck;
 use App\Entity\Ratetype;
 use App\Entity\Roomtype;
+use App\Util\OpenWeather\OpenWeather;
+use App\Util\OpenWeather\OpenWeatherException;
 use Doctrine\Common\Persistence\ObjectManager;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -19,6 +21,44 @@ class RenderController extends AbstractController
     public function renderVersionAction()
     {
         return new Response(getenv('PANEL_VERSION'));
+    }
+
+    /**
+     * @Route("/_render/_partial/_weather", name="renderWeather")
+     * @return Response
+     */
+    public function renderWeatherAction()
+    {
+
+        /**
+         * Weather Forecast
+         */
+        $weather = new OpenWeather(getenv('OPENWEATHER_APPID'));
+
+        try {
+            $forecast = $weather->forecast();
+        } catch (OpenWeatherException $e) {
+            $forecast = array(
+                'min' => 'N/A',
+                'max' => 'N/A',
+                'now' => 'N/A',
+                'icon' => 'N/A',
+                'condition' => 'N/A',
+                'wind' => 'N/A'
+            );
+        }
+
+        try {
+            $hourly = $weather->hourly();
+        } catch (OpenWeatherException $e) {
+            $hourly = array();
+        }
+
+        return $this->render('render/partial/weather.html.twig', [
+            'forecast' => $forecast,
+            'hourly' => $hourly,
+        ]);
+
     }
 
     /**
@@ -72,6 +112,28 @@ class RenderController extends AbstractController
      * @return Response
      */
     public function renderDetailsRatetype(int $id, ObjectManager $em)
+    {
+        /**
+         * Find Ratetype
+         */
+        $rate = $em->getRepository(Ratetype::class)->find($id);
+
+        if($rate === null){
+            return $this->render('render/detailsNotFound.html.twig', array('id' => $id));
+        }
+
+        return $this->render('render/detailsRatetype.html.twig', array(
+            'rate' => $rate
+        ));
+    }
+
+    /**
+     * @Route("/panel/_render/_budget/{id}", name="renderBudget", defaults={"id"="0"})
+     * @param int $id
+     * @param ObjectManager $em
+     * @return Response
+     */
+    public function renderDetailsBudget(int $id, ObjectManager $em)
     {
         /**
          * Find Ratetype

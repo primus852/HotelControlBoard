@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Budget;
 use App\Entity\CompetitorCheck;
 use App\Entity\HcbSettings;
 use App\Entity\Rateplan;
@@ -9,6 +10,8 @@ use App\Entity\Ratetype;
 use App\Entity\Roomtype;
 use App\Util\Helper\Helper;
 use App\Util\Helper\HelperException;
+use App\Util\OpenWeather\OpenWeather;
+use App\Util\OpenWeather\OpenWeatherException;
 use App\Util\Rate\RateHandler;
 use App\Util\Rate\RateHandlerException;
 use App\Util\Room\RoomHandler;
@@ -191,6 +194,7 @@ class DefaultController extends AbstractController
      * @Route("/panel", name="panel")
      * @param ObjectManager $em
      * @return RedirectResponse|Response
+     * @throws Exception
      */
     public function panel(ObjectManager $em)
     {
@@ -233,15 +237,72 @@ class DefaultController extends AbstractController
         }
 
         $latest_date = 'Error';
-        if($latest_forms !== null){
+        if ($latest_forms !== null) {
             $latest_date = $latest_forms;
         }
+
+        /**
+         * Get Daily Rates
+         */
+        $today = new DateTime();
+        $rateplan = $em->getRepository(Rateplan::class)->findOneBy(array(
+            'bookDate' => $today
+        ));
+
+        if ($rateplan === null) {
+            $todaysRate = 0;
+            $todaysRateDbl = 0;
+        } else {
+            $todaysRate = $rateplan->getPrice();
+
+            $settingDbl = $em->getRepository(HcbSettings::class)->findOneBy(array(
+                'name' => 'add_double',
+            ));
+            if ($settingDbl === null) {
+                $todaysRateDbl = 0;
+            } else {
+                $todaysRateDbl = $todaysRate + $settingDbl->getSetting();
+            }
+        }
+
+
+        /**
+         * CityTax for Daily Rates
+         */
+        try {
+            $taxesSingle = RateHandler::city_tax($todaysRate, 1, $em);
+        } catch (RateHandlerException $e) {
+            $taxesSingle = array(
+                'rate_no_tax' => 'N/A',
+                'city_tax' => 'N/A'
+            );
+        }
+
+        try {
+            $taxesDouble = RateHandler::city_tax($todaysRateDbl, 2, $em);
+        } catch (RateHandlerException $e) {
+            $taxesDouble = array(
+                'rate_no_tax' => 'N/A',
+                'city_tax' => 'N/A'
+            );
+        }
+
+        /**
+         * Get Stats
+         */
+        $today = new DateTime();
+        $stats = RateHandler::stats($today, $em);
 
         return $this->render('default/index.html.twig', [
             'competitors' => $competitors,
             'rooms' => $rooms,
             'forms' => $latest_date,
             'rates' => $rates,
+            'single' => number_format($todaysRate, 2),
+            'double' => number_format($todaysRateDbl, 2),
+            'taxesSingle' => $taxesSingle,
+            'taxesDouble' => $taxesDouble,
+            'stats' => $stats,
         ]);
     }
 
@@ -374,6 +435,33 @@ class DefaultController extends AbstractController
         return $this->render('default/settingsCompetitors.html.twig', array(
             'competitors' => $competitors,
         ));
+    }
+
+    /**
+     * @Route("/panel/settings/budget", name="settingsBudget")
+     * @param ObjectManager $em
+     * @return RedirectResponse|Response
+     * @throws Exception
+     */
+    public function settingsBudget(ObjectManager $em)
+    {
+
+        /* @var $security SecurityChecker */
+        $security = new SecurityChecker($this->getUser(), $this->container);
+
+        if (!$security->hasRole($this->getUser(), 'ROLE_MANAGER')) {
+            return $this->redirectToRoute('fos_user_security_login');
+        }
+
+        $budgets = $em->getRepository(Budget::class)->findBy(array(),array(
+            'year' => 'DESC',
+            'month' => 'DESC',
+        ));
+
+        return $this->render('default/settingsBudget.html.twig', array(
+            'budgets' => $budgets,
+        ));
+
     }
 
     /**

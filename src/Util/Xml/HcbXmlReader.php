@@ -205,7 +205,8 @@ class HcbXmlReader
             $totalRooms = (int)$dayCrawler->filterXPath('//INVENTORY_ROOMS')->text();
             $pax = (int)$dayCrawler->filterXPath('//NO_PERSONS')->text();
             $arrivalRooms = (int)$dayCrawler->filterXPath('//ARRIVAL_ROOMS')->text();
-            $departureRoome = (int)$dayCrawler->filterXPath('//DEPARTURE_ROOMS')->text();
+            $departureRooms = (int)$dayCrawler->filterXPath('//DEPARTURE_ROOMS')->text();
+            $revenue = (float)$dayCrawler->filterXPath('//REVENUE')->text();
 
             /**
              * Try to find an entry for the same date
@@ -223,7 +224,8 @@ class HcbXmlReader
             $hf->setTotalRooms($totalRooms);
             $hf->setPax($pax);
             $hf->setArrivalRooms($arrivalRooms);
-            $hf->setDepartureRooms($departureRoome);
+            $hf->setDepartureRooms($departureRooms);
+            $hf->setRevenue($revenue);
             $em->persist($hf);
 
         }

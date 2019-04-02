@@ -2001,15 +2001,13 @@ input[type="text"]:disabled, input[type="password"]:disabled {
     background: #9d200b;
 }
 
-.competitor-row{
-    padding-bottom:12px;
-    border-bottom:1px solid #ddd;
-    margin:0;
-}
 
 .competitor-roomtype{
     font-size:0.8rem;
-    position: absolute;
-    bottom: -10px;
-    left: 18px;
+}
+.comp-result-div{
+    font-weight:300;
+    font-size:0.8rem;
+    display: none;
+    padding-bottom:4px;
 }

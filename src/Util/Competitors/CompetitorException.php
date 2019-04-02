@@ -9,7 +9,9 @@
 namespace App\Util\Competitors;
 
 
-class CompetitorException extends \Exception
+use Exception;
+
+class CompetitorException extends Exception
 {
 
 }

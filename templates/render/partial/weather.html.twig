@@ -1,0 +1,51 @@
+<div class="row justify-content-center">
+    <div class="col-10">
+        <div class="row">
+            <div class="col-12">
+                <span style="line-height:30px;font-weight:100;font-size:25px;">Weather</span>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-4">
+                Current
+            </div>
+            <div class="col-4 text-center">
+                Today
+            </div>
+            <div class="col-4 text-center">
+                Wind
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-4">
+                <i class="owi owi-{{ forecast.icon }} tt" title="{{ forecast.condition }}"></i> {{ forecast.now }}&deg;C
+            </div>
+            <div class="col-4 text-center" style="font-weight:300;">
+                {{ forecast.min }}-{{ forecast.max }}&deg;C
+            </div>
+            <div class="col-4 text-center" style="font-weight:300;">
+                {{ forecast.wind }}km/h
+            </div>
+        </div>
+        <br/>
+        <div class="row">
+            <div class="col-12">
+                <span style="line-height:20px;font-weight:100;font-size:15px;">Hourly</span>
+            </div>
+        </div>
+        {% for h in hourly %}
+            <div class="row">
+                <div class="col-4">
+                    {{ h.time }}
+                </div>
+                <div class="col-4">
+                    {{ h.temp }}&deg;C
+                </div>
+                <div class="col-4" style="font-size:1.5rem;">
+                    <i class="owi owi-{{ h.icon }} tt" title="{{ h.condition }}"></i>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+    <br />
+</div>

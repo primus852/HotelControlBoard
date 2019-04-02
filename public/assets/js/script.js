@@ -219,6 +219,93 @@ $(document).on('click', '#js-add-rate', function (e) {
     });
 });
 
+$(document).on('click', '#js-add-budget', function (e) {
+
+    e.preventDefault();
+    var $btn = $(this);
+    var $url = $btn.attr('data-url');
+    var $table = $('#js-result-table');
+
+    var html = 'Would you like to add another Budget?<br />\n<div class="row">\n    <div class="col-5">\n        <select id="budget-month" style="height: 50px;">\n            <option value="1">January</option>\n            <option value="2">February</option>\n            <option value="3">March</option>\n            <option value="4">April</option>\n            <option value="5">May</option>\n            <option value="6">June</option>\n            <option value="7">July</option>\n            <option value="8">August</option>\n            <option value="9">September</option>\n            <option value="10">October</option>\n            <option value="11">November</option>\n            <option value="12">December</option>\n        </select>\n    </div>\n    <div class="col-5">\n        <input placeholder="Year" value="" type="text" id="budget-year"/>\n    </div>\n</div>\n<div class="row">\n    <div class="col-10">\n        <input placeholder="Accomodation &euro;" value="" type="text" id="budget-acc"/>\n    </div>\n</div>\n<div class="row">\n    <div class="col-10">\n        <input placeholder="Other Revenue &euro;" value="" type="text" id="budget-other"/>\n    </div>\n</div>\n<div class="row">\n    <div class="col-10">\n        <input placeholder="Occupancy &percnt;" value="" type="text" id="budget-occ"/>\n    </div>\n</div>\n<div class="row">\n    <div class="col-10">\n        <input placeholder="Rate &euro;" value="" type="text" id="budget-rate"/>\n    </div>\n</div>';
+
+    x0p({
+        title: 'Add Budget',
+        text: html,
+        html: true,
+        height: '70%',
+        maxHeight: '550px',
+        maxWidth: '500px',
+        animationType: 'fadeIn',
+        buttons: [
+            {
+                type: 'ok',
+                text: 'Save',
+                showLoading: true
+            },
+            {
+                type: 'error',
+                text: 'Cancel',
+                showLoading: false
+            }
+        ]
+    }).then(function (data) {
+        if (data.button === 'ok') {
+
+            var month = $.trim($('#budget-month').val());
+            var year = $.trim($('#budget-year').val());
+            var acc = $.trim($('#budget-acc').val());
+            var other = $.trim($('#budget-other').val());
+            var occ = $.trim($('#budget-occ').val());
+            var rate = $.trim($('#budget-rate').val());
+
+
+            /* Ajax Call */
+            $.post($url, {
+                month: month,
+                year: year,
+                acc: acc,
+                other: other,
+                occ: occ,
+                rate: rate
+            })
+                .done(function (data) {
+                    if (data.result === 'success') {
+
+                        $table.append('' +
+                            '<div class="row table-font" style="border-bottom:1px solid #ccc;" id="row_' + data.extra.type + '_' + data.extra.id + '">\n    ' +
+                            '   <div class="col-2" id="date_' + data.extra.type + '_' + data.extra.id + '">' + data.extra.date + '</div>\n    ' +
+                            '   <div class="col-3" id="acc_' + data.extra.type + '_' + data.extra.id + '">' + data.extra.acc + '</div>\n    ' +
+                            '   <div class="col-2" id="other_' + data.extra.type + '_' + data.extra.id + '">' + data.extra.other + '</div>\n    ' +
+                            '   <div class="col-2" id="occ_' + data.extra.type + '_' + data.extra.id + '">' + data.extra.occ + '</div>\n    ' +
+                            '   <div class="col-2" id="rate_' + data.extra.type + '_' + data.extra.id + '">' + data.extra.rate + '</div>\n    ' +
+                            '   <div class="col-1">\n        ' +
+                            '       <a href="#" class="btn btn-success btn-sm rounded-0 tt clickable" title="View Details"' +
+                            '           data-url="' + data.extra.link + '"' +
+                            '           data-hash="details-budget-' + data.extra.id + '"' +
+                            '           data-trigger="' + data.extra.id + '"' +
+                            '       >\n            ' +
+                            '           <i class="fa fa-info-circle"></i> Details\n        ' +
+                            '       </a>\n    ' +
+                            '   </div>\n' +
+                            '</div>');
+
+                        x0p('Success',
+                            data.extra.date + ' added',
+                            'ok', false);
+                    } else {
+                        x0p('Error',
+                            data.message,
+                            'error', false);
+                    }
+                })
+                .fail(function () {
+                    openNoty('error', 'Ajax Error');
+                })
+            ;
+        }
+    });
+});
+
 $(document).on('click', '#js-add-room', function (e) {
 
     e.preventDefault();
@@ -506,6 +593,8 @@ $(document).on('click', '#js-check-competitors', function (e) {
 
     $btn.addClass('disabled').html('<i class="fa fa-spin fa-spinner"></i>');
 
+    $('.comp-result-div').show();
+
     /**
      * Gather all Competitor Rows
      */
@@ -515,23 +604,24 @@ $(document).on('click', '#js-check-competitors', function (e) {
         var url = $(v).attr('data-url');
         started += 1;
 
-        $('#room_' + id).html('<i class="fa fa-spin fa-spinner"></i> <span class="text-success">Started Query...</span>');
-        $('#incl_' + id).html('');
-        $('#pax_' + id).html('');
-        $('#price_' + id).html('');
+        $('#room_' + id).html('<i class="fa fa-spin fa-spinner"></i>');
+        $('#incl_' + id).html('<i class="fa fa-spin fa-spinner"></i>');
+        $('#pax_' + id).html('<i class="fa fa-spin fa-spinner"></i>');
+        $('#price_' + id).html('<i class="fa fa-spin fa-spinner"></i>');
 
         $.post(url, {
             id: id,
             date: date.val()
         })
             .done(function (data) {
+                initTooltips('.tt');
                 if (data.result === 'success') {
-                    $('#room_' + id).html(data.extra.room);
+                    $('#room_' + id).html('<i class="fa fa-info-circle tt" title="'+data.extra.room+'"></i>');
                     $('#incl_' + id).html(data.extra.incl);
                     $('#pax_' + id).html(data.extra.pax);
                     $('#price_' + id).html(data.extra.price);
                 } else {
-                    $('#room_' + id).html('<i class="text-danger">' + data.message + '</i>');
+                    $('#room_' + id).html('<i class="fa fa-remove text-danger tt" title="'+data.extra.room+'"></i>');
                 }
                 started -= 1;
                 if (started === 0) {
@@ -691,6 +781,81 @@ $(document).on('click', '#js-remove-entity', function (e) {
     });
 });
 
+$(document).on('click', '#js-ct-gen-calc', function (e) {
+
+    e.preventDefault();
+    var $btn = $(this);
+    var $html = $btn.html();
+    var url = $btn.attr('data-url');
+
+    if ($btn.hasClass('disabled')) {
+        return false;
+    }
+
+    var $pax = $('#ct-gen-pax');
+    if ($.trim($pax.val()) === '') {
+        openNoty('error', 'Invalid Pax');
+        return false;
+    }
+
+    var $rate = $('#ct-gen-rate');
+    if ($.trim($pax.val()) === '' || isNaN(parseFloat($.trim($rate.val().replace(',','.'))))) {
+        openNoty('error', 'Invalid Rate');
+        return false;
+    }
+
+    var $discount1 = $('#ct-exp-dc1');
+    var dc1 = 'None';
+    if ($.trim($discount1.val()) !== '') {
+        if(isNaN(parseFloat($.trim($discount1.val().replace(',','.'))))){
+            openNoty('error', 'Invalid Discount 2');
+            return false;
+        }
+        dc1 = parseFloat($.trim($discount1.val().replace(',','.')));
+    }
+
+    var $discount2 = $('#ct-exp-dc2');
+    var dc2 = 'None';
+    if ($.trim($discount2.val()) !== '') {
+        if(isNaN(parseFloat($.trim($discount2.val().replace(',','.'))))){
+            openNoty('error', 'Invalid Discount 2');
+            return false;
+        }
+        dc2 = parseFloat($.trim($discount2.val().replace(',','.')));
+    }
+
+    $btn.addClass('disabled').html('<i class="fa fa-spin fa-spinner"></i>');
+
+    $.post(url, {
+        pax: $pax.val(),
+        rate: parseFloat($.trim($rate.val().replace(',','.'))),
+        dc1: dc1,
+        dc2: dc2
+    })
+        .done(function (data) {
+
+            x0p('CityTax Calculator',
+                'Rate Opera: '+data.extra.rate+'\n\nw/out CityTax: '+data.extra.rate_no_tax+'\n\nCityTax: '+data.extra.citytax,
+                'ok', false).then(function (inner) {
+                $btn.removeClass('disabled').html($html);
+                $rate.val('');
+                $discount1.val('');
+                $discount2.val('');
+                $pax.val('1');
+            });
+
+        })
+        .fail(function () {
+            openNoty('error', 'Ajax Error');
+            $btn.removeClass('disabled').html($html);
+        })
+    ;
+
+
+
+
+});
+
 $(document).on('click', '#js-save-settings', function (e) {
 
     e.preventDefault();
@@ -698,39 +863,39 @@ $(document).on('click', '#js-save-settings', function (e) {
     var $html = $btn.html();
     var url = $btn.attr('data-url');
 
-    if($btn.hasClass('disabled')){
+    if ($btn.hasClass('disabled')) {
         return false;
     }
 
     var $add_triple = $('#add_triple');
-    var triple_val = parseFloat($add_triple.val().replace(',','.'));
-    if(triple_val <= 0 || isNaN(triple_val)){
-        openNoty('error','Invalid Triple Room Modifier');
+    var triple_val = parseFloat($add_triple.val().replace(',', '.'));
+    if (triple_val <= 0 || isNaN(triple_val)) {
+        openNoty('error', 'Invalid Triple Room Modifier');
         return false;
     }
 
     var $add_double = $('#add_double');
-    var double_val = parseFloat($add_double.val().replace(',','.'));
-    if(double_val <= 0 || isNaN(double_val)){
-        openNoty('error','Invalid Double Room Modifier');
+    var double_val = parseFloat($add_double.val().replace(',', '.'));
+    if (double_val <= 0 || isNaN(double_val)) {
+        openNoty('error', 'Invalid Double Room Modifier');
         return false;
     }
 
     var $add_extra = $('#add_extra');
-    var extra_val = parseFloat($add_extra.val().replace(',','.'));
-    if(extra_val <= 0 || isNaN(extra_val)){
-        openNoty('error','Invalid Extra Person Modifier');
+    var extra_val = parseFloat($add_extra.val().replace(',', '.'));
+    if (extra_val <= 0 || isNaN(extra_val)) {
+        openNoty('error', 'Invalid Extra Person Modifier');
         return false;
     }
 
     var $bf = $('#bf');
-    var bf_val = parseFloat($bf.val().replace(',','.'));
-    if(bf_val <= 0 || isNaN(bf_val)){
-        openNoty('error','Invalid Breakfast Amount');
+    var bf_val = parseFloat($bf.val().replace(',', '.'));
+    if (bf_val <= 0 || isNaN(bf_val)) {
+        openNoty('error', 'Invalid Breakfast Amount');
         return false;
     }
 
-    $btn.addClass('disabled');
+    $btn.addClass('disabled').html('<i class="fa fa-spin fa-spinner"></i>');
 
     $.post(url, {
         add_double: double_val,
@@ -749,7 +914,6 @@ $(document).on('click', '#js-save-settings', function (e) {
     ;
 
 
-
 });
 
 $(document).on('click', '#js-generate-tax-forms', function (e) {
@@ -760,7 +924,7 @@ $(document).on('click', '#js-generate-tax-forms', function (e) {
     var url = $btn.attr('data-url');
     var status = $btn.attr('data-status');
 
-    if(status === 'Error'){
+    if (status === 'Error') {
         x0p('Error',
             'No XML found, please Upload Report first',
             'error', false);

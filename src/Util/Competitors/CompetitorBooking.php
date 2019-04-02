@@ -9,10 +9,12 @@
 namespace App\Util\Competitors;
 
 
+use App\Util\CurlConnection;
+use App\Util\CurlConnectionException;
 use DateTime;
 use Symfony\Component\Filesystem\Filesystem;
 
-class CompetitorBooking
+class CompetitorBooking extends CurlConnection
 {
     const BASE_URL = 'https://www.booking.com/';
 
@@ -55,8 +57,8 @@ class CompetitorBooking
          * Get the Site
          */
         try {
-            $result = self::call('hotel/de/' . $slug, $params, ';', $headers);
-        } catch (CompetitorException $e) {
+            $result = self::call(self::BASE_URL, 'hotel/de/' . $slug, $params, ';', $headers);
+        } catch (CurlConnectionException $e) {
             throw new CompetitorException($e->getMessage());
         }
 
@@ -107,7 +109,7 @@ class CompetitorBooking
             $price = 'booked';
             $isIncl = false;
         } else {
-            $price = (float)$rooms[0]['b_blocks'][$k]['b_raw_price'];
+            $price = (float)$rooms[0]['b_blocks'][$k]['b_raw_price'].'&euro;';
             $isIncl = $rooms[0]['b_blocks'][$k]['b_mealplan_included_name'] === 'breakfast' ? true : false;
         }
 
@@ -123,76 +125,7 @@ class CompetitorBooking
 
     }
 
-    /**
-     * @param string $endpoint
-     * @param array $params
-     * @param string $delimiter
-     * @param array $headers
-     * @param bool $return_headers
-     * @return array
-     * @throws CompetitorException
-     */
-    private static function call(string $endpoint, array $params = [], $delimiter = '&', array $headers = array(), bool $return_headers = true)
-    {
 
-        /**
-         * Create URL
-         */
-        $url = self::BASE_URL . $endpoint;
-
-        /**
-         * Attach Params
-         */
-        if (!empty($params)) {
-            $url .= '?';
-            $round = 0;
-            foreach ($params as $param => $value) {
-                $round++;
-                $url .= $round === 1 ? $param . '=' . $value : $delimiter . $param . '=' . $value;
-            }
-        }
-
-        /**
-         * Curl Call
-         */
-        $ch = curl_init($url);
-
-        /**
-         * Add Header Array
-         */
-        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-
-        /**
-         * Other Options
-         */
-        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
-        curl_setopt($ch, CURLOPT_TIMEOUT, 30);
-        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_HEADER, $return_headers);
-
-        $curl = curl_exec($ch);
-        $code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-
-        if (curl_error($ch)) {
-            $error_msg = curl_error($ch);
-        }
-        curl_close($ch);
-
-        if (isset($error_msg)) {
-            throw new CompetitorException('cURL Error: ' . $error_msg);
-        }
-
-
-        return array(
-            'code' => $code,
-            'result' => $curl,
-            'url' => $url,
-        );
-
-    }
 
 
 }

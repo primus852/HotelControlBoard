@@ -1,0 +1,63 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <main id="main">
+        <div class="overlay"></div>
+        <header class="header">
+            <h1 class="page-title">
+                <a class="sidebar-toggle-btn trigger-toggle-sidebar">
+                    <span class="line"></span>
+                    <span class="line"></span>
+                    <span class="line"></span>
+                    <span class="line line-angle1"></span>
+                    <span class="line line-angle2"></span>
+                </a>Budget Settings
+                <a class="btn btn-info btn-sm rounded-0" data-url="{{ path('ajaxAddBudget') }}" id="js-add-budget" href="#"><i class="fa fa-plus"></i> Add Budget</a>
+            </h1>
+        </header>
+        <div id="main-nano-wrapper" class="nano">
+            <div class="nano-content" id="perfectScroll">
+                <div class="container-fluid" id="js-result-table">
+                    <div class="row table-font-thicker" style="border-bottom:2px solid #ccc;">
+                        <div class="col-2">Date</div>
+                        <div class="col-3">Accomodation &euro;</div>
+                        <div class="col-2">Other Revenue &euro;</div>
+                        <div class="col-2">Occupancy &percnt;</div>
+                        <div class="col-2">Rate &euro;</div>
+                        <div class="col-1">Action</div>
+                    </div>
+                    {% for budget in budgets %}
+                        <div class="row table-font" style="border-bottom:1px solid #ccc;" id="row_{{ 'Budget'|encrypt }}_{{ budget.id }}">
+                            <div class="col-2" id="date_{{ 'Budget'|encrypt }}_{{ budget.id }}">{{ budget.year }}/{{ budget.month }}</div>
+                            <div class="col-3" id="acc_{{ 'Budget'|encrypt }}_{{ budget.id }}">{{ budget.accomodation|number_format(2) }}</div>
+                            <div class="col-2" id="other_{{ 'Budget'|encrypt }}_{{ budget.id }}">{{ budget.otherRevenue|number_format(2) }}</div>
+                            <div class="col-2" id="occ_{{ 'Budget'|encrypt }}_{{ budget.id }}">{{ budget.occupancy|number_format(2) }}</div>
+                            <div class="col-2" id="rate_{{ 'Budget'|encrypt }}_{{ budget.id }}">{{ budget.rate|number_format(2) }}</div>
+                            <div class="col-1">
+                                <a href="#"
+                                   class="btn btn-success btn-sm rounded-0 tt clickable"
+                                   title="View Details"
+                                   data-url="{{ path('renderBudget',{'id':budget.id}) }}"
+                                   data-hash="details-budget-{{ budget.id }}" data-trigger="{{ budget.id }}">
+                                    <i class="fa fa-info-circle"></i> Details
+                                </a>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+            <br/>
+        </div>
+    </main>
+{% endblock %}
+
+{% block stylesheets %}
+
+{% endblock stylesheets %}
+
+{% block javascripts %}
+    <script>
+        var GetNav = "contentSettingsBudget";
+    </script>
+{% endblock javascripts %}
+

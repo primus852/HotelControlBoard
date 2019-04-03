@@ -226,7 +226,7 @@ $(document).on('click', '#js-add-budget', function (e) {
     var $url = $btn.attr('data-url');
     var $table = $('#js-result-table');
 
-    var html = 'Would you like to add another Budget?<br />\n<div class="row">\n    <div class="col-5">\n        <select id="budget-month" style="height: 50px;">\n            <option value="1">January</option>\n            <option value="2">February</option>\n            <option value="3">March</option>\n            <option value="4">April</option>\n            <option value="5">May</option>\n            <option value="6">June</option>\n            <option value="7">July</option>\n            <option value="8">August</option>\n            <option value="9">September</option>\n            <option value="10">October</option>\n            <option value="11">November</option>\n            <option value="12">December</option>\n        </select>\n    </div>\n    <div class="col-5">\n        <input placeholder="Year" value="" type="text" id="budget-year"/>\n    </div>\n</div>\n<div class="row">\n    <div class="col-10">\n        <input placeholder="Accomodation &euro;" value="" type="text" id="budget-acc"/>\n    </div>\n</div>\n<div class="row">\n    <div class="col-10">\n        <input placeholder="Other Revenue &euro;" value="" type="text" id="budget-other"/>\n    </div>\n</div>\n<div class="row">\n    <div class="col-10">\n        <input placeholder="Occupancy &percnt;" value="" type="text" id="budget-occ"/>\n    </div>\n</div>\n<div class="row">\n    <div class="col-10">\n        <input placeholder="Rate &euro;" value="" type="text" id="budget-rate"/>\n    </div>\n</div>';
+    var html = 'Would you like to add another Budget?<br />\n<div class="row">\n    <div class="col-5">\n        <select id="budget-month" style="height: 50px;">\n            <option value="1">January</option>\n            <option value="2">February</option>\n            <option value="3">March</option>\n            <option value="4">April</option>\n            <option value="5">May</option>\n            <option value="6">June</option>\n            <option value="7">July</option>\n            <option value="8">August</option>\n            <option value="9">September</option>\n            <option value="10">October</option>\n            <option value="11">November</option>\n            <option value="12">December</option>\n        </select>\n    </div>\n    <div class="col-5">\n        <input placeholder="Year" value="" type="text" id="budget-year"/>\n    </div>\n</div>\n<div class="row">\n    <div class="col-10">\n        <input placeholder="Accomodation &euro;" value="" type="text" id="budget-acc"/>\n    </div>\n</div>\n<div class="row">\n    <div class="col-10">\n        <input placeholder="Other Revenue &euro;" value="" type="text" id="budget-other"/>\n    </div>\n</div>\n<div class="row">\n    <div class="col-10">\n        <input placeholder="Roomnights" value="" type="text" id="budget-nights"/>\n    </div>\n</div>\n<div class="row">\n    <div class="col-10">\n        <input placeholder="Occupancy &percnt;" value="" type="text" id="budget-occ"/>\n    </div>\n</div>\n<div class="row">\n    <div class="col-10">\n        <input placeholder="Rate &euro;" value="" type="text" id="budget-rate"/>\n    </div>\n</div>';
 
     x0p({
         title: 'Add Budget',
@@ -255,6 +255,7 @@ $(document).on('click', '#js-add-budget', function (e) {
             var year = $.trim($('#budget-year').val());
             var acc = $.trim($('#budget-acc').val());
             var other = $.trim($('#budget-other').val());
+            var nights = $.trim($('#budget-nights').val());
             var occ = $.trim($('#budget-occ').val());
             var rate = $.trim($('#budget-rate').val());
 
@@ -265,6 +266,7 @@ $(document).on('click', '#js-add-budget', function (e) {
                 year: year,
                 acc: acc,
                 other: other,
+                nights: nights,
                 occ: occ,
                 rate: rate
             })
@@ -273,9 +275,10 @@ $(document).on('click', '#js-add-budget', function (e) {
 
                         $table.append('' +
                             '<div class="row table-font" style="border-bottom:1px solid #ccc;" id="row_' + data.extra.type + '_' + data.extra.id + '">\n    ' +
-                            '   <div class="col-2" id="date_' + data.extra.type + '_' + data.extra.id + '">' + data.extra.date + '</div>\n    ' +
-                            '   <div class="col-3" id="acc_' + data.extra.type + '_' + data.extra.id + '">' + data.extra.acc + '</div>\n    ' +
+                            '   <div class="col-1" id="date_' + data.extra.type + '_' + data.extra.id + '">' + data.extra.date + '</div>\n    ' +
+                            '   <div class="col-2" id="acc_' + data.extra.type + '_' + data.extra.id + '">' + data.extra.acc + '</div>\n    ' +
                             '   <div class="col-2" id="other_' + data.extra.type + '_' + data.extra.id + '">' + data.extra.other + '</div>\n    ' +
+                            '   <div class="col-2" id="nights_' + data.extra.type + '_' + data.extra.id + '">' + data.extra.nights + '</div>\n    ' +
                             '   <div class="col-2" id="occ_' + data.extra.type + '_' + data.extra.id + '">' + data.extra.occ + '</div>\n    ' +
                             '   <div class="col-2" id="rate_' + data.extra.type + '_' + data.extra.id + '">' + data.extra.rate + '</div>\n    ' +
                             '   <div class="col-1">\n        ' +
@@ -701,6 +704,62 @@ $(document).on('click', '#js-update-rate', function (e) {
 
                 x0p('Success',
                     $nameShort.val() + ' updated',
+                    'ok', false);
+            } else {
+                x0p('Error',
+                    data.message,
+                    'error', false);
+            }
+        })
+        .fail(function () {
+            openNoty('error', 'Ajax Error');
+        })
+    ;
+});
+
+$(document).on('click', '#js-update-budget', function (e) {
+
+    e.preventDefault();
+    var $btn = $(this);
+    var url = $btn.attr('data-url');
+    var id = $btn.attr('data-id');
+
+    var $acc = $('#budget-acc');
+    var $other = $('#budget-other');
+    var $nights = $('#budget-nights');
+    var $occ = $('#budget-occ');
+    var $rate = $('#budget-rate');
+
+
+    /* Ajax Call */
+    $.post(url, {
+        acc: $acc.val(),
+        other: $other.val(),
+        nights: $nights.val(),
+        occ: $occ.val(),
+        rate: $rate.val(),
+        id: id
+    })
+        .done(function (data) {
+            if (data.result === 'success') {
+
+                closeDetails(function () {
+                    var $accRow = $('#acc_' + data.extra.type + '_' + data.extra.id);
+                    var $otherRow = $('#other_' + data.extra.type + '_' + data.extra.id);
+                    var $nightsRow = $('#nights_' + data.extra.type + '_' + data.extra.id);
+                    var $occRow = $('#occ_' + data.extra.type + '_' + data.extra.id);
+                    var $rateRow = $('#rate_' + data.extra.type + '_' + data.extra.id);
+
+                    $accRow.html(data.extra.acc);
+                    $otherRow.html(data.extra.other);
+                    $nightsRow.html(data.extra.nights);
+                    $occRow.html(data.extra.occ);
+                    $rateRow.html(data.extra.rate);
+
+                });
+
+                x0p('Success',
+                    'Budget updated',
                     'ok', false);
             } else {
                 x0p('Error',

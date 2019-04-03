@@ -9,6 +9,7 @@
 namespace App\Util\Helper;
 
 
+use App\Entity\Budget;
 use App\Entity\CompetitorCheck;
 use App\Entity\HistoryForecast;
 use App\Entity\Rateplan;
@@ -253,13 +254,10 @@ class Helper
         try {
             switch (true) {
                 case $entity instanceof Roomtype:
-                    return RemoveHelper::remove_roomtype($entity, $em);
-                    break;
                 case $entity instanceof Ratetype:
-                    return RemoveHelper::remove_ratetype($entity, $em);
-                    break;
                 case $entity instanceof CompetitorCheck:
-                    return RemoveHelper::remove_competitor($entity, $em);
+                case $entity instanceof Budget:
+                    return RemoveHelper::remove_simple($entity, $em);
                     break;
                 default:
                     throw new HelperException('Missing Entity in Detection');

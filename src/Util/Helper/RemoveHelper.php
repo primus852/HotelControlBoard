@@ -9,96 +9,39 @@
 namespace App\Util\Helper;
 
 
+use App\Entity\Budget;
 use App\Entity\CompetitorCheck;
 use App\Entity\Ratetype;
 use App\Entity\Roomtype;
 use Doctrine\Common\Persistence\ObjectManager;
+use Exception;
 
 class RemoveHelper
 {
 
-
     /**
-     * @param Roomtype $roomtype
+     * @param $entity Roomtype|Ratetype|CompetitorCheck|Budget
      * @param ObjectManager $em
-     * @return int|null
+     * @return mixed
      * @throws HelperException
      */
-    public static function remove_roomtype(Roomtype $roomtype, ObjectManager $em)
+    public static function remove_simple($entity, ObjectManager $em)
     {
 
         /**
          * "Save" old $id
          */
-        $id = $roomtype->getId();
+        $id = $entity->getId();
 
         /**
-         * Delete Roomtype
+         * Delete Entity
          */
-        $em->remove($roomtype);
+        $em->remove($entity);
 
-        try{
+        try {
             $em->flush();
-        }catch (\Exception $e){
-            throw new HelperException('MySQL Error: '.$e->getMessage());
-        }
-
-        return $id;
-
-    }
-
-    /**
-     * @param Ratetype $ratetype
-     * @param ObjectManager $em
-     * @return int|null
-     * @throws HelperException
-     */
-    public static function remove_ratetype(Ratetype $ratetype, ObjectManager $em)
-    {
-
-        /**
-         * "Save" old $id
-         */
-        $id = $ratetype->getId();
-
-        /**
-         * Delete Ratetype
-         */
-        $em->remove($ratetype);
-
-        try{
-            $em->flush();
-        }catch (\Exception $e){
-            throw new HelperException('MySQL Error: '.$e->getMessage());
-        }
-
-        return $id;
-
-    }
-
-    /**
-     * @param CompetitorCheck $competitor
-     * @param ObjectManager $em
-     * @return int|null
-     * @throws HelperException
-     */
-    public static function remove_competitor(CompetitorCheck $competitor, ObjectManager $em)
-    {
-
-        /**
-         * "Save" old $id
-         */
-        $id = $competitor->getId();
-
-        /**
-         * Delete Competitor
-         */
-        $em->remove($competitor);
-
-        try{
-            $em->flush();
-        }catch (\Exception $e){
-            throw new HelperException('MySQL Error: '.$e->getMessage());
+        } catch (Exception $e) {
+            throw new HelperException('MySQL Error: ' . $e->getMessage());
         }
 
         return $id;

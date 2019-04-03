@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Budget;
 use App\Entity\CompetitorCheck;
 use App\Entity\Ratetype;
 use App\Entity\Roomtype;
@@ -136,16 +137,16 @@ class RenderController extends AbstractController
     public function renderDetailsBudget(int $id, ObjectManager $em)
     {
         /**
-         * Find Ratetype
+         * Find Budget
          */
-        $rate = $em->getRepository(Ratetype::class)->find($id);
+        $budget = $em->getRepository(Budget::class)->find($id);
 
-        if($rate === null){
+        if($budget === null){
             return $this->render('render/detailsNotFound.html.twig', array('id' => $id));
         }
 
-        return $this->render('render/detailsRatetype.html.twig', array(
-            'rate' => $rate
+        return $this->render('render/detailsBudget.html.twig', array(
+            'budget' => $budget
         ));
     }
 }

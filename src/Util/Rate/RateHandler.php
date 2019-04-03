@@ -357,11 +357,13 @@ class RateHandler
 
         $acc_budget = 0;
         $other_budget = 0;
+        $nights_budget = 0;
         $occ_budget = 0;
         $rate_budget = 0;
         if($projected !== null){
             $acc_budget = $projected->getAccomodation();
             $other_budget = $projected->getOtherRevenue();
+            $nights_budget = $projected->getRoomNights();
             $occ_budget = $projected->getOccupancy();
             $rate_budget = $projected->getRate();
         }
@@ -376,11 +378,13 @@ class RateHandler
 
         $acc_budget_next = 0;
         $other_budget_next = 0;
+        $nights_budget_next = 0;
         $occ_budget_next = 0;
         $rate_budget_next = 0;
         if($projected_next !== null){
             $acc_budget_next = $projected_next->getAccomodation();
             $other_budget_next = $projected_next->getOtherRevenue();
+            $nights_budget_next = $projected_next->getRoomNights();
             $occ_budget_next = $projected_next->getOccupancy();
             $rate_budget_next = $projected_next->getRate();
         }
@@ -428,6 +432,9 @@ class RateHandler
         $missing_other = ($other_budget - $other_rev) > 0 ? '<span class="text-danger">-'.number_format(($other_budget - $other_rev),2).'&euro;</span>' : '<span class="text-success">+'.number_format(($other_rev - $other_budget),2).'&euro;</span>';
         $missing_other_next = ($other_budget_next - $other_rev_next) > 0 ? '<span class="text-danger">-'.number_format(($other_budget_next - $other_rev_next),2).'&euro;</span>' : '<span class="text-success">-'.number_format(($other_rev_next - $other_budget_next),2).'&euro;</span>';
 
+        $missing_nights = ($nights_budget - $rooms) > 0 ? '<span class="text-danger">-'.number_format(($nights_budget - $rooms),0).'</span>' : '<span class="text-success">+'.number_format(($rooms - $nights_budget)).'</span>';
+        $missing_nights_next = ($nights_budget_next - $rooms_next) > 0 ? '<span class="text-danger">-'.number_format(($nights_budget_next - $rooms_next),0).'</span>' : '<span class="text-success">+'.number_format(($rooms_next - $nights_budget_next)).'</span>';
+
         $missing_occ = ($occ_budget - $avg_occ) > 0 ? '<span class="text-danger">-'.number_format(($occ_budget - $avg_occ),2).'&percnt;</span>' : '<span class="text-success">+'.number_format(($avg_occ - $occ_budget),2).'&percnt;</span>';
         $missing_occ_next = ($occ_budget_next - $avg_occ_next) > 0 ? '<span class="text-danger">-'.number_format(($occ_budget_next - $avg_occ_next),2).'&percnt;</span>' : '<span class="text-success">-'.number_format(($avg_occ_next - $occ_budget_next),2).'&percnt;</span>';
 
@@ -440,8 +447,10 @@ class RateHandler
 
         return array(
             'today' => array(
+                'date' => $month_start,
                 'projected' => array(
                     'acc' => $acc_budget,
+                    'nights' => $nights_budget,
                     'occ' => $occ_budget,
                     'rate' => $rate_budget,
                     'other' => $other_budget,
@@ -450,6 +459,7 @@ class RateHandler
                     'acc' => $missing_acc,
                     'other' => $missing_other,
                     'rate' => $missing_rate,
+                    'nights' => $missing_nights,
                     'occ' => $missing_occ,
                 ),
                 'accomodation' => number_format($acc, 2),
@@ -462,12 +472,15 @@ class RateHandler
                 'pax' => $hf_today->getPax(),
                 'sell' => $hf_today->getTotalRooms() - $hf_today->getBookedRooms(),
                 'occ' => number_format($hf_today->getBookedRooms() * 100 / $hf_today->getTotalRooms(), 2),
+                'nights' => $rooms,
                 'rate' => number_format(($hf_today->getRevenue() + ($hf_today->getPax() * ($bf->getSetting() / 119 * 100))) / $hf_today->getBookedRooms(), 2),
             ),
             'tomorrow' => array(
+                'date' => $month_next_start,
                 'projected' => array(
                     'acc' => $acc_budget_next,
                     'occ' => $occ_budget_next,
+                    'nights' => $nights_budget_next,
                     'rate' => $rate_budget_next,
                     'other' => $other_budget_next,
                 ),
@@ -475,6 +488,7 @@ class RateHandler
                     'acc' => $missing_acc_next,
                     'other' => $missing_other_next,
                     'rate' => $missing_rate_next,
+                    'nights' => $missing_nights_next,
                     'occ' => $missing_occ_next,
                 ),
                 'accomodation' => number_format($acc_next, 2),
@@ -487,6 +501,7 @@ class RateHandler
                 'breakfasts' => $hf_today->getPax(),
                 'sell' => $hf_next->getTotalRooms() - $hf_next->getBookedRooms(),
                 'occ' => number_format($hf_next->getBookedRooms() * 100 / $hf_next->getTotalRooms(), 2),
+                'nights' => $rooms_next,
                 'rate' => number_format(($hf_next->getRevenue() + ($hf_next->getPax() * ($bf->getSetting() / 119 * 100))) / $hf_next->getBookedRooms(), 2),
             ),
         );

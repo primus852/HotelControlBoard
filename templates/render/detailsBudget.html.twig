@@ -1,0 +1,71 @@
+<div class="header">
+    <div class="row">
+        <div class="col-10">
+            <h1 class="page-title"><a class="icon circle-icon fa fa-remove trigger-message-close"></a>
+                Budget Details {{ budget.year }}/{{ budget.month }}
+            </h1>
+        </div>
+        <div class="col-2 text-right">
+            &nbsp;
+        </div>
+    </div>
+</div>
+<div class="messageFly-nano-wrapper nano">
+    <div class="nano-content subScroll">
+        <div class="message-container">
+            <div class="row">
+                <div class="col-12">
+                    <div class="message-box">
+                        <div class="message">
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="card">
+                                        <div class="card-header text-white bg-dark rounded-0">
+                                            <div class="row">
+                                                <div class="col-6">
+                                                    <div class="h2-wiki">Details</div>
+                                                </div>
+                                                <div class="col-6 text-right">
+                                                    <a href="#" class="btn btn-success btn-sm" id="js-update-budget" data-url="{{ path('ajaxUpdateBudget') }}" data-id="{{ budget.id }}"><i class="fa fa-save"></i> Save</a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="row">
+                                                <div class="col-3">
+                                                    <label for="budget-acc">Accomodation &euro;</label>
+                                                    <input type="text" id="budget-acc" value="{{ budget.accomodation }}">
+                                                </div>
+                                                <div class="col-2">
+                                                    <label for="budget-other">Other Revenue &euro;</label>
+                                                    <input type="text" id="budget-other" value="{{ budget.otherRevenue }}">
+                                                </div>
+                                                <div class="col-2">
+                                                    <label for="budget-nights">Roomnights</label>
+                                                    <input type="text" id="budget-nights" value="{{ budget.roomNights }}">
+                                                </div>
+                                                <div class="col-2">
+                                                    <label for="budget-occ">Occupancy &percnt;</label>
+                                                    <input type="text" id="budget-occ" value="{{ budget.occupancy }}">
+                                                </div>
+                                                <div class="col-2">
+                                                    <label for="budget-rate">Rate &euro;</label>
+                                                    <input type="text" id="budget-rate" value="{{ budget.rate }}">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tool-box">
+                            <a href="#" class="btn btn-sm btn-danger" id="js-remove-entity" data-name="Budget {{ budget.year }}/{{ budget.month }}" data-url="{{ path('ajaxRemoveEntity') }}" data-type="{{ 'Budget'|encrypt }}" data-id="{{ budget.id }}">
+                                <i class="fa fa-remove"></i> Remove
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

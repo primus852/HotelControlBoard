@@ -46,6 +46,11 @@ class Budget
      */
     private $rate;
 
+    /**
+     * @ORM\Column(type="integer")
+     */
+    private $roomNights;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -119,6 +124,18 @@ class Budget
     public function setRate($rate): self
     {
         $this->rate = $rate;
+
+        return $this;
+    }
+
+    public function getRoomNights(): ?int
+    {
+        return $this->roomNights;
+    }
+
+    public function setRoomNights(int $roomNights): self
+    {
+        $this->roomNights = $roomNights;
 
         return $this;
     }

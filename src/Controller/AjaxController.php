@@ -554,6 +554,59 @@ class AjaxController extends AbstractController
     }
 
     /**
+     * @Route("/_ajax/_updateBudget", name="ajaxUpdateBudget")
+     * @param Request $request
+     * @param ObjectManager $em
+     * @return JsonResponse
+     */
+    public function updateBudget(Request $request, ObjectManager $em)
+    {
+
+        /**
+         * Gather Vars
+         */
+        $id = $request->get('id');
+        $acc = (float) str_replace(',','.',$request->get('acc'));
+        $other = (float) str_replace(',','.',$request->get('other'));
+        $nights = (int)$request->get('nights');
+        $occ = (float) str_replace(',','.',$request->get('occ'));
+        $rate = (float) str_replace(',','.',$request->get('rate'));
+
+        $budget = $em->getRepository(Budget::class)->find($id);
+
+        if($budget === null){
+            return ShortResponse::error('Could not find Budget: '.$id);
+        }
+
+        $budget->setAccomodation($acc);
+        $budget->setOtherRevenue($other);
+        $budget->setRoomNights($nights);
+        $budget->setOccupancy($occ);
+        $budget->setRate($rate);
+
+        $em->persist($budget);
+
+        try {
+            $em->flush();
+        } catch (Exception $e) {
+            return ShortResponse::mysql($e->getMessage());
+        }
+
+        return ShortResponse::success('Budget updated', array(
+            'id' => $budget->getId(),
+            'type' => SimpleCrypt::enc('Budget'),
+            'acc' => number_format($budget->getAccomodation(),2),
+            'other' => number_format($budget->getOtherRevenue(),2),
+            'nights' => $budget->getRoomNights(),
+            'occ' => number_format($budget->getOccupancy(),2),
+            'rate' => number_format($budget->getRate(),2),
+        ));
+
+
+
+    }
+
+    /**
      * @Route("/_ajax/_updateRatetype", name="ajaxUpdateRatetype")
      * @param Request $request
      * @param ObjectManager $em
@@ -807,6 +860,7 @@ class AjaxController extends AbstractController
         $year = $request->get('year');
         $acc = (float)str_replace(',', '.', $request->get('acc'));
         $other = (float)str_replace(',', '.', $request->get('other'));
+        $nights = (int)$request->get('nights');
         $occ = (float)str_replace(',', '.', $request->get('occ'));
         $rate = (float)str_replace(',', '.', $request->get('rate'));
 
@@ -843,6 +897,7 @@ class AjaxController extends AbstractController
         $budget->setYear($year);
         $budget->setAccomodation($acc);
         $budget->setOtherRevenue($other);
+        $budget->setRoomNights($nights);
         $budget->setOccupancy($occ);
         $budget->setRate($rate);
         $em->persist($budget);
@@ -857,6 +912,7 @@ class AjaxController extends AbstractController
             'id' => $budget->getId(),
             'date' => $budget->getYear() . '/' . $budget->getMonth(),
             'acc' => number_format($budget->getAccomodation(), 2),
+            'nights' => $budget->getRoomNights(),
             'occ' => number_format($budget->getOccupancy(), 2),
             'other' => number_format($budget->getOtherRevenue(), 2),
             'rate' => number_format($budget->getRate(), 2),

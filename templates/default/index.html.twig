@@ -90,8 +90,8 @@
                                     </div>
                                     <div class="row">
                                         <div class="col-4">&nbsp;</div>
-                                        <div class="col-4 text-right"><span style="line-height:20px;font-weight:100;font-size:15px;">This</span></div>
-                                        <div class="col-4 text-right"><span style="line-height:20px;font-weight:100;font-size:15px;">Next</span></div>
+                                        <div class="col-4 text-right"><span style="line-height:20px;font-weight:100;font-size:15px;">{{ stats.today.date|date('F Y') }}</span></div>
+                                        <div class="col-4 text-right"><span style="line-height:20px;font-weight:100;font-size:15px;">{{ stats.tomorrow.date|date('F Y') }}</span></div>
                                     </div>
                                     <div class="row">
                                         <div class="col-4"><i class="fa fa-info-circle tt" title="This: {{ stats.today.projected.acc|number_format(2) }}&euro;<br />Next: {{ stats.tomorrow.projected.acc|number_format(2) }}&euro;"></i> Acc.</div>
@@ -132,6 +132,16 @@
                                         <div class="col-4" >&nbsp;</div>
                                         <div class="col-4 text-right" style="line-height:15px;font-weight:300;font-size:0.7rem;">{{ stats.today.missing.occ|raw }}</div>
                                         <div class="col-4 text-right" style="line-height:15px;font-weight:300;font-size:0.7rem;">{{ stats.tomorrow.missing.occ|raw }}</div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-4"><i class="fa fa-info-circle tt" title="This: {{ stats.today.projected.nights|number_format(0) }}<br />Next: {{ stats.tomorrow.projected.nights|number_format(0) }}"></i> Roomnights</div>
+                                        <div class="col-4 text-right" style="line-height:20px;font-weight:300;font-size:15px;">{{ stats.today.nights|number_format(0) }}</div>
+                                        <div class="col-4 text-right" style="line-height:20px;font-weight:300;font-size:15px;">{{ stats.tomorrow.nights|number_format(0) }}</div>
+                                    </div>
+                                    <div class="row" style="font-size:0.7rem;font-weight:300;margin-top:-5px;">
+                                        <div class="col-4" >&nbsp;</div>
+                                        <div class="col-4 text-right" style="line-height:15px;font-weight:300;font-size:0.7rem;">{{ stats.today.missing.nights|raw }}</div>
+                                        <div class="col-4 text-right" style="line-height:15px;font-weight:300;font-size:0.7rem;">{{ stats.tomorrow.missing.nights|raw }}</div>
                                     </div>
                                 </div>
                             </div>

@@ -1,5 +1,8 @@
 # Changelog #
 
+## 0.6.1 ##
+- added Roomnights to monthly Stats & Budget
+
 ## 0.6.0 ##
 - Added Budget Setting
 - Added Budget (daily/monthly) to Dashboard

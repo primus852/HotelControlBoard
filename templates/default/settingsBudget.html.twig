@@ -19,18 +19,20 @@
             <div class="nano-content" id="perfectScroll">
                 <div class="container-fluid" id="js-result-table">
                     <div class="row table-font-thicker" style="border-bottom:2px solid #ccc;">
-                        <div class="col-2">Date</div>
-                        <div class="col-3">Accomodation &euro;</div>
+                        <div class="col-1">Date</div>
+                        <div class="col-2">Accomodation &euro;</div>
                         <div class="col-2">Other Revenue &euro;</div>
+                        <div class="col-2">Roomnights</div>
                         <div class="col-2">Occupancy &percnt;</div>
                         <div class="col-2">Rate &euro;</div>
                         <div class="col-1">Action</div>
                     </div>
                     {% for budget in budgets %}
                         <div class="row table-font" style="border-bottom:1px solid #ccc;" id="row_{{ 'Budget'|encrypt }}_{{ budget.id }}">
-                            <div class="col-2" id="date_{{ 'Budget'|encrypt }}_{{ budget.id }}">{{ budget.year }}/{{ budget.month }}</div>
-                            <div class="col-3" id="acc_{{ 'Budget'|encrypt }}_{{ budget.id }}">{{ budget.accomodation|number_format(2) }}</div>
+                            <div class="col-1" id="date_{{ 'Budget'|encrypt }}_{{ budget.id }}">{{ budget.year }}/{{ budget.month }}</div>
+                            <div class="col-2" id="acc_{{ 'Budget'|encrypt }}_{{ budget.id }}">{{ budget.accomodation|number_format(2) }}</div>
                             <div class="col-2" id="other_{{ 'Budget'|encrypt }}_{{ budget.id }}">{{ budget.otherRevenue|number_format(2) }}</div>
+                            <div class="col-2" id="nights_{{ 'Budget'|encrypt }}_{{ budget.id }}">{{ budget.roomNights }}</div>
                             <div class="col-2" id="occ_{{ 'Budget'|encrypt }}_{{ budget.id }}">{{ budget.occupancy|number_format(2) }}</div>
                             <div class="col-2" id="rate_{{ 'Budget'|encrypt }}_{{ budget.id }}">{{ budget.rate|number_format(2) }}</div>
                             <div class="col-1">

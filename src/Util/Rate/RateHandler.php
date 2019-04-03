@@ -297,10 +297,16 @@ class RateHandler
             $pax += $item->getPax();
             $roomsTotal += $item->getTotalRooms();
         }
+
+        /**
+         * Add Breakfast net to Acc
+         */
+        $acc = $acc + ($pax * ($bf->getSetting() / 119 * 100));
+
         /**
          * Calc Avg. Rate this month
          */
-        $avg_rate = number_format(($acc + ($pax * ($bf->getSetting() / 119 * 100))) / $rooms, 2);
+        $avg_rate = number_format($acc / $rooms, 2);
 
         /**
          * Calc Occupancy this Month
@@ -322,9 +328,14 @@ class RateHandler
         }
 
         /**
-         * Calc Avg. Rate next month
+         * Add Breakfast net to Acc
          */
-        $avg_rate_next = number_format(($acc_next + ($pax_next * ($bf->getSetting() / 119 * 100))) / $rooms_next, 2);
+        $acc_next = $acc_next + ($pax_next * ($bf->getSetting() / 119 * 100));
+
+        /**
+         * Calc Avg. Rate this month
+         */
+        $avg_rate_next = number_format($acc_next / $rooms_next, 2);
 
         /**
          * Calc Occupancy next Month

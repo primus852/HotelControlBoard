@@ -1,5 +1,10 @@
 # Changelog #
 
+## 0.6.2 ##
+- updated Dashboard
+- fixed missing BF in Accomodation monthly
+- highered precision in DB for floats
+
 ## 0.6.1 ##
 - added Roomnights to monthly Stats & Budget
 

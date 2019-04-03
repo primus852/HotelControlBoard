@@ -47,7 +47,7 @@ class HistoryForecast
     private $departureRooms;
 
     /**
-     * @ORM\Column(type="decimal", precision=10, scale=2)
+     * @ORM\Column(type="decimal", precision=20, scale=10)
      */
     private $revenue;
 

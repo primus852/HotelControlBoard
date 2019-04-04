@@ -671,6 +671,8 @@ $(document).on('click', '#js-check-competitors', function (e) {
 
 $(document).on('click', '#js-check-rate', function (e) {
 
+    e.preventDefault();
+
     var $btn = $(this);
     var $html = $btn.html();
     var url = $btn.attr('data-url');

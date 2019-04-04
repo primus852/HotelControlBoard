@@ -202,7 +202,7 @@ class HcbXmlReader
             }
 
             $bookedRooms = (int)$dayCrawler->filterXPath('//NO_ROOMS')->text();
-            $totalRooms = (int)$dayCrawler->filterXPath('//INVENTORY_ROOMS')->text();
+            $totalRooms = (int)$dayCrawler->filterXPath('//INVENTORY_ROOMS')->text() - (int)$dayCrawler->filterXPath('//CF_OOO_ROOMS')->text();
             $pax = (int)$dayCrawler->filterXPath('//NO_PERSONS')->text();
             $arrivalRooms = (int)$dayCrawler->filterXPath('//ARRIVAL_ROOMS')->text();
             $departureRooms = (int)$dayCrawler->filterXPath('//DEPARTURE_ROOMS')->text();

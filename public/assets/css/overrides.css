@@ -366,4 +366,5 @@ fieldset[disabled] .btn-purple.active {
 .x0p.default input[type="text"], .x0p.default input[type="password"]{
     background-color: transparent !important;
     border-color: #ddd !important;
+    margin-top: 8px;
 }

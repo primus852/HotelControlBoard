@@ -15,11 +15,14 @@ use App\Entity\HistoryForecast;
 use App\Entity\JournalBudget;
 use App\Entity\Rateplan;
 use App\Entity\Ratetype;
+use DateInterval;
+use DatePeriod;
 use DateTime;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\Common\Persistence\ObjectManager;
 use Exception;
 use primus852\SimpleCrypt\SimpleCrypt;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 class RateHandler
 {
@@ -91,6 +94,330 @@ class RateHandler
     );
 
     /**
+     * @param DateTime $start
+     * @param int $nights
+     * @param int $pax
+     * @param ObjectManager $em
+     * @return array
+     * @throws RateHandlerException
+     */
+    public static function rate_check(DateTime $start, int $nights, int $pax, ObjectManager $em)
+    {
+
+        /**
+         * Get Pax Modifier
+         */
+        $isSingle = false;
+        $isDouble = false;
+        if ($pax === 1) {
+            $add = 0;
+            $isSingle = true;
+        } elseif ($pax === 2) {
+            $mod = $em->getRepository(HcbSettings::class)->findOneBy(array(
+                'name' => 'add_double',
+            ));
+            if ($mod === null) {
+                throw new RateHandlerException('No Setting for "add_double" found');
+            }
+            $add = $mod->getSetting();
+            $isDouble = true;
+        } elseif ($pax === 3) {
+            $mod = $em->getRepository(HcbSettings::class)->findOneBy(array(
+                'name' => 'add_triple',
+            ));
+            if ($mod === null) {
+                throw new RateHandlerException('No Setting for "add_triple" found');
+            }
+            $add = $mod->getSetting();
+        } else {
+            throw new RateHandlerException('Invalid Pax, only 1-3 allowed');
+        }
+
+        /**
+         * Check if we have a BaseRate
+         */
+        $baseRate = $em->getRepository(Ratetype::class)->findOneBy(array(
+            'isBase' => true,
+        ));
+
+        if ($baseRate === null) {
+            throw new RateHandlerException('No BaseRate defined, please set it first');
+        }
+
+        /**
+         * Get end Date
+         */
+        $end = clone $start;
+        $end->modify('+' . $nights . ' days');
+
+        /**
+         * Get Checkout Date
+         */
+        $checkout = clone $end;
+        $checkout->modify('+1 day');
+
+        /**
+         * Days advance
+         */
+        $now = new DateTime();
+        $diff = $now->diff($start);
+        $daysAdv = $diff->days;
+
+        /**
+         * Create Interval to get every single day
+         */
+        try {
+            $interval = DateInterval::createFromDateString('1 day');
+            $period = new DatePeriod($start, $interval, $end);
+        } catch (Exception $e) {
+            throw new AccessDeniedHttpException('Error creating DateTime: ' . $e->getMessage());
+        }
+
+        $days = array(
+            'summary' => array(),
+            'checkout' => $checkout,
+        );
+
+        /* @var $dt DateTime */
+        $countDay = 0;
+        foreach ($period as $dt) {
+
+            $countDay++;
+
+            /**
+             * Get todays Rate
+             */
+            $rate = $em->getRepository(Rateplan::class)->findOneBy(array(
+                'bookDate' => $dt,
+            ));
+
+            if($rate === null){
+                throw new RateHandlerException('Could not find rates for specified date');
+            }
+
+            /**
+             * Get alle Ratetypes
+             */
+            $ratetypes = $em->getRepository(Ratetype::class)->findBy(array(
+                'isActive' => true,
+            ));
+
+            foreach ($ratetypes as $ratetype) {
+
+                $available = true;
+
+                /**
+                 * Get Color
+                 */
+                $priceColor = self::RATE_COLORS[(int)$rate->getPrice()]['color'];
+                $priceColorFont = self::RATE_COLORS[(int)$rate->getPrice()]['font'];
+
+                /**
+                 * Get Regular Price
+                 */
+                $price = $rate->getPrice() + $add;
+
+                /**
+                 * Get fixed Single
+                 */
+                if ($ratetype->getFixedSingle() !== null && $ratetype->getFixedSingle() > 0) {
+                    if ($isSingle) {
+                        $price = $ratetype->getFixedSingle();
+                    }
+                }
+
+                /**
+                 * Get fixed Double
+                 */
+                if ($ratetype->getFixedDouble() !== null && $ratetype->getFixedDouble() > 0) {
+                    if ($isDouble) {
+                        $price = $ratetype->getFixedDouble();
+                    }
+                }
+
+                /**
+                 * Get Discount
+                 */
+                if ($ratetype->getDiscountAmount() > 0) {
+
+                    $discount = $ratetype->getDiscountAmount();
+                    if ($ratetype->getDiscountPercent()) {
+                        $discount = $price / 100 * $ratetype->getDiscountAmount();
+                    }
+
+                    $price = $price - $discount;
+
+                }
+
+                $priceTooltip = $price;
+
+                /**
+                 * Get Min Stay
+                 */
+                if ($nights < $ratetype->getMinStay()) {
+                    $price = 'N/A';
+                    $priceTooltip = 'min. Stay ' . $ratetype->getMinStay();
+                    $priceColor = '#fff';
+                    $priceColorFont = '#dc3545';
+                    $available = false;
+                }
+
+                /**
+                 * Check if we meet max Advance Days
+                 */
+                if ($ratetype->getMaxAdvance() > 0) {
+                    if ($daysAdv > $ratetype->getMaxAdvance()) {
+                        $price = 'N/A';
+                        $priceTooltip = 'max. advance Days ' . $ratetype->getMaxAdvance(). ' (is '.$daysAdv.')';
+                        $priceColor = '#fff';
+                        $priceColorFont = '#dc3545';
+                        $available = false;
+                    }
+                }
+
+                /**
+                 * Check if we meet min Advance Days
+                 */
+                if ($ratetype->getDaysAdvance() > 1) {
+                    if ($daysAdv < $ratetype->getDaysAdvance()) {
+                        $price = 'N/A';
+                        $priceTooltip = 'min. advance Days ' . $ratetype->getDaysAdvance(). ' (is '.$daysAdv.')';
+                        $priceColor = '#fff';
+                        $priceColorFont = '#dc3545';
+                        $available = false;
+                    }
+                }
+
+                /**
+                 * Check if we have a fair date
+                 */
+                if ($rate->getCxl() !== null && $ratetype->getFairsAllowed() === false) {
+                    $price = 'N/A';
+                    $priceTooltip = 'Fair Date: ' . $rate->getCxl() . ' weeks CXL';
+                    $priceColor = '#fff';
+                    $priceColorFont = '#dc3545';
+                    $available = false;
+                }
+
+                /**
+                 * Check if Day is allowed
+                 */
+                $curDay = (int)$dt->format('N');
+
+                /**
+                 * Monday
+                 */
+                if ($curDay === 1 && $ratetype->getAllowMon() === false) {
+                    $price = 'N/A';
+                    $priceTooltip = 'Day not allowed: Monday';
+                    $priceColor = '#fff';
+                    $priceColorFont = '#dc3545';
+                    $available = false;
+                }
+
+                /**
+                 * Tuesday
+                 */
+                if ($curDay === 2 && $ratetype->getAllowTue() === false) {
+                    $price = 'N/A';
+                    $priceTooltip = 'Day not allowed: Tuesday';
+                    $priceColor = '#fff';
+                    $priceColorFont = '#dc3545';
+                    $available = false;
+                }
+
+                /**
+                 * Wednesday
+                 */
+                if ($curDay === 3 && $ratetype->getAllowWed() === false) {
+                    $price = 'N/A';
+                    $priceTooltip = 'Day not allowed: Wednesday';
+                    $priceColor = '#fff';
+                    $priceColorFont = '#dc3545';
+                    $available = false;
+                }
+
+                /**
+                 * Thursday
+                 */
+                if ($curDay === 4 && $ratetype->getAllowThu() === false) {
+                    $price = 'N/A';
+                    $priceTooltip = 'Day not allowed: Thursday';
+                    $priceColor = '#fff';
+                    $priceColorFont = '#dc3545';
+                    $available = false;
+                }
+
+                /**
+                 * Friday
+                 */
+                if ($curDay === 5 && $ratetype->getAllowFri() === false) {
+                    $price = 'N/A';
+                    $priceTooltip = 'Day not allowed: Friday';
+                    $priceColor = '#fff';
+                    $priceColorFont = '#dc3545';
+                    $available = false;
+                }
+
+                /**
+                 * Saturday
+                 */
+                if ($curDay === 6 && $ratetype->getAllowSat() === false) {
+                    $price = 'N/A';
+                    $priceTooltip = 'Day not allowed: Saturday';
+                    $priceColor = '#fff';
+                    $priceColorFont = '#dc3545';
+                    $available = false;
+                }
+
+                /**
+                 * Sunday
+                 */
+                if ($curDay === 7 && $ratetype->getAllowSun() === false) {
+                    $price = 'N/A';
+                    $priceTooltip = 'Day not allowed: Sunday';
+                    $priceColor = '#fff';
+                    $priceColorFont = '#dc3545';
+                    $available = false;
+                }
+
+
+                $days[$dt->format('Y-m-d')][$ratetype->getNameShort()] = array(
+                    'rateType' => $ratetype->getName(),
+                    'rateNote' => $ratetype->getNote(),
+                    'price' => $price,
+                    'tooltip' => $priceTooltip,
+                    'color' => $priceColor,
+                    'colorFont' => $priceColorFont,
+                );
+
+                /**
+                 * Add Summary per RateCode
+                 */
+                if (!array_key_exists($ratetype->getNameShort(), $days['summary'])) {
+                    $days['summary'][$ratetype->getNameShort()] = array(
+                        'available' => true,
+                        'total' => 0,
+                        'avg' => 0,
+                        'tooltip' => $ratetype->getNote()
+                    );
+                }
+                if ($available === false) {
+                    $days['summary'][$ratetype->getNameShort()]['available'] = false;
+                } else {
+                    $days['summary'][$ratetype->getNameShort()]['total'] += (float)$price;
+                    $days['summary'][$ratetype->getNameShort()]['avg'] = $days['summary'][$ratetype->getNameShort()]['total'] / $countDay;
+                }
+
+            }
+
+        }
+
+        return $days;
+
+    }
+
+    /**
      * @param ObjectManager $em
      * @return array
      */
@@ -102,16 +429,24 @@ class RateHandler
 
         foreach ($ratetypes as $ratetype) {
 
+            $symbol = $ratetype->getDiscountPercent() ? '&percnt;' : '&euro;';
+            $dcString = $ratetype->getDiscountAmount() . $symbol;
+            if ($ratetype->getFixedSingle() !== null || $ratetype->getFixedDouble() !== null) {
+                $dcString = number_format($ratetype->getFixedSingle(), 2) . '/' . number_format($ratetype->getFixedDouble(), 2);
+            }
+
             $rates[] = array(
                 'id' => $ratetype->getId(),
                 'name' => $ratetype->getName(),
+                'note' => $ratetype->getNote(),
                 'nameShort' => $ratetype->getNameShort(),
                 'isActive' => $ratetype->getIsActive(),
                 'isBase' => $ratetype->getIsBase(),
                 'minStay' => $ratetype->getMinStay(),
+                'maxAdvance' => $ratetype->getMaxAdvance(),
+                'fairsAllowed' => $ratetype->getFairsAllowed(),
                 'daysAdvance' => $ratetype->getDaysAdvance(),
-                'discountAmount' => $ratetype->getDiscountAmount(),
-                'discountPercent' => $ratetype->getDiscountPercent(),
+                'discount' => $dcString,
                 'connections' => 0 //@todo: count connected x?
             );
 
@@ -346,7 +681,7 @@ class RateHandler
          * Get total Other Rev for this month
          */
         $other_rev = 0;
-        foreach($jb_month as $item){
+        foreach ($jb_month as $item) {
             $other_rev += $item->getTransTotal();
         }
 
@@ -354,7 +689,7 @@ class RateHandler
          * Get total Other Rev for next month
          */
         $other_rev_next = 0;
-        foreach($jb_month_next as $item){
+        foreach ($jb_month_next as $item) {
             $other_rev_next += $item->getTransTotal();
         }
 
@@ -371,7 +706,7 @@ class RateHandler
         $nights_budget = 0;
         $occ_budget = 0;
         $rate_budget = 0;
-        if($projected !== null){
+        if ($projected !== null) {
             $acc_budget = $projected->getAccomodation();
             $other_budget = $projected->getOtherRevenue();
             $nights_budget = $projected->getRoomNights();
@@ -392,7 +727,7 @@ class RateHandler
         $nights_budget_next = 0;
         $occ_budget_next = 0;
         $rate_budget_next = 0;
-        if($projected_next !== null){
+        if ($projected_next !== null) {
             $acc_budget_next = $projected_next->getAccomodation();
             $other_budget_next = $projected_next->getOtherRevenue();
             $nights_budget_next = $projected_next->getRoomNights();
@@ -437,20 +772,20 @@ class RateHandler
         /**
          * Get missing projected
          */
-        $missing_acc = ($acc_budget - $acc) > 0 ? '<span class="text-danger">-'.number_format(($acc_budget - $acc),2).'&euro;</span>' : '<span class="text-success">+'.number_format(($acc - $acc_budget),2).'&euro;</span>';
-        $missing_acc_next = ($acc_budget_next - $acc_next) > 0 ? '<span class="text-danger">-'.number_format(($acc_budget_next - $acc_next),2).'&euro;</span>' : '<span class="text-success">-'.number_format(($acc_next - $acc_budget_next),2).'&euro;</span>';
+        $missing_acc = ($acc_budget - $acc) > 0 ? '<span class="text-danger">-' . number_format(($acc_budget - $acc), 2) . '&euro;</span>' : '<span class="text-success">+' . number_format(($acc - $acc_budget), 2) . '&euro;</span>';
+        $missing_acc_next = ($acc_budget_next - $acc_next) > 0 ? '<span class="text-danger">-' . number_format(($acc_budget_next - $acc_next), 2) . '&euro;</span>' : '<span class="text-success">-' . number_format(($acc_next - $acc_budget_next), 2) . '&euro;</span>';
 
-        $missing_other = ($other_budget - $other_rev) > 0 ? '<span class="text-danger">-'.number_format(($other_budget - $other_rev),2).'&euro;</span>' : '<span class="text-success">+'.number_format(($other_rev - $other_budget),2).'&euro;</span>';
-        $missing_other_next = ($other_budget_next - $other_rev_next) > 0 ? '<span class="text-danger">-'.number_format(($other_budget_next - $other_rev_next),2).'&euro;</span>' : '<span class="text-success">-'.number_format(($other_rev_next - $other_budget_next),2).'&euro;</span>';
+        $missing_other = ($other_budget - $other_rev) > 0 ? '<span class="text-danger">-' . number_format(($other_budget - $other_rev), 2) . '&euro;</span>' : '<span class="text-success">+' . number_format(($other_rev - $other_budget), 2) . '&euro;</span>';
+        $missing_other_next = ($other_budget_next - $other_rev_next) > 0 ? '<span class="text-danger">-' . number_format(($other_budget_next - $other_rev_next), 2) . '&euro;</span>' : '<span class="text-success">-' . number_format(($other_rev_next - $other_budget_next), 2) . '&euro;</span>';
 
-        $missing_nights = ($nights_budget - $rooms) > 0 ? '<span class="text-danger">-'.number_format(($nights_budget - $rooms),0).'</span>' : '<span class="text-success">+'.number_format(($rooms - $nights_budget)).'</span>';
-        $missing_nights_next = ($nights_budget_next - $rooms_next) > 0 ? '<span class="text-danger">-'.number_format(($nights_budget_next - $rooms_next),0).'</span>' : '<span class="text-success">+'.number_format(($rooms_next - $nights_budget_next)).'</span>';
+        $missing_nights = ($nights_budget - $rooms) > 0 ? '<span class="text-danger">-' . number_format(($nights_budget - $rooms), 0) . '</span>' : '<span class="text-success">+' . number_format(($rooms - $nights_budget)) . '</span>';
+        $missing_nights_next = ($nights_budget_next - $rooms_next) > 0 ? '<span class="text-danger">-' . number_format(($nights_budget_next - $rooms_next), 0) . '</span>' : '<span class="text-success">+' . number_format(($rooms_next - $nights_budget_next)) . '</span>';
 
-        $missing_occ = ($occ_budget - $avg_occ) > 0 ? '<span class="text-danger">-'.number_format(($occ_budget - $avg_occ),2).'&percnt;</span>' : '<span class="text-success">+'.number_format(($avg_occ - $occ_budget),2).'&percnt;</span>';
-        $missing_occ_next = ($occ_budget_next - $avg_occ_next) > 0 ? '<span class="text-danger">-'.number_format(($occ_budget_next - $avg_occ_next),2).'&percnt;</span>' : '<span class="text-success">-'.number_format(($avg_occ_next - $occ_budget_next),2).'&percnt;</span>';
+        $missing_occ = ($occ_budget - $avg_occ) > 0 ? '<span class="text-danger">-' . number_format(($occ_budget - $avg_occ), 2) . '&percnt;</span>' : '<span class="text-success">+' . number_format(($avg_occ - $occ_budget), 2) . '&percnt;</span>';
+        $missing_occ_next = ($occ_budget_next - $avg_occ_next) > 0 ? '<span class="text-danger">-' . number_format(($occ_budget_next - $avg_occ_next), 2) . '&percnt;</span>' : '<span class="text-success">-' . number_format(($avg_occ_next - $occ_budget_next), 2) . '&percnt;</span>';
 
-        $missing_rate = ($rate_budget - $avg_rate) > 0 ? '<span class="text-danger">-'.number_format(($rate_budget - $avg_rate),2).'&euro;</span>' : '<span class="text-success">+'.number_format(($avg_rate - $rate_budget),2).'&euro;</span>';
-        $missing_rate_next = ($rate_budget_next - $avg_rate_next) > 0 ? '<span class="text-danger">-'.number_format(($rate_budget_next - $avg_rate_next),2).'&euro;</span>' : '<span class="text-success">-'.number_format(($avg_rate_next - $rate_budget_next),2).'&euro;</span>';
+        $missing_rate = ($rate_budget - $avg_rate) > 0 ? '<span class="text-danger">-' . number_format(($rate_budget - $avg_rate), 2) . '&euro;</span>' : '<span class="text-success">+' . number_format(($avg_rate - $rate_budget), 2) . '&euro;</span>';
+        $missing_rate_next = ($rate_budget_next - $avg_rate_next) > 0 ? '<span class="text-danger">-' . number_format(($rate_budget_next - $avg_rate_next), 2) . '&euro;</span>' : '<span class="text-success">-' . number_format(($avg_rate_next - $rate_budget_next), 2) . '&euro;</span>';
 
         /**
          * Get Stats for Month
@@ -476,7 +811,7 @@ class RateHandler
                 'accomodation' => number_format($acc, 2),
                 'avg_rate' => $avg_rate,
                 'avg_occ' => $avg_occ,
-                'other_rev' => number_format($other_rev,2),
+                'other_rev' => number_format($other_rev, 2),
                 'arrivals' => $hf_today->getArrivalRooms(),
                 'departures' => $hf_today->getDepartureRooms(),
                 'breakfasts' => $hf_prev->getPax(),
@@ -505,7 +840,7 @@ class RateHandler
                 'accomodation' => number_format($acc_next, 2),
                 'avg_rate' => $avg_rate_next,
                 'avg_occ' => $avg_occ_next,
-                'other_rev' => number_format($other_rev_next,2),
+                'other_rev' => number_format($other_rev_next, 2),
                 'arrivals' => $hf_next->getArrivalRooms(),
                 'departures' => $hf_next->getDepartureRooms(),
                 'pax' => $hf_next->getPax(),

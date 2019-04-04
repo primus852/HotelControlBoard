@@ -1,0 +1,81 @@
+<div class="row">
+    <div class="col-12 text-center" style="font-size:1.0rem;font-weight:300;">
+        Totals for Checkin {{ start|date('d.m.Y') }}, {{ nights }} nights, {{ pax }} Pax
+    </div>
+</div>
+<div class="row">
+    <div class="col-12">
+        <div class="row justify-content-center">
+            {% for key, rate in rates.summary %}
+                <div class="col-2 text-center tt pointer" title="Note: {{ rate.tooltip }}" style="border:1px solid #ddd;padding:5px;font-weight:300;">
+                    {% if rate.available == true %}
+                        {{ key }}
+                        <br/>
+                        <span class="text-success" style="font-size:1.3rem;">{{ rate.total }}&euro;</span>
+                        <span style="font-weight:300;font-size:0.8rem;">{{ rate.avg|number_format(2) }}&euro;/night</span>
+                    {% else %}
+                        {{ key }}
+                        <br/>
+                        {% if rate.total == 0 %}<span class="text-danger" style="font-size:1.3rem;">N/A</span>{% else %}<span class="text-warning" style="font-size:1.3rem;">partially</span><br /><span style="font-weight:300;font-size:0.8rem;">check Details</span>{% endif %}
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+<hr/>
+<div class="row">
+    <div class="col-12">
+        <div class="row justify-content-center">
+            <div class="col-11">
+                {% set counter = 1 %}
+                {% for key, rate in rates %}
+                    {% if key != 'summary' and key != 'checkout' and counter == 1 %}
+                        {% set counter = 2 %}
+                        <div class="row justify-content-center">
+                            <div class="col-2 text-center" style="border:0;padding:5px;font-weight:300;">
+                                &nbsp;
+                            </div>
+                            {% for short, r in rate %}
+                                <div class="col-2 text-center" style="border:1px solid #ddd;padding:5px;font-weight:300;">
+                                    {{ short }}
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+        {% for key, rate in rates %}
+            {% if key != 'summary' and key != 'checkout' %}
+                <div class="row justify-content-center">
+                    <div class="col-11">
+                        <div class="row justify-content-center">
+                            <div class="col-2 text-center" style="border:1px solid #ddd;padding:5px;font-weight:300;">
+                                {{ key }}
+                            </div>
+                            {% for short, r in rate %}
+                                <div class="col-2 text-center pointer tt" title="{{ rates[key][short].tooltip }}"
+                                     style="border:1px solid #ddd;padding:5px;font-weight:300;background: {{ rates[key][short].color }};color:{{ rates[key][short].colorFont }};">
+                                    {{ rates[key][short].price }}
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        {% endfor %}
+        <div class="row justify-content-center">
+            <div class="col-11">
+                <div class="row justify-content-center">
+                    <div class="col-2 text-center" style="border:1px solid #ddd;padding:5px;font-weight:300;">
+                        {{ rates.checkout|date('Y-m-d') }}
+                    </div>
+                        <div class="col-10 text-center" style="border:1px solid #ddd;padding:5px;font-weight:300;">
+                            Checkout
+                        </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

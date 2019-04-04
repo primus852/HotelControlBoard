@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Util\Rate\RateHandler;
 use App\Util\Xml\HcbXmlReader;
 use Doctrine\Common\Persistence\ObjectManager;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -17,7 +18,11 @@ class ExperimentalController extends AbstractController
      */
     public function index(ObjectManager $em)
     {
-        HcbXmlReader::da($em);
+        $start = new \DateTime();
+        $nights = 3;
+        $pax = 1;
+
+        RateHandler::rate_check($start, $nights, $pax, $em);
         die;
     }
 }

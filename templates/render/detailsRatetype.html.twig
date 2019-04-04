@@ -39,21 +39,32 @@
                                                         <option value="no" {% if not rate.isBase %}selected="selected"{% endif %}>No</option>
                                                     </select>
                                                 </div>
-                                                <div class="col-3">
+                                                <div class="col-4">
                                                     <label for="rate-name">Name</label>
                                                     <input type="text" id="rate-name" value="{{ rate.name }}">
                                                 </div>
-                                                <div class="col-2">
+                                                <div class="col-3">
                                                     <label for="rate-name-short">Short Name</label>
                                                     <input type="text" id="rate-name-short" value="{{ rate.nameShort }}">
                                                 </div>
+                                                <div class="col-3">
+                                                    <label for="rate-note">Note</label>
+                                                    <input type="text" id="rate-note" value="{{ rate.note }}">
+                                                </div>
+                                            </div>
+                                            <br />
+                                            <div class="row">
                                                 <div class="col-2">
                                                     <label for="rate-min-stay">Minimum Stay</label>
                                                     <input type="text" id="rate-min-stay" value="{{ rate.minStay }}">
                                                 </div>
                                                 <div class="col-2">
-                                                    <label for="rate-days-advance">Days Advance</label>
+                                                    <label for="rate-days-advance">min. Days Advance</label>
                                                     <input type="text" id="rate-days-advance" value="{{ rate.daysAdvance }}">
+                                                </div>
+                                                <div class="col-2">
+                                                    <label for="rate-max-advance">max. Days Advance</label>
+                                                    <input type="text" id="rate-max-advance" value="{{ rate.maxAdvance }}">
                                                 </div>
                                                 <div class="col-1">
                                                     <label for="rate-dc-amount">Discount</label>
@@ -65,6 +76,78 @@
                                                         <option value="p" {% if rate.discountPercent %}selected="selected"{% endif %}>&percnt;</option>
                                                         <option value="e" {% if not rate.discountPercent %}selected="selected"{% endif %}>&euro;</option>
                                                     </select>
+                                                </div>
+                                                <div class="col-1">
+                                                    <label for="rate-fixed-single">fixed Single</label>
+                                                    <input type="text" id="rate-fixed-single" value="{{ rate.fixedSingle }}">
+                                                </div>
+                                                <div class="col-1">
+                                                    <label for="rate-fixed-double">fixed Double</label>
+                                                    <input type="text" id="rate-fixed-double" value="{{ rate.fixedDouble }}">
+                                                </div>
+                                            </div>
+                                            <br />
+                                            <div class="row">
+                                                <div class="col-12">
+                                                    <label for="rate-fixed-double">bookable on</label>
+                                                    <div class="row">
+                                                        <div class="col-1">
+                                                            <label for="rate-days-mon">Monday</label>
+                                                            <select id="rate-days-mon">
+                                                                <option value="yes" {% if rate.allowMon %}selected="selected"{% endif %}>Yes</option>
+                                                                <option value="no" {% if not rate.allowMon %}selected="selected"{% endif %}>No</option>
+                                                            </select>
+                                                        </div>
+                                                        <div class="col-1">
+                                                            <label for="rate-days-tue">Tuesday</label>
+                                                            <select id="rate-days-tue">
+                                                                <option value="yes" {% if rate.allowTue%}selected="selected"{% endif %}>Yes</option>
+                                                                <option value="no" {% if not rate.allowTue %}selected="selected"{% endif %}>No</option>
+                                                            </select>
+                                                        </div>
+                                                        <div class="col-1">
+                                                            <label for="rate-days-wed">Wednesday</label>
+                                                            <select id="rate-days-wed">
+                                                                <option value="yes" {% if rate.allowWed %}selected="selected"{% endif %}>Yes</option>
+                                                                <option value="no" {% if not rate.allowWed %}selected="selected"{% endif %}>No</option>
+                                                            </select>
+                                                        </div>
+                                                        <div class="col-1">
+                                                            <label for="rate-days-thu">Thursday</label>
+                                                            <select id="rate-days-thu">
+                                                                <option value="yes" {% if rate.allowThu %}selected="selected"{% endif %}>Yes</option>
+                                                                <option value="no" {% if not rate.allowThu %}selected="selected"{% endif %}>No</option>
+                                                            </select>
+                                                        </div>
+                                                        <div class="col-1">
+                                                            <label for="rate-days-fri">Friday</label>
+                                                            <select id="rate-days-fri">
+                                                                <option value="yes" {% if rate.allowFri %}selected="selected"{% endif %}>Yes</option>
+                                                                <option value="no" {% if not rate.allowFri %}selected="selected"{% endif %}>No</option>
+                                                            </select>
+                                                        </div>
+                                                        <div class="col-1">
+                                                            <label for="rate-days-sat">Saturday</label>
+                                                            <select id="rate-days-sat">
+                                                                <option value="yes" {% if rate.allowSat %}selected="selected"{% endif %}>Yes</option>
+                                                                <option value="no" {% if not rate.allowSat %}selected="selected"{% endif %}>No</option>
+                                                            </select>
+                                                        </div>
+                                                        <div class="col-1">
+                                                            <label for="rate-days-sun">Sunday</label>
+                                                            <select id="rate-days-sun">
+                                                                <option value="yes" {% if rate.allowSun %}selected="selected"{% endif %}>Yes</option>
+                                                                <option value="no" {% if not rate.allowMon %}selected="selected"{% endif %}>No</option>
+                                                            </select>
+                                                        </div>
+                                                        <div class="col-1">
+                                                            <label for="rate-fairs">fairs</label>
+                                                            <select id="rate-fairs">
+                                                                <option value="yes" {% if rate.fairsAllowed %}selected="selected"{% endif %}>Yes</option>
+                                                                <option value="no" {% if not rate.fairsAllowed %}selected="selected"{% endif %}>No</option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>

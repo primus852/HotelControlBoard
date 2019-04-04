@@ -287,6 +287,39 @@ class AjaxController extends AbstractController
     public function checkRate(Request $request, ObjectManager $em)
     {
 
+        $date = DateTime::createFromFormat('Y-m-d', $request->get('date'));
+        $nights = (int)$request->get('nights');
+        $pax = (int)$request->get('pax');
+
+        if ($nights === null || $nights === 0) {
+            $nights = 1;
+        }
+
+        if ($pax === 0 || $pax === null) {
+            return ShortResponse::error('Please select Pax');
+        }
+
+        if ($date === false) {
+            return ShortResponse::error('Could not create Checkin Date: ' . $request->get('date'));
+        }
+
+        try {
+            $rates = RateHandler::rate_check($date, $nights, $pax, $em);
+        } catch (RateHandlerException $e) {
+            return ShortResponse::exception('Could not get Rates', $e->getMessage());
+        }
+
+        $template = $this->renderView('render/partial/rateCheck.html.twig', array(
+            'start' => $date,
+            'nights' => $nights,
+            'pax' => $pax,
+            'rates' => $rates,
+        ));
+
+        return ShortResponse::success('Rates calculated', array(
+            'template' => $template,
+        ));
+
 
     }
 
@@ -566,16 +599,16 @@ class AjaxController extends AbstractController
          * Gather Vars
          */
         $id = $request->get('id');
-        $acc = (float) str_replace(',','.',$request->get('acc'));
-        $other = (float) str_replace(',','.',$request->get('other'));
+        $acc = (float)str_replace(',', '.', $request->get('acc'));
+        $other = (float)str_replace(',', '.', $request->get('other'));
         $nights = (int)$request->get('nights');
-        $occ = (float) str_replace(',','.',$request->get('occ'));
-        $rate = (float) str_replace(',','.',$request->get('rate'));
+        $occ = (float)str_replace(',', '.', $request->get('occ'));
+        $rate = (float)str_replace(',', '.', $request->get('rate'));
 
         $budget = $em->getRepository(Budget::class)->find($id);
 
-        if($budget === null){
-            return ShortResponse::error('Could not find Budget: '.$id);
+        if ($budget === null) {
+            return ShortResponse::error('Could not find Budget: ' . $id);
         }
 
         $budget->setAccomodation($acc);
@@ -595,13 +628,12 @@ class AjaxController extends AbstractController
         return ShortResponse::success('Budget updated', array(
             'id' => $budget->getId(),
             'type' => SimpleCrypt::enc('Budget'),
-            'acc' => number_format($budget->getAccomodation(),2),
-            'other' => number_format($budget->getOtherRevenue(),2),
+            'acc' => number_format($budget->getAccomodation(), 2),
+            'other' => number_format($budget->getOtherRevenue(), 2),
             'nights' => $budget->getRoomNights(),
-            'occ' => number_format($budget->getOccupancy(),2),
-            'rate' => number_format($budget->getRate(),2),
+            'occ' => number_format($budget->getOccupancy(), 2),
+            'rate' => number_format($budget->getRate(), 2),
         ));
-
 
 
     }
@@ -620,11 +652,23 @@ class AjaxController extends AbstractController
          */
         $id = $request->get('id');
         $name = $request->get('name');
+        $note = $request->get('note');
         $nameShort = $request->get('nameShort');
         $minStay = (int)$request->get('minStay');
         $daysAdvance = (int)$request->get('daysAdvance');
+        $maxAdvance = (int)$request->get('maxAdvance');
         $isBaseRate = $request->get('isBase') === 'yes' ? true : false;
+        $allowMon = $request->get('allowMon') === 'yes' ? true : false;
+        $allowTue = $request->get('allowTue') === 'yes' ? true : false;
+        $allowWed = $request->get('allowWed') === 'yes' ? true : false;
+        $allowThu = $request->get('allowThu') === 'yes' ? true : false;
+        $allowFri = $request->get('allowFri') === 'yes' ? true : false;
+        $allowSat = $request->get('allowSat') === 'yes' ? true : false;
+        $allowSun = $request->get('allowSun') === 'yes' ? true : false;
+        $fairs = $request->get('fairs') === 'yes' ? true : false;
         $dcAmount = (float)str_replace(',', '.', $request->get('dcAmount'));
+        $fixedSingle = (float)str_replace(',', '.', $request->get('fixedSingle'));
+        $fixedDouble = (float)str_replace(',', '.', $request->get('fixedDouble'));
         $dcType = $request->get('dcType') === 'p' ? true : false;
 
         if ($name === null || trim($name) === '') {
@@ -695,13 +739,34 @@ class AjaxController extends AbstractController
             return ShortResponse::error('There is no BaseRate defined. Please define a BaseRate before adding a discounted Rate');
         }
 
+        if ($dcAmount > 0 && ($fixedDouble > 0 || $fixedSingle > 0)) {
+            return ShortResponse::error('Cannot apply Discount and fixed Rate');
+        }
+
+        if ($dcAmount > 0) {
+            $fixedDouble = null;
+            $fixedSingle = null;
+        }
+
         $rate->setName($name);
+        $rate->setNote($note);
         $rate->setNameShort($nameShort);
         $rate->setIsBase($isBaseRate);
+        $rate->setFairsAllowed($fairs);
         $rate->setMinStay($minStay);
         $rate->setDaysAdvance($daysAdvance);
+        $rate->setMaxAdvance($maxAdvance);
         $rate->setDiscountAmount($dcAmount);
         $rate->setDiscountPercent($dcType);
+        $rate->setFixedSingle($fixedSingle);
+        $rate->setFixedDouble($fixedDouble);
+        $rate->setAllowMon($allowMon);
+        $rate->setAllowTue($allowTue);
+        $rate->setAllowWed($allowWed);
+        $rate->setAllowThu($allowThu);
+        $rate->setAllowFri($allowFri);
+        $rate->setAllowSat($allowSat);
+        $rate->setAllowSun($allowSun);
 
         $em->persist($rate);
 
@@ -711,16 +776,27 @@ class AjaxController extends AbstractController
             return ShortResponse::mysql($e->getMessage());
         }
 
+        /**
+         * Get the Discount string
+         */
+        $symbol = $rate->getDiscountPercent() ? '&percnt;' : '&euro;';
+        $dcString = $rate->getDiscountAmount() . $symbol;
+        if ($fixedSingle !== null || $fixedDouble !== null) {
+            $dcString = number_format($fixedSingle, 2) . '/' . number_format($fixedDouble, 2);
+        }
+
         return ShortResponse::success('Ratetype updated', array(
             'id' => $rate->getId(),
             'type' => SimpleCrypt::enc('Ratetype'),
             'name' => $rate->getName(),
+            'note' => $rate->getNote(),
             'minStay' => $rate->getMinStay(),
             'daysAdvance' => $rate->getDaysAdvance(),
+            'maxAdvance' => $rate->getMaxAdvance(),
             'nameShort' => $rate->getNameShort(),
-            'dcAmount' => $rate->getDiscountAmount(),
-            'dcType' => $rate->getDiscountPercent() ? '&percnt;' : '&euro;',
+            'discount' => $dcString,
             'isBase' => $rate->getIsBase() ? '<i class="fa fa-check" id="base_' . SimpleCrypt::enc('Ratetype') . '_' . $rate->getId() . '"></i>' : '<i class="fa fa-remove" id="base_' . SimpleCrypt::enc('Ratetype') . '_' . $rate->getId() . '"></i>',
+            'fairs' => $rate->getFairsAllowed() ? '<i class="fa fa-check" id="fairs_' . SimpleCrypt::enc('Ratetype') . '_' . $rate->getId() . '"></i>' : '<i class="fa fa-remove" id="fairs_' . SimpleCrypt::enc('Ratetype') . '_' . $rate->getId() . '"></i>',
         ));
 
 
@@ -916,7 +992,7 @@ class AjaxController extends AbstractController
             'occ' => number_format($budget->getOccupancy(), 2),
             'other' => number_format($budget->getOtherRevenue(), 2),
             'rate' => number_format($budget->getRate(), 2),
-            'link' => $this->generateUrl('renderRatetype',array(
+            'link' => $this->generateUrl('renderRatetype', array(
                 'id' => $budget->getId(),
             ))
         ));
@@ -937,10 +1013,22 @@ class AjaxController extends AbstractController
          */
         $name = $request->get('name');
         $short = $request->get('nameShort');
+        $note = $request->get('note');
         $isBase = $request->get('isBase') === 'yes' ? true : false;
+        $allowMon = $request->get('allowMon') === 'yes' ? true : false;
+        $allowTue = $request->get('allowTue') === 'yes' ? true : false;
+        $allowWed = $request->get('allowWed') === 'yes' ? true : false;
+        $allowThu = $request->get('allowThu') === 'yes' ? true : false;
+        $allowFri = $request->get('allowFri') === 'yes' ? true : false;
+        $allowSat = $request->get('allowSat') === 'yes' ? true : false;
+        $allowSun = $request->get('allowSun') === 'yes' ? true : false;
+        $fairs = $request->get('fairs') === 'yes' ? true : false;
         $dcAmount = (float)str_replace(',', '.', $request->get('dcAmount'));
+        $fixedSingle = (float)str_replace(',', '.', $request->get('fixedSingle'));
+        $fixedDouble = (float)str_replace(',', '.', $request->get('fixedDouble'));
         $minStay = (int)$request->get('minStay');
         $preDays = (int)$request->get('preDays');
+        $maxAdvance = (int)$request->get('maxPreDays');
         $dcType = $request->get('dcType') === 'p' ? true : false;
 
         /**
@@ -988,6 +1076,15 @@ class AjaxController extends AbstractController
             return ShortResponse::error('There is no BaseRate defined. Please define a BaseRate before adding a discounted Rate');
         }
 
+        if ($dcAmount > 0 && ($fixedSingle > 0 || $fixedDouble > 0)) {
+            return ShortResponse::error('You can only add fixed rates OR discount from BaseRate');
+        }
+
+        if ($dcAmount > 0) {
+            $fixedSingle = null;
+            $fixedDouble = null;
+        }
+
         /**
          * Check if the same $name is already available
          */
@@ -1013,10 +1110,22 @@ class AjaxController extends AbstractController
         $rate = new Ratetype();
         $rate->setName($name);
         $rate->setNameShort($short);
+        $rate->setNote($note);
         $rate->setIsBase($isBase);
+        $rate->setAllowMon($allowMon);
+        $rate->setAllowTue($allowTue);
+        $rate->setAllowWed($allowWed);
+        $rate->setAllowThu($allowThu);
+        $rate->setAllowFri($allowFri);
+        $rate->setAllowSat($allowSat);
+        $rate->setAllowSun($allowSun);
+        $rate->setFairsAllowed($fairs);
         $rate->setDiscountAmount($dcAmount);
         $rate->setDiscountPercent($dcType);
+        $rate->setFixedSingle($fixedSingle);
+        $rate->setFixedDouble($fixedDouble);
         $rate->setDaysAdvance($preDays);
+        $rate->setMaxAdvance($maxAdvance);
         $rate->setMinStay($minStay);
         $rate->setIsActive(true);
 
@@ -1027,15 +1136,27 @@ class AjaxController extends AbstractController
             return ShortResponse::mysql();
         }
 
+        /**
+         * Get the Discount string
+         */
+        $symbol = $rate->getDiscountPercent() ? '&percnt;' : '&euro;';
+        $dcString = $rate->getDiscountAmount() . $symbol;
+        if ($fixedSingle !== null || $fixedDouble !== null) {
+            $dcString = number_format($fixedSingle, 2) . '/' . number_format($fixedDouble, 2);
+        }
+
+
         return ShortResponse::success('Ratetype added', array(
             'id' => $rate->getId(),
             'name' => $rate->getName(),
+            'note' => $rate->getNote(),
             'nameShort' => $rate->getNameShort(),
-            'dcAmount' => $rate->getDiscountAmount(),
             'minStay' => $rate->getMinStay(),
             'preDays' => $rate->getDaysAdvance(),
-            'dcType' => $rate->getDiscountPercent() ? '&percnt;' : '&euro;',
+            'maxAdvance' => $rate->getMaxAdvance(),
+            'discount' => $dcString,
             'isBase' => $rate->getIsBase() ? '<i class="fa fa-check" id="base_' . SimpleCrypt::enc('Ratetype') . '_' . $rate->getId() . '"></i>' : '<i class="fa fa-remove" id="base_' . SimpleCrypt::enc('Ratetype') . '_' . $rate->getId() . '"></i>',
+            'fairs' => $rate->getFairsAllowed() ? '<i class="fa fa-check" id="fairs_' . SimpleCrypt::enc('Ratetype') . '_' . $rate->getId() . '"></i>' : '<i class="fa fa-remove" id="fairs_' . SimpleCrypt::enc('Ratetype') . '_' . $rate->getId() . '"></i>',
             'link' => $this->generateUrl('renderRatetype', array(
                 'id' => $rate->getId(),
             )),

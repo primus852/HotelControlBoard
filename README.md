@@ -1,5 +1,9 @@
 # Changelog #
 
+## 0.7.0 ##
+- added more Options to Ratetypes
+- added RateQuery to Dashboard
+
 ## 0.6.2 ##
 - updated Dashboard
 - fixed missing BF in Accomodation monthly

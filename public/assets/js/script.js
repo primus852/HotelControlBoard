@@ -134,14 +134,14 @@ $(document).on('click', '#js-add-rate', function (e) {
     var $url = $btn.attr('data-url');
     var $table = $('#js-result-table');
 
-    var html = 'Would you like to add another Ratetype?<br />\n<div class="row">\n    <div class="col-10">\n        <input placeholder="Rate Name (e.g. Best available Rate)" value="" type="text" id="rate-name"/>\n    </div>\n</div>\n<div class="row">\n    <div class="col-10">\n        <input placeholder="Rate Name Short (e.g. BAR)" value="" type="text" id="rate-name-short"/>\n    </div>\n</div>\n<div class="row">\n    <div class="col-8">\n        <input placeholder="Discount from BaseRate" value="" type="text" id="rate-dc-amount"/>\n    </div>\n    <div class="col-2">\n        <select id="rate-dc-type" style="margin-top:30%;">\n            <option value="p">&percnt;</option>\n            <option value="e">&euro;</option>\n        </select>\n    </div>\n</div>\n<div class="row">\n    <div class="col-10">\n        <input placeholder="Minimum Stay" value="" type="text" id="rate-min-stay"/>\n    </div>\n</div>\n<div class="row">\n    <div class="col-10">\n        <input placeholder="Days in Advance" value="" type="text" id="rate-pre-days"/>\n    </div>\n</div>\n<div class="row">\n    <div class="col-1">\n        <input style="position:relative;top:10px;" type="checkbox" id="rate-is-base">\n    </div>\n    <div class="col-9">\n        <span style="position:relative;top:10px;">is Baserate<br />(Discounts will be applied from this rate)</span>\n    </div>\n</div>';
+    var html = 'Would you like to add another Ratetype?<br />\n<div class="row">\n    <div class="col-12">\n        <input placeholder="Rate Name (e.g. Best available Rate)" value="" type="text" id="rate-name"/>\n    </div>\n</div>\n<div class="row">\n    <div class="col-12">\n        <input placeholder="Rate Name Short (e.g. BAR)" value="" type="text" id="rate-name-short"/>\n    </div>\n</div>\n<div class="row">\n    <div class="col-12">\n        <input placeholder="Note (e.g. non-ref.)" value="" type="text" id="rate-note"/>\n    </div>\n</div>\n<div class="row">\n    <div class="col-9">\n        <input placeholder="Discount from BaseRate" value="" type="text" id="rate-dc-amount"/>\n    </div>\n    <div class="col-3">\n        <select id="rate-dc-type" style="margin-top:21%;height:24px;">\n            <option value="p">&percnt;</option>\n            <option value="e">&euro;</option>\n        </select>\n    </div>\n</div>\n<div class="row">\n    <div class="col-6">\n        <input placeholder="fixed Rate Single" value="" type="text" id="rate-fixed-single"/>\n    </div>\n    <div class="col-6">\n        <input placeholder="fixed Rate Double" value="" type="text" id="rate-fixed-double"/>\n    </div>\n</div>\n<div class="row">\n    <div class="col-12">\n        <input placeholder="Minimum Stay" value="" type="text" id="rate-min-stay"/>\n    </div>\n</div>\n<div class="row">\n    <div class="col-6">\n        <input placeholder="min. Days in advance" value="" type="text" id="rate-pre-days"/>\n    </div>\n    <div class="col-6">\n        <input placeholder="max. Days in advance" value="" type="text" id="rate-max-pre"/>\n    </div>\n</div>\n<div class="row">\n    <div class="col-2" style="position:relative;top:10px;">Bookable</div>\n    <div class="col-1">\n        <input style="position:relative;top:10px;" type="checkbox" checked="checked" id="rate-days-mon">\n    </div>\n    <div class="col-1">\n        <input style="position:relative;top:10px;" type="checkbox" checked="checked" id="rate-days-tue">\n    </div>\n    <div class="col-1">\n        <input style="position:relative;top:10px;" type="checkbox" checked="checked" id="rate-days-wed">\n    </div>\n    <div class="col-1">\n        <input style="position:relative;top:10px;" type="checkbox" checked="checked" id="rate-days-thu">\n    </div>\n    <div class="col-1">\n        <input style="position:relative;top:10px;" type="checkbox" checked="checked" id="rate-days-fri">\n    </div>\n    <div class="col-1">\n        <input style="position:relative;top:10px;" checked="checked" type="checkbox" id="rate-days-sat">\n    </div>\n    <div class="col-1">\n        <input style="position:relative;top:10px;" type="checkbox" checked="checked" id="rate-days-sun">\n    </div>\n</div>\n<br />\n<div class="row">\n    <div class="col-2">&nbsp;</div>\n    <div class="col-1">Mon</div>\n    <div class="col-1">Tue</div>\n    <div class="col-1">Wed</div>\n    <div class="col-1">Thu</div>\n    <div class="col-1">Fri</div>\n    <div class="col-1">Sat</div>\n    <div class="col-1">Sun</div>\n</div>\n<br />\n<div class="row">\n    <div class="col-2">\n        <input style="position:relative;top:10px;" type="checkbox" id="rate-fairs">\n    </div>\n    <div class="col-10">\n        <span style="position:relative;top:10px;">allowed during fairs</span>\n    </div>\n</div>\n<br />\n<div class="row">\n    <div class="col-2">\n        <input style="position:relative;top:10px;" type="checkbox" id="rate-is-base">\n    </div>\n    <div class="col-10">\n        <span style="position:relative;top:10px;">is Baserate<br />(Discounts will be applied from this rate)</span>\n    </div>\n</div>';
 
     x0p({
         title: 'Add Ratetype',
         text: html,
         html: true,
-        height: '70%',
-        maxHeight: '550px',
+        height: '100%',
+        maxHeight: '650px',
         maxWidth: '500px',
         animationType: 'fadeIn',
         buttons: [
@@ -161,36 +161,61 @@ $(document).on('click', '#js-add-rate', function (e) {
 
             var name = $.trim($('#rate-name').val());
             var nameShort = $.trim($('#rate-name-short').val());
+            var note = $.trim($('#rate-note').val());
+            var fairs = $('#rate-fairs:checked').val() ? 'yes' : 'no';
             var isBase = $('#rate-is-base:checked').val() ? 'yes' : 'no';
             var dcAmount = $.trim($('#rate-dc-amount').val());
             var minStay = $.trim($('#rate-min-stay').val());
             var preDays = $.trim($('#rate-pre-days').val());
+            var maxPreDays = $.trim($('#rate-max-pre').val());
+            var fixedSingle = $.trim($('#rate-fixed-single').val());
+            var fixedDouble = $.trim($('#rate-fixed-double').val());
             var dcType = $.trim($('#rate-dc-type').val());
+            var allowMon = $('#rate-days-mon:checked').val() ? 'yes' : 'no';
+            var allowTue = $('#rate-days-tue:checked').val() ? 'yes' : 'no';
+            var allowWed = $('#rate-days-wed:checked').val() ? 'yes' : 'no';
+            var allowThu = $('#rate-days-thu:checked').val() ? 'yes' : 'no';
+            var allowFri = $('#rate-days-fri:checked').val() ? 'yes' : 'no';
+            var allowSat = $('#rate-days-sat:checked').val() ? 'yes' : 'no';
+            var allowSun = $('#rate-days-sun:checked').val() ? 'yes' : 'no';
 
             /* Ajax Call */
             $.post($url, {
                 name: name,
                 nameShort: nameShort,
+                note: note,
                 isBase: isBase,
+                allowMon: allowMon,
+                allowTue: allowTue,
+                allowWed: allowWed,
+                allowThu: allowThu,
+                allowFri: allowFri,
+                allowSat: allowSat,
+                allowSun: allowSun,
+                fixedSingle: fixedSingle,
+                fixedDouble: fixedDouble,
+                fairs: fairs,
                 dcAmount: dcAmount,
                 dcType: dcType,
                 minStay: minStay,
-                preDays: preDays
+                preDays: preDays,
+                maxPreDays: maxPreDays
             })
                 .done(function (data) {
                     if (data.result === 'success') {
 
                         $table.append('' +
                             '<div class="row table-font" style="border-bottom:1px solid #ccc;" id="row_' + data.extra.type + '_' + data.extra.id + '">\n    ' +
-                            '   <div class="col-2" id="nameShort_' + data.extra.type + '_' + data.extra.id + '">' + data.extra.nameShort + '</div>\n    ' +
-                            '   <div class="col-4" id="name_' + data.extra.type + '_' + data.extra.id + '">' + data.extra.name + '</div>\n    ' +
+                            '   <div class="col-1" id="nameShort_' + data.extra.type + '_' + data.extra.id + '">' + data.extra.nameShort + '</div>\n    ' +
+                            '   <div class="col-2" id="name_' + data.extra.type + '_' + data.extra.id + '">' + data.extra.name + '</div>\n    ' +
+                            '   <div class="col-1" id="note_' + data.extra.type + '_' + data.extra.id + '">' + data.extra.note + '</div>\n    ' +
+                            '   <div class="col-1" id="maxAdvance_' + data.extra.type + '_' + data.extra.id + '">' + data.extra.maxAdvance + '</div>\n    ' +
+                            '   <div class="col-1">' + data.extra.fairs + '</div>\n    ' +
                             '   <div class="col-1" id="minStay_' + data.extra.type + '_' + data.extra.id + '">' + data.extra.minStay + '</div>\n    ' +
                             '   <div class="col-1" id="daysAdvance_' + data.extra.type + '_' + data.extra.id + '">' + data.extra.preDays + '</div>\n    ' +
                             '   <div class="col-1">' + data.extra.isBase + '</div>\n    ' +
                             '   <div class="col-1"><span class="badge badge-success" id="status_' + data.extra.type + '_' + data.extra.id + '">active</span></div>\n    ' +
-                            '   <div class="col-1">\n        ' +
-                            '       <span id="dc_amount_' + data.extra.type + '_' + data.extra.id + '">' + data.extra.dcAmount + '</span><span id="dc_type_' + data.extra.type + '_' + data.extra.id + '">' + data.extra.dcType + '</span>\n    ' +
-                            '   </div>\n    ' +
+                            '   <div class="col-1" id="discount_' + data.extra.type + '_' + data.extra.id + '">' + data.extra.discount + '</div>\n    ' +
                             '   <div class="col-1">\n        ' +
                             '       <a href="#" class="btn btn-success btn-sm rounded-0 tt clickable" title="View Details"' +
                             '           data-url="' + data.extra.link + '"' +
@@ -644,6 +669,52 @@ $(document).on('click', '#js-check-competitors', function (e) {
 
 });
 
+$(document).on('click', '#js-check-rate', function (e) {
+
+    var $btn = $(this);
+    var $html = $btn.html();
+    var url = $btn.attr('data-url');
+
+    if($btn.hasClass('disabled')){
+        return false;
+    }
+
+    var $nights = $('#js-stay-nights');
+    var $pax = $('#js-stay-pax');
+    var $date = $('#js-checkin-date');
+
+    var $result = $('#js-rate-result');
+
+    $btn.addClass('disabled').html('<i class="fa fa-spin fa-spinner"></i>');
+    $result.html('<i class="fa fa-spin fa-spinner fa-3x"></i>');
+
+    /* Ajax Call */
+    $.post(url, {
+        nights: $nights.val(),
+        pax: $pax.val(),
+        date: $date.val()
+    })
+        .done(function (data) {
+            $result.html('');
+            $btn.removeClass('disabled').html($html).blur();
+            if (data.result === 'success') {
+                $result.html(data.extra.template);
+            }else{
+                openNoty(data.result, data.message);
+            }
+            initTooltips('.tt');
+        })
+        .fail(function () {
+            openNoty('error', 'Ajax Error');
+            $result.html('');
+            $btn.removeClass('disabled').html($html).blur();
+        })
+    ;
+
+
+
+});
+
 $(document).on('click', '#js-update-rate', function (e) {
 
     e.preventDefault();
@@ -652,12 +723,24 @@ $(document).on('click', '#js-update-rate', function (e) {
     var id = $btn.attr('data-id');
 
     var $name = $('#rate-name');
+    var $note = $('#rate-note');
     var $nameShort = $('#rate-name-short');
     var $isBase = $('#rate-base');
     var $minStay = $('#rate-min-stay');
     var $daysAdvance = $('#rate-days-advance');
+    var $maxAdvance = $('#rate-max-advance');
     var $dcAmount = $('#rate-dc-amount');
     var $dcType = $('#rate-dc-type');
+    var $fixedSingle = $('#rate-fixed-single');
+    var $fixedDouble = $('#rate-fixed-double');
+    var $allowMon = $('#rate-days-mon');
+    var $allowTue = $('#rate-days-tue');
+    var $allowWed = $('#rate-days-wed');
+    var $allowThu = $('#rate-days-thu');
+    var $allowFri = $('#rate-days-fri');
+    var $allowSat = $('#rate-days-sat');
+    var $allowSun = $('#rate-days-sun');
+    var $fairsAllowed = $('#rate-fairs');
 
     if ($.trim($name.val()) === '') {
         openNoty('error', 'Name cannot be empty');
@@ -672,10 +755,22 @@ $(document).on('click', '#js-update-rate', function (e) {
     /* Ajax Call */
     $.post(url, {
         name: $name.val(),
+        note: $note.val(),
         nameShort: $nameShort.val(),
         minStay: $minStay.val(),
         daysAdvance: $daysAdvance.val(),
+        maxAdvance: $maxAdvance.val(),
         isBase: $isBase.val(),
+        fairs: $fairsAllowed.val(),
+        fixedSingle: $fixedSingle.val(),
+        fixedDouble: $fixedDouble.val(),
+        allowMon: $allowMon.val(),
+        allowTue: $allowTue.val(),
+        allowWed: $allowWed.val(),
+        allowThu: $allowThu.val(),
+        allowFri: $allowFri.val(),
+        allowSat: $allowSat.val(),
+        allowSun: $allowSun.val(),
         id: id,
         dcAmount: $dcAmount.val(),
         dcType: $dcType.val()
@@ -684,21 +779,25 @@ $(document).on('click', '#js-update-rate', function (e) {
             if (data.result === 'success') {
 
                 closeDetails(function () {
+                    var $noteRow = $('#note_' + data.extra.type + '_' + data.extra.id);
                     var $nameRow = $('#name_' + data.extra.type + '_' + data.extra.id);
                     var $nameShortRow = $('#nameShort_' + data.extra.type + '_' + data.extra.id);
                     var $minStayRow = $('#minStay_' + data.extra.type + '_' + data.extra.id);
                     var $daysAdvanceRow = $('#daysAdvance_' + data.extra.type + '_' + data.extra.id);
+                    var $maxAdvanceRow = $('#maxAdvance_' + data.extra.type + '_' + data.extra.id);
                     var $isBaseRow = $('#base_' + data.extra.type + '_' + data.extra.id).parent();
-                    var $dcAmountRow = $('#dc_amount_' + data.extra.type + '_' + data.extra.id);
-                    var $dcTypeRow = $('#dc_type_' + data.extra.type + '_' + data.extra.id);
+                    var $fairsRow = $('#fairs_' + data.extra.type + '_' + data.extra.id).parent();
+                    var $dcRow = $('#discount_' + data.extra.type + '_' + data.extra.id);
 
+                    $noteRow.html(data.extra.note);
                     $nameRow.html(data.extra.name);
                     $nameShortRow.html(data.extra.nameShort);
                     $minStayRow.html(data.extra.minStay);
                     $daysAdvanceRow.html(data.extra.daysAdvance);
+                    $maxAdvanceRow.html(data.extra.maxAdvance);
                     $isBaseRow.html(data.extra.isBase);
-                    $dcAmountRow.html(data.extra.dcAmount);
-                    $dcTypeRow.html(data.extra.dcType);
+                    $fairsRow.html(data.extra.fairs);
+                    $dcRow.html(data.extra.discount);
 
                 });
 

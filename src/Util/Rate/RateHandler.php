@@ -399,7 +399,8 @@ class RateHandler
                         'available' => true,
                         'total' => 0,
                         'avg' => 0,
-                        'tooltip' => $ratetype->getNote()
+                        'tooltip' => $ratetype->getNote(),
+                        'name' => $ratetype->getName(),
                     );
                 }
                 if ($available === false) {

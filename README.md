@@ -1,5 +1,5 @@
 # Project #
-A feature rich Board for managing daily duties in the Hotel business. For custumization, please mail: tow.berlin@gmail.com
+A feature rich Board for managing daily duties in the Hotel business. For customization, please mail: tow.berlin@gmail.com
 
 ## Features ##
 - Daily/Monthly Statistics

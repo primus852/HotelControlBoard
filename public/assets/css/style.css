@@ -1939,7 +1939,8 @@ input[type="text"]:disabled, input[type="password"]:disabled {
     top:5px;
     left:5px;
     font-size:40px;
-    font-weight:100;
+    font-weight:300;
+    color:#000;
 }
 .ratebox-rate form{
     position: absolute;
@@ -1956,9 +1957,9 @@ input[type="text"]:disabled, input[type="password"]:disabled {
     position:absolute;
     bottom:2px;
     left:5px;
-    font-size:12px;
+    font-size:15px;
     font-style: italic;
-    font-weight:200;
+    color:#000;
 }
 
 .ratebox-date{
@@ -1968,6 +1969,7 @@ input[type="text"]:disabled, input[type="password"]:disabled {
     font-size:12px;
     font-style: italic;
     font-weight:300;
+    color:#000;
 }
 
 .ratebox-cxl{
@@ -1988,7 +1990,7 @@ input[type="text"]:disabled, input[type="password"]:disabled {
     right:5px;
     font-size:15px;
     font-style: italic;
-    font-weight:300;
+
 }
 
 .cxlreg{

@@ -39,8 +39,8 @@
                                 <span class="ratebox-rate {% if is_granted('ROLE_SUPER_ADMIN') %}edit{% endif %}" id="{{ hf.id }}_{{ bookDate }}">{{ hf.rate|number_format(2) }}</span>
                                 <span class="ratebox-date">{{ bookDate|date('d.m.Y') }}</span>
                                 <span class="ratebox-suggested tt text-{{ hf.suggested.useClass }}" id="sugg_{{ hf.id }}_{{ bookDate }}" title="Suggested Rate">{{ hf.suggested.rate|number_format(0) }}&euro;</span>
-                                <span class="ratebox-stats tt" title="Arrivals/Departures/Occ/Avail/Pax"><i class="fa fa-arrow-down"></i> {{ hf.arrivals }} | <i class="fa fa-arrow-up"></i> {{ hf.departures }} | <i
-                                            class="fa fa-percent"></i> {{ hf.occ|number_format(2) }} | <i class="fa fa-server"></i> {{ hf.avail }} | <i class="fa fa-users"></i> {{ hf.pax }}</span>
+                                <span class="ratebox-stats tt" title="Arrivals/Departures/Occ/Avail/Pax"><i class="fa fa-arrow-down"></i>{{ hf.arrivals }} | <i class="fa fa-arrow-up"></i>{{ hf.departures }} | <i
+                                            class="fa fa-percent"></i>{{ hf.occ|number_format(2) }} | <i class="fa fa-server"></i>{{ hf.avail }} | <i class="fa fa-users"></i>{{ hf.pax }}</span>
                                 <span class="ratebox-cxl cxl{{ hf.cxl }} tt" title="CXL: {{ hf.cxlText }}" data-id="{{ hf.id }}"></span>
                             </div>
                         {% endfor %}

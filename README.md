@@ -14,11 +14,11 @@ A feature rich Board for managing daily duties in the Hotel business. For custum
 ![alt text](https://raw.githubusercontent.com/primus852/HotelControlBoard/master/public/assets/screens/dashboard_0.7.1.jpg "Dashboard")
 Dashboard
 
-![alt text](https://raw.githubusercontent.com/primus852/HotelControlBoard/master/public/assets/screens/rateplan_0.7.1.jpg "Rateplans")
-Rateplans
+![alt text](https://raw.githubusercontent.com/primus852/HotelControlBoard/master/public/assets/screens/rateplan_0.7.1.jpg "Rateoverview")
+Rateoverview
 
-![alt text](https://raw.githubusercontent.com/primus852/HotelControlBoard/master/public/assets/screens/budget_0.7.1.jpg "Budget Planning")
-Budget Planning
+![alt text](https://raw.githubusercontent.com/primus852/HotelControlBoard/master/public/assets/screens/budget_0.7.1.jpg "Ratetypes")
+Ratetypes
 
 
 # Changelog #

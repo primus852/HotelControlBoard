@@ -35,7 +35,7 @@
                     <br/>
                     <div class="row" style="margin: 0 auto;">
                         {% for bookDate, hf in hfs %}
-                            <div class="col-2 ratebox">
+                            <div class="col-3 ratebox">
                                 <span class="ratebox-rate {% if is_granted('ROLE_SUPER_ADMIN') %}edit{% endif %}" id="{{ hf.id }}_{{ bookDate }}">{{ hf.rate|number_format(2) }}</span>
                                 <span class="ratebox-date">{{ bookDate|date('d.m.Y') }}</span>
                                 <span class="ratebox-suggested tt text-{{ hf.suggested.useClass }}" id="sugg_{{ hf.id }}_{{ bookDate }}" title="Suggested Rate">{{ hf.suggested.rate|number_format(0) }}&euro;</span>

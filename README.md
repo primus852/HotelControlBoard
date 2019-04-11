@@ -37,6 +37,10 @@ Ratetypes
 
 # Changelog #
 
+## 0.7.2 ##
+- fixed wrong checkout date on Rate Check
+- Fixed Select Text Alignment
+
 ## 0.7.1 ##
 - adjusted colors for Rateplan
 - added Screenshots

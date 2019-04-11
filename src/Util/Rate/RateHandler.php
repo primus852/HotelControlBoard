@@ -154,7 +154,6 @@ class RateHandler
          * Get Checkout Date
          */
         $checkout = clone $end;
-        $checkout->modify('+1 day');
 
         /**
          * Days advance

@@ -4,8 +4,10 @@ namespace App\Controller;
 
 use App\Entity\Budget;
 use App\Entity\CompetitorCheck;
+use App\Entity\Department;
 use App\Entity\Ratetype;
 use App\Entity\Roomtype;
+use App\Entity\User;
 use App\Util\OpenWeather\OpenWeather;
 use App\Util\OpenWeather\OpenWeatherException;
 use Doctrine\Common\Persistence\ObjectManager;
@@ -147,6 +149,31 @@ class RenderController extends AbstractController
 
         return $this->render('render/detailsBudget.html.twig', array(
             'budget' => $budget
+        ));
+    }
+
+    /**
+     * @Route("/panel/_render/_user/{id}", name="renderUser", defaults={"id"="0"})
+     * @param int $id
+     * @param ObjectManager $em
+     * @return Response
+     */
+    public function renderDetailsUser(int $id, ObjectManager $em)
+    {
+        /**
+         * Find User
+         */
+        $user = $em->getRepository(User::class)->find($id);
+
+        if($user === null){
+            return $this->render('render/detailsNotFound.html.twig', array('id' => $id));
+        }
+
+        $departments = $em->getRepository(Department::class)->findAll();
+
+        return $this->render('render/detailsUser.html.twig', array(
+            'user' => $user,
+            'departments' => $departments,
         ));
     }
 }

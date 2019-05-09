@@ -1,0 +1,63 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <main id="main">
+        <div class="overlay"></div>
+        <header class="header">
+            <h1 class="page-title">
+                <a class="sidebar-toggle-btn trigger-toggle-sidebar">
+                    <span class="line"></span>
+                    <span class="line"></span>
+                    <span class="line"></span>
+                    <span class="line line-angle1"></span>
+                    <span class="line line-angle2"></span>
+                </a>All Users
+                <a class="btn btn-info btn-sm rounded-0" data-url="{{ path('ajaxAddUser') }}" id="js-add-user" href="#"><i class="fa fa-plus"></i> Add User</a>
+            </h1>
+        </header>
+        <div id="main-nano-wrapper" class="nano">
+            <div class="nano-content" id="perfectScroll">
+                <div class="container-fluid" id="js-result-table">
+                    <div class="row table-font-thicker" style="border-bottom:2px solid #ccc;">
+                        <div class="col-3">Name</div>
+                        <div class="col-2">Short</div>
+                        <div class="col-3">Department</div>
+                        <div class="col-1">Holidays</div>
+                        <div class="col-2">Status</div>
+                        <div class="col-1">Action</div>
+                    </div>
+                    {% for user in users %}
+                        <div class="row table-font" style="border-bottom:1px solid #ccc;" id="row_{{ 'User'|encrypt }}_{{ user.id }}">
+                            <div class="col-3" id="name_{{ 'User'|encrypt }}_{{ user.id }}">{{ user.name }}</div>
+                            <div class="col-2" id="username_{{ 'User'|encrypt }}_{{ user.id }}">{{ user.username }}</div>
+                            <div class="col-3" id="department_{{ 'User'|encrypt }}_{{ user.id }}">{{ user.department.name }}</div>
+                            <div class="col-1" id="holidays_{{ 'User'|encrypt }}_{{ user.id }}">{{ user.holidays }}</div>
+                            <div class="col-2">{% if user.enabled %}<span class="badge badge-success" id="status_{{ 'User'|encrypt }}_{{ user.id }}">active</span>{% else %}<span class="badge badge-danger" id="status_{{ 'User'|encrypt }}_{{ user.id }}">inactive</span>{% endif %}</div>
+                            <div class="col-1">
+                                <a href="#"
+                                   class="btn btn-success btn-sm rounded-0 tt clickable"
+                                   title="View Details"
+                                   data-url="{{ path('renderUser',{'id':user.id}) }}"
+                                   data-hash="details-user-{{ user.id }}" data-trigger="{{ user.id }}">
+                                    <i class="fa fa-info-circle"></i> Details
+                                </a>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+            <br/>
+        </div>
+    </main>
+{% endblock %}
+
+{% block stylesheets %}
+
+{% endblock stylesheets %}
+
+{% block javascripts %}
+    <script>
+        var GetNav = "contentSettingsUser";
+    </script>
+{% endblock javascripts %}
+

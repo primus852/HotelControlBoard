@@ -15,6 +15,7 @@ use App\Entity\HistoryForecast;
 use App\Entity\Rateplan;
 use App\Entity\Ratetype;
 use App\Entity\Roomtype;
+use App\Entity\User;
 use App\Util\Rate\RateHandler;
 use DateInterval;
 use DatePeriod;
@@ -63,13 +64,13 @@ class Helper
         $calendar .= '<tr class="calendar-row">';
 
         /* print "blank" days until the first of the current week */
-        for ($x = 0; $x < $running_day; $x++){
+        for ($x = 0; $x < $running_day; $x++) {
             $calendar .= '<td class="calendar-day-np"> </td>';
             $days_in_this_week++;
         }
 
         /* keep going with days.... */
-        for ($list_day = 1; $list_day <= $days_in_month; $list_day++){
+        for ($list_day = 1; $list_day <= $days_in_month; $list_day++) {
 
             try {
                 $today = DateTime::createFromFormat('Y-m-d', $year . '-' . $month . '-' . $list_day);
@@ -116,8 +117,8 @@ class Helper
         }
 
         /* finish the rest of the days in the week */
-        if ($days_in_this_week < 8){
-            for ($x = 1; $x <= (8 - $days_in_this_week); $x++){
+        if ($days_in_this_week < 8) {
+            for ($x = 1; $x <= (8 - $days_in_this_week); $x++) {
                 $calendar .= '<td class="calendar-day-np"> </td>';
             }
         }
@@ -202,7 +203,7 @@ class Helper
         /**
          * Check if we have "isActive"
          */
-        if (!method_exists($entity, 'getIsActive')) {
+        if (!method_exists($entity, 'getIsActive') && !$entity instanceof User) {
             throw new HelperException('Entity has no "getIsActive" Method');
         }
 
@@ -212,7 +213,12 @@ class Helper
         $b_class = $to_set === 'activate' ? 'success' : 'danger';
         $b_html = $to_set === 'activate' ? 'active' : 'inactive';
 
-        $entity->setIsActive($set);
+        if (method_exists($entity, 'setIsActive')) {
+            $entity->setIsActive($set);
+        }else{
+            $entity->setEnabled($set);
+        }
+
 
         $em->persist($entity);
 
@@ -260,6 +266,9 @@ class Helper
                 case $entity instanceof CompetitorCheck:
                 case $entity instanceof Budget:
                     return RemoveHelper::remove_simple($entity, $em);
+                    break;
+                case $entity instanceof User:
+                    return RemoveHelper::remove_user($entity, $em);
                     break;
                 default:
                     throw new HelperException('Missing Entity in Detection');

@@ -8,10 +8,9 @@ use App\Entity\HcbSettings;
 use App\Entity\Rateplan;
 use App\Entity\Ratetype;
 use App\Entity\Roomtype;
+use App\Entity\User;
 use App\Util\Helper\Helper;
 use App\Util\Helper\HelperException;
-use App\Util\OpenWeather\OpenWeather;
-use App\Util\OpenWeather\OpenWeatherException;
 use App\Util\Rate\RateHandler;
 use App\Util\Rate\RateHandlerException;
 use App\Util\Room\RoomHandler;
@@ -459,6 +458,30 @@ class DefaultController extends AbstractController
 
         return $this->render('default/settingsBudget.html.twig', array(
             'budgets' => $budgets,
+        ));
+
+    }
+
+    /**
+     * @Route("/panel/settings/user", name="settingsUser")
+     * @param ObjectManager $em
+     * @return RedirectResponse|Response
+     * @throws Exception
+     */
+    public function settingsUser(ObjectManager $em)
+    {
+
+        /* @var $security SecurityChecker */
+        $security = new SecurityChecker($this->getUser(), $this->container);
+
+        if (!$security->hasRole($this->getUser(), 'ROLE_MANAGER')) {
+            return $this->redirectToRoute('fos_user_security_login');
+        }
+
+        $users = $em->getRepository(User::class)->findAll();
+
+        return $this->render('default/settingsUsers.html.twig', array(
+            'users' => $users,
         ));
 
     }

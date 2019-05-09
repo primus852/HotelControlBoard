@@ -4,18 +4,25 @@ namespace App\Controller;
 
 use App\Entity\Budget;
 use App\Entity\CompetitorCheck;
+use App\Entity\Department;
 use App\Entity\HcbSettings;
+use App\Entity\Holiday;
 use App\Entity\Rateplan;
 use App\Entity\Ratetype;
 use App\Entity\Roomtype;
+use App\Entity\User;
 use App\Util\Competitors\CompetitorBooking;
 use App\Util\Competitors\CompetitorException;
+use App\Util\DFA\DFA;
+use App\Util\DFA\DFAException;
 use App\Util\Helper\Helper;
 use App\Util\Helper\HelperException;
 use App\Util\Rate\RateHandler;
 use App\Util\Rate\RateHandlerException;
+use App\Util\SecurityChecker;
 use App\Util\Xml\HcbXmlReader;
 use DateTime;
+use Doctrine\Common\Collections\Criteria;
 use Doctrine\Common\Persistence\ObjectManager;
 use Exception;
 use iio\libmergepdf\Merger;
@@ -33,6 +40,90 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class AjaxController extends AbstractController
 {
+
+    /**
+     * @Route("/_ajax/_loadHolidayEvents", name="loadHolidayEvents")
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function loadHolidayEventsAction(Request $request)
+    {
+        $start = DateTime::createFromFormat('Y-m-d', $request->get('start'));
+        if ($start === false) {
+            return ShortResponse::error('Invalid StartDate');
+        }
+        $start->modify('first day of this month')->setTime(0, 0, 0);
+
+        $end = DateTime::createFromFormat('Y-m-d', $request->get('end'));
+        if ($end === false) {
+            return ShortResponse::error('Invalid EndDate');
+        }
+        $end->modify('last day of this month');
+
+        /**
+         * Build Criteria
+         */
+        $criteria = Criteria::create();
+        $criteria->where(Criteria::expr()->andX(
+            Criteria::expr()->gte('start', $start),
+            Criteria::expr()->lte('end', $end)
+        ));
+
+        $holidays = $this->getDoctrine()->getRepository(Holiday::class)->matching($criteria);
+
+        foreach ($holidays as $holiday) {
+
+            /**
+             * @todo Color by Department
+             */
+            $color = '#ccc';
+            $css = 'js-load-holiday-info';
+
+            $allDay = true;
+
+            if ($holiday->getStart()->format('H') === '12' || $holiday->getEnd()->format('H') === '12') {
+                $allDay = false;
+            }
+
+            $startHalf = '';
+            $endHalf = '';
+            if ($holiday->getStart()->format('H') === '12') {
+                $startHalf = ' (1/2 Day)';
+            }
+            if ($holiday->getEnd()->format('H') === '12') {
+                $endHalf = ' (1/2 Day)';
+            }
+
+            $html = '<strong>Taken: </strong>' . $holiday->getDaysTaken();
+            $htmlHead = $holiday->getStart()->format('d.m.Y') . $startHalf . ' - ' . $holiday->getEnd()->format('d.m.Y') . $endHalf;
+
+            $eventArray[] = array(
+                'title' => $holiday->getName(),
+                'start' => $holiday->getStart()->format('Y-m-d\TH:i:s'),
+                'end' => $holiday->getEnd()->format('Y-m-d\TH:i:s'),
+                'dbId' => $holiday->getId(),
+                'isMultiple' => true,
+                'html' => $html,
+                'htmlHead' => $htmlHead,
+                'allDay' => $allDay,
+                'durationEditable' => false,
+                'color' => $color,
+                'className' => $css,
+            );
+        }
+
+        /**
+         * Gather holidays from API
+         */
+        try {
+            $api = DFA::api($start->format('Y'), array(
+                'bundeslaender' => 'be'
+            ));
+        } catch (DFAException $e) {
+            return ShortResponse::exception('API Error', $e->getMessage());
+        }
+
+    }
 
     /**
      * @Route("/_ajax/_calcCityTaxGeneral", name="ajaxCalcCityTaxGeneral")
@@ -587,6 +678,141 @@ class AjaxController extends AbstractController
     }
 
     /**
+     * @Route("/_ajax/_updateUser", name="ajaxUpdateUser")
+     * @param Request $request
+     * @param ObjectManager $em
+     * @return JsonResponse
+     */
+    public function updateUser(Request $request, ObjectManager $em)
+    {
+
+        /* @var $security SecurityChecker */
+        $security = new SecurityChecker($this->getUser(), $this->container);
+
+        if (!$security->hasRole($this->getUser(), 'ROLE_MANAGER')) {
+            return ShortResponse::denied();
+        }
+
+        $id = $request->get('id');
+        $name = $request->get('name');
+        $username = $request->get('username');
+        $password = $request->get('password');
+        $dep = $request->get('department');
+        $holidays = (float)str_replace(',', '.', $request->get('holidays'));
+        $isAdmin = $request->get('isAdmin') === 'yes' ? true : false;
+        $isManager = $request->get('isManager') === 'yes' ? true : false;
+
+        /**
+         * Validate ID
+         */
+        if ($id === '' || $id === null) {
+            return ShortResponse::error('ID cannot be empty');
+        }
+
+        /**
+         * Validate Name
+         */
+        if ($name === '' || $name === null) {
+            return ShortResponse::error('Name cannot be empty');
+        }
+
+        /**
+         * Validate Department
+         */
+        if ($dep === '' || $dep === null) {
+            return ShortResponse::error('Department cannot be empty');
+        }
+
+        $department = $em->getRepository(Department::class)->find($dep);
+        if($department === null){
+            return ShortResponse::error('Department not found');
+        }
+
+        /**
+         * Validate Username
+         */
+        if ($username === '' || $username === null) {
+            return ShortResponse::error('Name cannot be empty');
+        }
+        $user_exists = $em->getRepository(User::class)->findOneBy(array(
+            'username' => $username,
+        ));
+
+        /**
+         * Validate Holidays
+         */
+        if($holidays < 0){
+            return ShortResponse::error('Please set Holidays >= 0');
+        }
+
+        /**
+         * Find the User that is edited
+         */
+        $user = $em->getRepository(User::class)->find($id);
+
+        if ($user === null) {
+            return ShortResponse::error('User not found');
+        }
+
+        if ($user->getUsername() !== $user_exists->getUsername()) {
+            return ShortResponse::error('There is already another User \'' . $username . '\', please chose a different Username');
+        }
+
+        /**
+         * Set Password only is filled
+         */
+        if($password !== '' && $password !== null){
+            $user->setPassword(password_hash($password, PASSWORD_BCRYPT, array(
+                'cost' => 10,
+            )));
+        }
+
+        /**
+         * Check that if revoking USER_MANAGER, it is not the user himself
+         */
+        if($isManager === false && $user->getId() === $this->getUser()->getId()){
+            return ShortResponse::error('You cannot revoke your Manager Status from yourself');
+        }
+
+        /**
+         * Update the User
+         */
+        $user->setName($name);
+        $user->setUsername($username);
+        $user->setUsernameCanonical($username);
+        $user->setDepartment($department);
+        $user->setHolidays($holidays);
+        if($isAdmin){
+            $user->addRole('ROLE_SUPER_ADMIN');
+        }else{
+            $user->removeRole('ROLE_ADMIN');
+            $user->removeRole('ROLE_SUPER_ADMIN');
+        }
+        if($isManager){
+            $user->addRole('ROLE_MANAGER');
+        }else{
+            $user->removeRole('ROLE_MANAGER');
+        }
+        $em->persist($user);
+
+        try{
+            $em->flush();
+        }catch (Exception $e){
+            return ShortResponse::mysql($e->getMessage());
+        }
+
+        return ShortResponse::success('User updated',array(
+            'id' => $user->getId(),
+            'name' => $user->getName(),
+            'username' => $user->getUsername(),
+            'department' => $department->getName(),
+            'holidays' => $user->getHolidays(),
+            'type' => SimpleCrypt::enc('User')
+        ));
+
+    }
+
+    /**
      * @Route("/_ajax/_updateBudget", name="ajaxUpdateBudget")
      * @param Request $request
      * @param ObjectManager $em
@@ -888,7 +1114,7 @@ class AjaxController extends AbstractController
         try {
             $state = Helper::toggleActive($request->get('type'), $request->get('id'), $request->get('to_set'), $em);
         } catch (HelperException $e) {
-            return ShortResponse::exception('Error deleting Entity', $e->getMessage());
+            return ShortResponse::exception('Error changing Entity', $e->getMessage());
         }
 
         return ShortResponse::success('Entry updated', $state);
@@ -915,6 +1141,101 @@ class AjaxController extends AbstractController
 
         return ShortResponse::success('Entry deleted', array(
             'id' => $del_id,
+        ));
+
+    }
+
+    /**
+     * @Route("/_ajax/_addUser", name="ajaxAddUser")
+     * @param Request $request
+     * @param ObjectManager $em
+     * @return JsonResponse
+     * @throws Exception
+     */
+    public function addUser(Request $request, ObjectManager $em)
+    {
+
+        /**
+         * Get Vars
+         */
+        $name = $request->get('name');
+        $username = $request->get('username');
+        $password = $request->get('password');
+        $dep = $request->get('department');
+        $holidays = (float)str_replace(',', '.', $request->get('holidays'));
+        $manager = $request->get('isManager') === 'yes' ? true : false;
+        $admin = $request->get('isAdmin') === 'yes' ? true : false;
+
+        if($name === '' || $name === null){
+            return ShortResponse::error('Name cannot be empty');
+        }
+
+        if($username === '' || $username === null){
+            return ShortResponse::error('Username cannot be empty');
+        }
+
+        if($password === '' || $password === null){
+            return ShortResponse::error('Password cannot be empty');
+        }
+
+        $department = $em->getRepository(Department::class)->find($dep);
+        if($department === null){
+            return ShortResponse::error('Department not found');
+        }
+
+        /**
+         * Check if Username exists
+         */
+        $user_exists = $em->getRepository(User::class)->findOneBy(array(
+            'username' => $username
+        ));
+
+        if($user_exists !== null){
+            return ShortResponse::error('Short Name already exists');
+        }
+
+        /**
+         * @todo make this useful
+         */
+        $email = rand(0,1000).'-'.rand(0,1000).'-'.rand(0,1000).'@mailinator.com';
+
+        $user = new User();
+        $user->setName($name);
+        $user->setUsernameCanonical($username);
+        $user->setUsername($username);
+        $user->setDepartment($department);
+        $user->setEmail($email);
+        $user->setEmailCanonical($email);
+        $user->setEnabled(true);
+        $user->setPassword(password_hash($password, PASSWORD_BCRYPT, array(
+            'cost' => 10,
+        )));
+        if($admin){
+            $user->addRole('ROLE_ADMIN');
+        }
+        if($manager){
+            $user->addRole('ROLE_MANAGER');
+        }
+        $user->setHolidays($holidays);
+
+        $em->persist($user);
+
+        try{
+            $em->flush();
+        }catch (Exception $e){
+            return ShortResponse::mysql($e->getMessage());
+        }
+
+        return ShortResponse::success('User saved',array(
+            'name' => $user->getName(),
+            'username' => $user->getUsername(),
+            'department' => $user->getDepartment()->getName(),
+            'id' => $user->getId(),
+            'holidays' => $user->getHolidays(),
+            'link' => $this->generateUrl('renderUser', array(
+                'id' => $user->getId(),
+            )),
+            'type' => SimpleCrypt::enc('User'),
         ));
 
     }

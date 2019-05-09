@@ -1,0 +1,98 @@
+<div class="header">
+    <div class="row">
+        <div class="col-10">
+            <h1 class="page-title"><a class="icon circle-icon fa fa-remove trigger-message-close"></a>
+                Details {{ user.name }} ({{ user.username }})
+            </h1>
+        </div>
+        <div class="col-2 text-right">
+            &nbsp;
+        </div>
+    </div>
+</div>
+<div class="messageFly-nano-wrapper nano">
+    <div class="nano-content subScroll">
+        <div class="message-container">
+            <div class="row">
+                <div class="col-12">
+                    <div class="message-box">
+                        <div class="message">
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="card">
+                                        <div class="card-header text-white bg-dark rounded-0">
+                                            <div class="row">
+                                                <div class="col-6">
+                                                    <div class="h2-wiki">Details</div>
+                                                </div>
+                                                <div class="col-6 text-right">
+                                                    <a href="#" class="btn btn-success btn-sm" id="js-update-user" data-url="{{ path('ajaxUpdateUser') }}" data-id="{{ user.id }}"><i class="fa fa-save"></i> Save</a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="row">
+                                                <div class="col-2">
+                                                    <label for="user-name">Name</label>
+                                                    <input type="text" id="user-name" value="{{ user.name }}">
+                                                </div>
+                                                <div class="col-1">
+                                                    <label for="user-username">Username</label>
+                                                    <input type="text" id="user-username" value="{{ user.username }}">
+                                                </div>
+                                                <div class="col-2">
+                                                    <label for="user-password">Password</label>
+                                                    <input type="password" id="user-password" value="">
+                                                </div>
+                                                <div class="col-1">
+                                                    <label for="user-holidays">Holidays / Year</label>
+                                                    <input type="text" id="user-holidays" value="{{ user.holidays }}">
+                                                </div>
+                                                <div class="col-2">
+                                                    <label for="user-department">Department</label>
+                                                    <select id="user-department">
+                                                        {% for dep in departments %}
+                                                            <option {% if user.department.id == dep.id %}selected="selected" {% endif %}value="{{ dep.id }}">{{ dep.nameShort }}</option>
+                                                        {% endfor %}
+                                                    </select>
+                                                </div>
+                                                <div class="col-2">
+                                                    <label for="user-admin">HCB Admin</label>
+                                                    <select id="user-manager">
+                                                        <option value="yes" {% if 'ROLE_ADMIN' in user.roles or 'ROLE_SUPER_ADMIN' in user.roles %}selected="selected"{% endif %}>Yes</option>
+                                                        <option value="no" {% if 'ROLE_ADMIN' not in user.roles and 'ROLE_SUPER_ADMIN' not in user.roles %}selected="selected"{% endif %}>No</option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-2">
+                                                    <label for="user-manager">HCB Manager</label>
+                                                    <select id="user-manager">
+                                                        <option value="yes" {% if 'ROLE_MANAGER' in user.roles %}selected="selected"{% endif %}>Yes</option>
+                                                        <option value="no" {% if 'ROLE_MANAGER' not in user.roles %}selected="selected"{% endif %}>No</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tool-box">
+                            <a href="#" class="btn btn-sm btn-danger" id="js-remove-entity" data-name="User {{ user.username }}" data-url="{{ path('ajaxRemoveEntity') }}" data-type="{{ 'User'|encrypt }}" data-id="{{ user.id }}">
+                                <i class="fa fa-remove"></i> Remove
+                            </a>
+                            {% if user.enabled %}
+                                <a href="#" class="btn btn-sm btn-warning js-toggle-active" data-url="{{ path('ajaxToggleActive') }}" data-set="deactivate" data-type="{{ 'User'|encrypt }}" data-id="{{ user.id }}">
+                                    <i class="fa fa-ban"></i> Deactivate
+                                </a>
+                            {% else %}
+                                <a href="#" class="btn btn-sm btn-warning js-toggle-active" data-url="{{ path('ajaxToggleActive') }}" data-set="activate" data-type="{{ 'User'|encrypt }}" data-id="{{ user.id }}">
+                                    <i class="fa fa-check"></i> Activate
+                                </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -127,6 +127,96 @@ $(document).on('click', '.clickable', function (e) {
 
 });
 
+$(document).on('click', '#js-add-user', function (e) {
+
+    e.preventDefault();
+    var $btn = $(this);
+    var $url = $btn.attr('data-url');
+    var $table = $('#js-result-table');
+
+    var html = 'Would you like to add another User?<br />\n<div class="row">\n    <div class="col-12">\n        <input placeholder="Full Name" value="" type="text" id="user-name"/>\n    </div>\n</div>\n<div class="row">\n    <div class="col-12">\n        <input placeholder="Short Name" value="" type="text" id="user-username"/>\n    </div>\n</div>\n<div class="row">\n    <div class="col-12">\n        <input placeholder="Password" value="" type="password" id="user-password"/>\n    </div>\n</div>\n<br />\n<div class="row">\n    <div class="col-12">\n        <select id="user-department">\n            <option value="1">ADMIN</option>\n            <option value="2">TENTEMPIÉ</option>\n            <option value="3">FO</option>\n            <option value="4">HSK</option>\n        </select>\n    </div>\n</div>\n<div class="row">\n    <div class="col-12">\n        <input placeholder="Holidays" value="" type="text" id="user-holidays"/>\n    </div>\n</div>\n<div class="row">\n    <div class="col-2">\n        <input style="position:relative;top:10px;" type="checkbox" id="user-admin">\n    </div>\n    <div class="col-10">\n        <span style="position:relative;top:10px;">HCB Admin</span>\n    </div>\n</div>\n<br />\n<div class="row">\n    <div class="col-2">\n        <input style="position:relative;top:10px;" type="checkbox" id="user-manager">\n    </div>\n    <div class="col-10">\n        <span style="position:relative;top:10px;">HCB Manager</span>\n    </div>\n</div>';
+
+    x0p({
+        title: 'Add User',
+        text: html,
+        html: true,
+        height: '100%',
+        maxHeight: '450px',
+        maxWidth: '400px',
+        animationType: 'fadeIn',
+        buttons: [
+            {
+                type: 'ok',
+                text: 'Save',
+                showLoading: true
+            },
+            {
+                type: 'error',
+                text: 'Cancel',
+                showLoading: false
+            }
+        ]
+    }).then(function (data) {
+        if (data.button === 'ok') {
+
+            var name = $.trim($('#user-name').val());
+            var username = $.trim($('#user-username').val());
+            var password = $.trim($('#user-password').val());
+            var department = $.trim($('#user-department').val());
+            var admin = $('#user-admin:checked').val() ? 'yes' : 'no';
+            var manager = $('#user-manager:checked').val() ? 'yes' : 'no';
+            var holidays = $.trim($('#user-holidays').val());
+
+
+            /* Ajax Call */
+            $.post($url, {
+                name: name,
+                username: username,
+                password: password,
+                department: department,
+                isAdmin: admin,
+                isManager: manager,
+                holidays: holidays
+            })
+                .done(function (data) {
+                    if (data.result === 'success') {
+
+                        $table.append('' +
+                            '<div class="row table-font" style="border-bottom:1px solid #ccc;" id="row_' + data.extra.type + '_' + data.extra.id + '">\n    ' +
+                            '   <div class="col-3" id="name_' + data.extra.type + '_' + data.extra.id + '">' + data.extra.name + '</div>\n    ' +
+                            '   <div class="col-2" id="username_' + data.extra.type + '_' + data.extra.id + '">' + data.extra.username + '</div>\n    ' +
+                            '   <div class="col-3" id="department_' + data.extra.type + '_' + data.extra.id + '">' + data.extra.department + '</div>\n    ' +
+                            '   <div class="col-1" id="holidays_' + data.extra.type + '_' + data.extra.id + '">' + data.extra.holidays + '</div>\n    ' +
+                            '   <div class="col-2"><span class="badge badge-success" id="status_' + data.extra.type + '_' + data.extra.id + '">active</span></div>\n    ' +
+                            '   <div class="col-1">\n        ' +
+                            '       <a href="#" class="btn btn-success btn-sm rounded-0 tt clickable" title="View Details"' +
+                            '           data-url="' + data.extra.link + '"' +
+                            '           data-hash="details-user-' + data.extra.id + '"' +
+                            '           data-trigger="' + data.extra.id + '"' +
+                            '       >\n            ' +
+                            '           <i class="fa fa-info-circle"></i> Details\n        ' +
+                            '       </a>\n    ' +
+                            '   </div>\n' +
+                            '</div>');
+
+                        x0p('Success',
+                            data.extra.username + ' added',
+                            'ok', false);
+                    } else {
+                        x0p('Error',
+                            data.message,
+                            'error', false);
+                    }
+                })
+                .fail(function () {
+                    openNoty('error', 'Ajax Error');
+                })
+            ;
+        }
+    });
+
+});
+
 $(document).on('click', '#js-add-rate', function (e) {
 
     e.preventDefault();
@@ -713,6 +803,75 @@ $(document).on('click', '#js-check-rate', function (e) {
         })
     ;
 
+
+
+});
+
+$(document).on('click', '#js-update-user', function (e) {
+
+    e.preventDefault();
+    var $btn = $(this);
+    var url = $btn.attr('data-url');
+    var id = $btn.attr('data-id');
+
+    var $name = $('#user-name');
+    var $username = $('#user-username');
+    var $password = $('#user-password');
+    var $holidays = $('#user-holidays');
+    var $department = $('#user-department');
+    var $admin = $('#user-admin');
+    var $manager = $('#user-manager');
+
+    if ($.trim($name.val()) === '') {
+        openNoty('error', 'Name cannot be empty');
+        return false;
+    }
+
+    if ($.trim($username.val()) === '') {
+        openNoty('error', 'Username cannot be empty');
+        return false;
+    }
+
+    /* Ajax Call */
+    $.post(url, {
+        name: $name.val(),
+        username: $username.val(),
+        password: $password.val(),
+        holidays: $holidays.val(),
+        department: $department.val(),
+        isAdmin: $admin.val(),
+        isManager: $manager.val(),
+        id: id
+    })
+        .done(function (data) {
+            if (data.result === 'success') {
+
+                closeDetails(function () {
+                    var $nameRow = $('#name_' + data.extra.type + '_' + data.extra.id);
+                    var $usernameRow = $('#username_' + data.extra.type + '_' + data.extra.id);
+                    var $departmentRow = $('#department_' + data.extra.type + '_' + data.extra.id);
+                    var $holidaysRow = $('#holidays_' + data.extra.type + '_' + data.extra.id);
+
+                    $nameRow.html(data.extra.name);
+                    $usernameRow.html(data.extra.username);
+                    $departmentRow.html(data.extra.department);
+                    $holidaysRow.html(data.extra.holidays);
+
+                });
+
+                x0p('Success',
+                    $username.val() + ' updated',
+                    'ok', false);
+            } else {
+                x0p('Error',
+                    data.message,
+                    'error', false);
+            }
+        })
+        .fail(function () {
+            openNoty('error', 'Ajax Error');
+        })
+    ;
 
 
 });

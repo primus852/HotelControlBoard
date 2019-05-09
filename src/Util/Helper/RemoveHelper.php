@@ -13,6 +13,7 @@ use App\Entity\Budget;
 use App\Entity\CompetitorCheck;
 use App\Entity\Ratetype;
 use App\Entity\Roomtype;
+use App\Entity\User;
 use Doctrine\Common\Persistence\ObjectManager;
 use Exception;
 
@@ -46,6 +47,37 @@ class RemoveHelper
 
         return $id;
 
+    }
+
+    /**
+     * @param User $user
+     * @param ObjectManager $em
+     * @return int|null
+     * @throws HelperException
+     */
+    public static function remove_user(User $user, ObjectManager $em)
+    {
+        $id = $user->getId();
+
+        /**
+         * Delete Holidays
+         */
+        foreach($user->getHolidays() as $holiday){
+            $em->remove($holiday);
+        }
+
+        /**
+         * Delete User
+         */
+        $em->remove($user);
+
+        try {
+            $em->flush();
+        } catch (Exception $e) {
+            throw new HelperException('MySQL Error: ' . $e->getMessage());
+        }
+
+        return $id;
     }
 
 }

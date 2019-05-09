@@ -1,0 +1,85 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <main id="main">
+        <div class="overlay"></div>
+        <header class="header">
+            <h1 class="page-title">
+                <a class="sidebar-toggle-btn trigger-toggle-sidebar">
+                    <span class="line"></span>
+                    <span class="line"></span>
+                    <span class="line"></span>
+                    <span class="line line-angle1"></span>
+                    <span class="line line-angle2"></span>
+                </a>Holidayplan
+            </h1>
+        </header>
+        <div id="main-nano-wrapper" class="nano">
+            <div class="nano-content" id="perfectScroll">
+                <div class="container-fluid" id="js-result-table">
+                    <div class="row" style="padding-left:15px;">
+                        <div class="col-12" id="js-all-calendars" data-url="{{ path('loadHolidayEvents') }}">
+                            <div class="row">
+                                <div class="col">
+                                    <div class="calendar" data-count="1"></div>
+                                </div>
+                                <div class="col">
+                                    <div class="calendar" data-count="2"></div>
+                                </div>
+                                <div class="col">
+                                    <div class="calendar" data-count="3"></div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col">
+                                    <div class="calendar" data-count="4"></div>
+                                </div>
+                                <div class="col">
+                                    <div class="calendar" data-count="5"></div>
+                                </div>
+                                <div class="col">
+                                    <div class="calendar" data-count="6"></div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col">
+                                    <div class="calendar" data-count="7"></div>
+                                </div>
+                                <div class="col">
+                                    <div class="calendar" data-count="8"></div>
+                                </div>
+                                <div class="col">
+                                    <div class="calendar" data-count="9"></div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col">
+                                    <div class="calendar" data-count="10"></div>
+                                </div>
+                                <div class="col">
+                                    <div class="calendar" data-count="11"></div>
+                                </div>
+                                <div class="col">
+                                    <div class="calendar" data-count="12"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <br/>
+        </div>
+    </main>
+{% endblock %}
+
+{% block stylesheets %}
+
+{% endblock stylesheets %}
+
+{% block javascripts %}
+    <script>
+        var GetNav = "contentMain";
+    </script>
+{% endblock javascripts %}
+

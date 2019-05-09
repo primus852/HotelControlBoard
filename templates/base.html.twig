@@ -63,63 +63,79 @@
                         <i class="fa fa-upload"></i> Daily Uploads
                     </a>
                 </li>
+                {% if is_granted('ROLE_MANAGER') %}
+                    <!--
+                    <li id="contentHoliday" class="treeItem">
+                        <a href="{{ path('dailyUploads') }}" class="mLink">
+                            <i class="fa fa-calendar"></i> Holidayplan
+                        </a>
+                    </li>
+                    -->
+                {% endif %}
             </ul>
         </menu>
-        <div class="separator"></div>
         {% if is_granted('ROLE_ADMIN') %}
-        <menu class="menu-segment">
-            <ul>
-                <li>
-                    <a href="#" class="mLink toggleTree">
-                        <i class="fa fa-chevron-right"></i> Settings
-                    </a>
-                    <ul class="treeMenu">
-                        {% if is_granted('ROLE_ADMIN') %}
-                            <li id="contentSettingsPrice" class="treeItem">
-                                <a href="{{ path('settingsRateplan') }}" class="mLink">
-                                    <i class="fa fa-calendar"></i> Rateplan
-                                </a>
-                            </li>
-                        {% endif %}
-                        {% if is_granted('ROLE_ADMIN') %}
-                            <li id="contentSettingsRoomtypes" class="treeItem">
-                                <a href="{{ path('settingsRoomtypes') }}" class="mLink">
-                                    <i class="fa fa-bed"></i> Roomtypes
-                                </a>
-                            </li>
-                        {% endif %}
-                        {% if is_granted('ROLE_ADMIN') %}
-                            <li id="contentSettingsRates" class="treeItem">
-                                <a href="{{ path('settingsRatetypes') }}" class="mLink">
-                                    <i class="fa fa-money"></i> Ratetypes
-                                </a>
-                            </li>
-                        {% endif %}
-                        {% if is_granted('ROLE_ADMIN') %}
-                            <li id="contentSettingsComp" class="treeItem">
-                                <a href="{{ path('settingsCompetitors') }}" class="mLink">
-                                    <i class="fa fa-usd"></i> Competitors
-                                </a>
-                            </li>
-                        {% endif %}
-                        {% if is_granted('ROLE_ADMIN') %}
-                            <li id="contentSettingsHcb" class="treeItem">
-                                <a href="{{ path('settingsGlobal') }}" class="mLink">
-                                    <i class="fa fa-cogs"></i> General
-                                </a>
-                            </li>
-                        {% endif %}
-                        {% if is_granted('ROLE_MANAGER') %}
-                            <li id="contentSettingsBudget" class="treeItem">
-                                <a href="{{ path('settingsBudget') }}" class="mLink">
-                                    <i class="fa fa-euro"></i> Budget
-                                </a>
-                            </li>
-                        {% endif %}
-                    </ul>
-                </li>
-            </ul>
-        </menu>
+            <div class="separator"></div>
+            <menu class="menu-segment">
+                <ul>
+                    <li>
+                        <a href="#" class="mLink toggleTree">
+                            <i class="fa fa-chevron-right"></i> Settings
+                        </a>
+                        <ul class="treeMenu">
+                            {% if is_granted('ROLE_ADMIN') %}
+                                <li id="contentSettingsPrice" class="treeItem">
+                                    <a href="{{ path('settingsRateplan') }}" class="mLink">
+                                        <i class="fa fa-calendar"></i> Rateplan
+                                    </a>
+                                </li>
+                            {% endif %}
+                            {% if is_granted('ROLE_ADMIN') %}
+                                <li id="contentSettingsRoomtypes" class="treeItem">
+                                    <a href="{{ path('settingsRoomtypes') }}" class="mLink">
+                                        <i class="fa fa-bed"></i> Roomtypes
+                                    </a>
+                                </li>
+                            {% endif %}
+                            {% if is_granted('ROLE_ADMIN') %}
+                                <li id="contentSettingsRates" class="treeItem">
+                                    <a href="{{ path('settingsRatetypes') }}" class="mLink">
+                                        <i class="fa fa-money"></i> Ratetypes
+                                    </a>
+                                </li>
+                            {% endif %}
+                            {% if is_granted('ROLE_ADMIN') %}
+                                <li id="contentSettingsComp" class="treeItem">
+                                    <a href="{{ path('settingsCompetitors') }}" class="mLink">
+                                        <i class="fa fa-usd"></i> Competitors
+                                    </a>
+                                </li>
+                            {% endif %}
+                            {% if is_granted('ROLE_ADMIN') %}
+                                <li id="contentSettingsHcb" class="treeItem">
+                                    <a href="{{ path('settingsGlobal') }}" class="mLink">
+                                        <i class="fa fa-cogs"></i> General
+                                    </a>
+                                </li>
+                            {% endif %}
+                            {% if is_granted('ROLE_MANAGER') %}
+                                <li id="contentSettingsBudget" class="treeItem">
+                                    <a href="{{ path('settingsBudget') }}" class="mLink">
+                                        <i class="fa fa-euro"></i> Budget
+                                    </a>
+                                </li>
+                            {% endif %}
+                            {% if is_granted('ROLE_MANAGER') %}
+                                <li id="contentSettingsUser" class="treeItem">
+                                    <a href="{{ path('settingsUser') }}" class="mLink">
+                                        <i class="fa fa-users"></i> User
+                                    </a>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </li>
+                </ul>
+            </menu>
         {% endif %}
         <div class="separator"></div>
         {{ render(controller('App\\Controller\\RenderController::renderWeatherAction')) }}

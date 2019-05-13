@@ -43,6 +43,10 @@ class RateHandler
     );
 
     const RATE_COLORS = array(
+        140 => array(
+            'color' => '#9da353',
+            'font' => '#000',
+        ),
         150 => array(
             'color' => '#F7FFF6',
             'font' => '#000',

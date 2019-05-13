@@ -43,10 +43,6 @@ class RateHandler
     );
 
     const RATE_COLORS = array(
-        140 => array(
-            'color' => '#9da353',
-            'font' => '#000',
-        ),
         150 => array(
             'color' => '#F7FFF6',
             'font' => '#000',
@@ -212,8 +208,13 @@ class RateHandler
                 /**
                  * Get Color
                  */
+                try{
                 $priceColor = self::RATE_COLORS[(int)$rate->getPrice()]['color'];
                 $priceColorFont = self::RATE_COLORS[(int)$rate->getPrice()]['font'];
+                }catch (Exception $e){
+                    $priceColor = '#fff';
+                    $priceColorFont = '#000';
+                }
 
                 /**
                  * Get Regular Price

@@ -119,6 +119,9 @@
     "ocramius/proxy-manager": {
         "version": "2.2.2"
     },
+    "php": {
+        "version": "7.2"
+    },
     "primus852/simple-crypt": {
         "version": "1.2.0"
     },

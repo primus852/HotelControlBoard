@@ -190,7 +190,7 @@ class RateHandler
                 'bookDate' => $dt,
             ));
 
-            if($rate === null){
+            if ($rate === null) {
                 throw new RateHandlerException('Could not find rates for specified date');
             }
 
@@ -208,10 +208,10 @@ class RateHandler
                 /**
                  * Get Color
                  */
-                try{
-                $priceColor = self::RATE_COLORS[(int)$rate->getPrice()]['color'];
-                $priceColorFont = self::RATE_COLORS[(int)$rate->getPrice()]['font'];
-                }catch (Exception $e){
+                try {
+                    $priceColor = self::RATE_COLORS[(int)$rate->getPrice()]['color'];
+                    $priceColorFont = self::RATE_COLORS[(int)$rate->getPrice()]['font'];
+                } catch (Exception $e) {
                     $priceColor = '#fff';
                     $priceColorFont = '#000';
                 }
@@ -272,7 +272,7 @@ class RateHandler
                 if ($ratetype->getMaxAdvance() > 0) {
                     if ($daysAdv > $ratetype->getMaxAdvance()) {
                         $price = 'N/A';
-                        $priceTooltip = 'max. advance Days ' . $ratetype->getMaxAdvance(). ' (is '.$daysAdv.')';
+                        $priceTooltip = 'max. advance Days ' . $ratetype->getMaxAdvance() . ' (is ' . $daysAdv . ')';
                         $priceColor = '#fff';
                         $priceColorFont = '#dc3545';
                         $available = false;
@@ -285,7 +285,7 @@ class RateHandler
                 if ($ratetype->getDaysAdvance() > 1) {
                     if ($daysAdv < $ratetype->getDaysAdvance()) {
                         $price = 'N/A';
-                        $priceTooltip = 'min. advance Days ' . $ratetype->getDaysAdvance(). ' (is '.$daysAdv.')';
+                        $priceTooltip = 'min. advance Days ' . $ratetype->getDaysAdvance() . ' (is ' . $daysAdv . ')';
                         $priceColor = '#fff';
                         $priceColorFont = '#dc3545';
                         $available = false;
@@ -795,6 +795,8 @@ class RateHandler
         /**
          * Get Stats for Month
          */
+        $rate_today = $hf_today->getBookedRooms() > 0 ? ($hf_today->getRevenue() + ($hf_today->getPax() * ($bf->getSetting() / 119 * 100))) / $hf_today->getBookedRooms() : 0;
+        $rate_tomorrow = $hf_next->getBookedRooms() > 0 ? ($hf_next->getRevenue() + ($hf_next->getPax() * ($bf->getSetting() / 119 * 100))) / $hf_next->getBookedRooms() : 0;
 
         return array(
             'today' => array(
@@ -824,7 +826,7 @@ class RateHandler
                 'sell' => $hf_today->getTotalRooms() - $hf_today->getBookedRooms(),
                 'occ' => number_format($hf_today->getBookedRooms() * 100 / $hf_today->getTotalRooms(), 2),
                 'nights' => $rooms,
-                'rate' => number_format(($hf_today->getRevenue() + ($hf_today->getPax() * ($bf->getSetting() / 119 * 100))) / $hf_today->getBookedRooms(), 2),
+                'rate' => number_format($rate_today, 2),
             ),
             'tomorrow' => array(
                 'date' => $month_next_start,
@@ -853,7 +855,7 @@ class RateHandler
                 'sell' => $hf_next->getTotalRooms() - $hf_next->getBookedRooms(),
                 'occ' => number_format($hf_next->getBookedRooms() * 100 / $hf_next->getTotalRooms(), 2),
                 'nights' => $rooms_next,
-                'rate' => number_format(($hf_next->getRevenue() + ($hf_next->getPax() * ($bf->getSetting() / 119 * 100))) / $hf_next->getBookedRooms(), 2),
+                'rate' => number_format($rate_tomorrow, 2),
             ),
         );
 

@@ -18,6 +18,7 @@ You need a webserver (apache or nginx or whatever you prefer) and composer insta
 - `git clone https://github.com/primus852/HotelControlBoard`
 - `cd HotelControlBoard && composer install`
 - adjust DB Settings in `.env` or you enviroment variables for your webserver.
+- Create DB `php bin/console doctrine:schema:update --force`
 - Create SuperAdmin User `php bin/console fos:user:create testuser test@example.com p@ssword --super-admin`
 - Create additional Users `php bin/console fos:user:create normaluser normal@example.com p@ssword`
 - Users that should be able to edit the Budget should have `ROLE_MANAGER` as well: `php bin/console fos:user:promote normaluser ROLE_MANAGER`

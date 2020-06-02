@@ -38,6 +38,9 @@ Ratetypes
 
 # Changelog #
 
+## 0.7.3 ##
+- fixed Division by Zero in RateHandler
+
 ## 0.7.2 ##
 - fixed wrong checkout date on Rate Check
 - Fixed Select Text Alignment

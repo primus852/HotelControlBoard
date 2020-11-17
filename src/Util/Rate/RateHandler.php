@@ -646,12 +646,12 @@ class RateHandler
         /**
          * Calc Avg. Rate this month
          */
-        $avg_rate = number_format($acc / $rooms, 2);
+        $avg_rate = $rooms > 0 ? number_format($acc / $rooms, 2) : 0;
 
         /**
          * Calc Occupancy this Month
          */
-        $avg_occ = number_format(($rooms * 100 / $roomsTotal), 2);
+        $avg_occ = $roomsTotal > 0 ? number_format(($rooms * 100 / $roomsTotal), 2) : 0;
 
         /**
          * Get total Stats for next month
@@ -675,12 +675,12 @@ class RateHandler
         /**
          * Calc Avg. Rate this month
          */
-        $avg_rate_next = number_format($acc_next / $rooms_next, 2);
+        $avg_rate_next = $rooms_next > 0 ? number_format($acc_next / $rooms_next, 2) : 0;
 
         /**
          * Calc Occupancy next Month
          */
-        $avg_occ_next = number_format(($rooms_next * 100 / $roomsTotal_next), 2);
+        $avg_occ_next = $roomsTotal_next > 0 ? number_format(($rooms_next * 100 / $roomsTotal_next), 2) : 0;
 
         /**
          * Get total Other Rev for this month
